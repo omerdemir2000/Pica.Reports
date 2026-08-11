@@ -16,15 +16,22 @@
     3. html/body yüksekliği %100: tasarımcı kendisine verilen yüksekliği
        doldurur, sayfa akışına göre uzamaz. Yükseklik verilmezse kâğıt
        görünmez, çünkü kabın boyu sıfır olur.
+
+    4. lang etiketi geçerli kültürden gelir, sabit yazılmaz: sayfanın yarısı
+       İngilizceyken lang="tr" demek ekran okuyucuyu yanlış sesle okutur,
+       arama motoruna da yanlış dili bildirir. Kütüphane kendi metinlerini
+       CurrentUICulture'dan alıyor; kabuk da aynı yerden almalı.
 *@
+@using System.Globalization
+
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <title>Pica.Reports örneği</title>
+    <title>Pica.Reports @(Turkce ? "örneği" : "sample")</title>
 
     <link rel="stylesheet" href="_content/Pica.Reports/rapor-tasarim.css" />
     <link rel="stylesheet" href="ornek.css" />
@@ -37,8 +44,8 @@
        ekran öylece durur ve "tıklıyorum bir şey olmuyor" denir — hatanın
        kendisi tarayıcı konsolunda kalır. *@
     <div id="blazor-error-ui">
-        Bir hata oluştu. Sayfayı yenilemek gerekiyor.
-        <a href="" class="reload">Yenile</a>
+        @(Turkce ? "Bir hata oluştu. Sayfayı yenilemek gerekiyor." : "An error occurred. This page needs to be reloaded.")
+        <a href="" class="reload">@(Turkce ? "Yenile" : "Reload")</a>
         <span class="dismiss">🗙</span>
     </div>
 
@@ -46,3 +53,10 @@
 </body>
 
 </html>
+
+@code {
+    // Kabuğun kendi iki dizesi için kaynak dosyası açmaya değmez; barındıran
+    // uygulama kendi metnini nasıl isterse öyle çevirir — kütüphaneninkiler
+    // zaten Kaynak.resx'ten geliyor.
+    private static bool Turkce => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "tr";
+}
