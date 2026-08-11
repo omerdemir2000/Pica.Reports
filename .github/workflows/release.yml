@@ -1,0 +1,54 @@
+# Sürüm etiketi atıldığında paketi NuGet'e gönderir.
+#
+#   git tag v0.9.0 && git push origin v0.9.0
+#
+# Şart: depoda NUGET_API_KEY adlı bir gizli değer (Settings → Secrets and
+# variables → Actions). Anahtar nuget.org → API Keys'ten alınır ve YALNIZCA
+# Pica.Reports paketine izin verecek şekilde kısıtlanmalıdır — geniş yetkili
+# bir anahtar, sızarsa bütün paketleri etkiler.
+#
+# Sürüm numarası csproj'dan okunur; etiket yalnızca tetikleyicidir. İkisini
+# birbirine karıştırmamak için etiketi sürümle aynı yazın.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  yayimla:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Derle ve sına
+        run: |
+          dotnet restore Pica.Reports.slnx
+          dotnet build Pica.Reports.slnx --configuration Release --no-restore
+          dotnet test src/Pica.Reports.Testleri --configuration Release --no-build
+
+      - name: Paketle
+        run: dotnet pack src/Pica.Reports --configuration Release --no-build --output artifacts
+
+      - name: NuGet'e gönder
+        env:
+          ANAHTAR: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -z "$ANAHTAR" ]; then
+            echo "NUGET_API_KEY tanımlı değil; gönderilmedi." >&2
+            exit 1
+          fi
+          dotnet nuget push artifacts/*.nupkg \
+            --api-key "$ANAHTAR" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg

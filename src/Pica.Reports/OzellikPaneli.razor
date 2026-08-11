@@ -1,0 +1,403 @@
+@*
+    Seçili kutunun özellikleri.
+
+    Panel kutuyu DOĞRUDAN düzenler: bağlanan nesne çalışma kopyasının içindeki
+    kutudur, dolayısıyla her değişiklik tuvale anında yansır. Düzeltme dosyası
+    bu değişikliklerden kaydederken çıkarılır (DuzenDuzeltmesi.Cikar), panel
+    yama biriktirmez — biriktirseydi bir alanı özgün değerine geri döndürmek
+    onu dosyadan düşürmezdi.
+*@
+
+<div class="rt-ozellik">
+
+    <div class="rt-ozellik-tepe">
+        <span class="rt-ozellik-ad">@Secim.Nesne.Ad</span>
+        <span class="rt-ozellik-alt">
+            @Etiketler.Nesne(Secim.Nesne.Tur) · @Etiketler.Bant(Secim.Bant.Tur) · @Secim.Bant.Ad
+        </span>
+    </div>
+
+    <div class="rt-ozellik-govde">
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Ozellik_Yerlesim") <span class="rt-kume-not">@Metin.T("Ozellik_YerlesimNot")</span></legend>
+            <div class="rt-dortlu">
+                <label>@Metin.T("Ozellik_Sol")<input type="number" step="0.1" class="rt-girdi rt-sayi"
+                                 value="@Yuvarla(Secim.Nesne.SolPt)" @onchange="e => Say(e, v => Secim.Nesne.SolPt = v)" /></label>
+                <label>@Metin.T("Ozellik_Ust")<input type="number" step="0.1" class="rt-girdi rt-sayi"
+                                 value="@Yuvarla(Secim.Nesne.UstPt)" @onchange="e => Say(e, v => Secim.Nesne.UstPt = v)" /></label>
+                <label>@Metin.T("Ozellik_En")<input type="number" step="0.1" class="rt-girdi rt-sayi"
+                                value="@Yuvarla(Secim.Nesne.GenislikPt)" @onchange="e => Say(e, v => Secim.Nesne.GenislikPt = v)" /></label>
+                <label>@Metin.T("Ozellik_Boy")<input type="number" step="0.1" class="rt-girdi rt-sayi"
+                                 value="@Yuvarla(Secim.Nesne.YukseklikPt)" @onchange="e => Say(e, v => Secim.Nesne.YukseklikPt = v)" /></label>
+            </div>
+        </fieldset>
+
+        @if (Secim.Nesne.Tur is NesneTuru.Yazi)
+        {
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_Icerik")</legend>
+
+                <label class="rt-tam">@Metin.T("Ozellik_Metin")
+                    <textarea class="rt-girdi rt-metin" rows="4"
+                              value="@Secim.Nesne.Metin"
+                              @onchange="e => Yaz(e, v => Secim.Nesne.Metin = v)"></textarea>
+                </label>
+                <p class="rt-ipucu">@((MarkupString)Metin.T("Ozellik_MetinIpucu"))</p>
+
+                <label class="rt-tam">@Metin.T("Ozellik_VeriAlani")
+                    <input class="rt-girdi" list="rt-alanlar" value="@Secim.Nesne.VeriAlani"
+                           @onchange="e => Yaz(e, v => Secim.Nesne.VeriAlani = v)" />
+                </label>
+                @* Öneriler düzenin kendi kullandığı adlardan çıkarılıyor —
+                   gerçek alan listesi yok, çünkü düzen veriyi tanımaz. *@
+                <datalist id="rt-alanlar">
+                    @foreach (var alan in Alanlar)
+                    {
+                        <option value="@alan"></option>
+                    }
+                </datalist>
+                <p class="rt-ipucu">@Metin.T("Ozellik_VeriAlaniIpucu")</p>
+            </fieldset>
+
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_Yazi")</legend>
+
+                <div class="rt-ikili">
+                    <label>@Metin.T("Ozellik_YaziTipi")
+                        <input class="rt-girdi" value="@Secim.Nesne.YaziTipi"
+                               @onchange="e => Yaz(e, v => Secim.Nesne.YaziTipi = v ?? string.Empty)" />
+                    </label>
+                    <label>@Metin.T("Ozellik_Punto")
+                        <input type="number" step="0.25" min="1" class="rt-girdi rt-sayi"
+                               value="@Yuvarla(Secim.Nesne.PuntoPt)"
+                               @onchange="e => Say(e, v => Secim.Nesne.PuntoPt = v)" />
+                    </label>
+                </div>
+
+                <div class="rt-satir">
+                    <button type="button" class="rt-acik" aria-pressed="@Secim.Nesne.Kalin"
+                            title="@Metin.T("Ozellik_Kalin")" @onclick="() => Degistir(() => Secim.Nesne.Kalin = !Secim.Nesne.Kalin)"><b>@Metin.T("Ozellik_KalinKisa")</b></button>
+                    <button type="button" class="rt-acik" aria-pressed="@Secim.Nesne.Egik"
+                            title="@Metin.T("Ozellik_Egik")" @onclick="() => Degistir(() => Secim.Nesne.Egik = !Secim.Nesne.Egik)"><i>@Metin.T("Ozellik_EgikKisa")</i></button>
+                    <button type="button" class="rt-acik" aria-pressed="@Secim.Nesne.AltiCizili"
+                            title="@Metin.T("Ozellik_AltiCizili")" @onclick="() => Degistir(() => Secim.Nesne.AltiCizili = !Secim.Nesne.AltiCizili)"><u>@Metin.T("Ozellik_AltiCiziliKisa")</u></button>
+
+                    <span class="rt-ara"></span>
+
+                    <label class="rt-renk" title="@Metin.T("Ozellik_YaziRengi")">
+                        <input type="color" value="@(Secim.Nesne.Renk ?? "#000000")"
+                               @onchange="e => Yaz(e, v => Secim.Nesne.Renk = v)" />
+                        @Metin.T("Ozellik_Yazi")
+                    </label>
+                </div>
+
+                <div class="rt-ikili">
+                    <label>@Metin.T("Ozellik_YatayHiza")
+                        <select class="rt-girdi" value="@Secim.Nesne.Yatay"
+                                @onchange="e => Sec<YatayHiza>(e, v => Secim.Nesne.Yatay = v)">
+                            <option value="@YatayHiza.Sol">@Metin.T("Hiza_Sol")</option>
+                            <option value="@YatayHiza.Orta">@Metin.T("Hiza_Orta")</option>
+                            <option value="@YatayHiza.Sag">@Metin.T("Hiza_Sag")</option>
+                            <option value="@YatayHiza.Yasli">@Metin.T("Hiza_Yasli")</option>
+                        </select>
+                    </label>
+                    <label>@Metin.T("Ozellik_DikeyHiza")
+                        <select class="rt-girdi" value="@Secim.Nesne.Dikey"
+                                @onchange="e => Sec<DikeyHiza>(e, v => Secim.Nesne.Dikey = v)">
+                            <option value="@DikeyHiza.Ust">@Metin.T("Hiza_Ust")</option>
+                            <option value="@DikeyHiza.Orta">@Metin.T("Hiza_Orta")</option>
+                            <option value="@DikeyHiza.Alt">@Metin.T("Hiza_Alt")</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="rt-satir">
+                    <label class="rt-onay">
+                        <input type="checkbox" checked="@Secim.Nesne.KelimeKaydir"
+                               @onchange="e => Onay(e, v => Secim.Nesne.KelimeKaydir = v)" /> @Metin.T("Ozellik_KelimeKaydir")
+                    </label>
+                    <label class="rt-onay">
+                        <input type="checkbox" checked="@Secim.Nesne.Uzayabilir"
+                               @onchange="e => Onay(e, v => Secim.Nesne.Uzayabilir = v)" /> @Metin.T("Ozellik_Uzayabilir")
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_Bicim") <span class="rt-kume-not">@Metin.T("Ozellik_BicimNot")</span></legend>
+                <div class="rt-ikili">
+                    <label>@Metin.T("Ozellik_Tur")
+                        <select class="rt-girdi" value="@Secim.Nesne.Bicim"
+                                @onchange="e => Sec<BicimTuru>(e, v => Secim.Nesne.Bicim = v)">
+                            <option value="@BicimTuru.Yok">@Metin.T("Bicim_Yok")</option>
+                            <option value="@BicimTuru.Sayi">@Metin.T("Bicim_Sayi")</option>
+                            <option value="@BicimTuru.Tarih">@Metin.T("Bicim_Tarih")</option>
+                            <option value="@BicimTuru.Saat">@Metin.T("Bicim_Saat")</option>
+                            <option value="@BicimTuru.Metin">@Metin.T("Bicim_Metin")</option>
+                            <option value="@BicimTuru.Boolean">@Metin.T("Bicim_Boolean")</option>
+                        </select>
+                    </label>
+                    <label>@Metin.T("Ozellik_Desen")
+                        <input class="rt-girdi rt-mono" placeholder="%2.2n · dd.mm.yyyy"
+                               value="@Secim.Nesne.BicimDeseni"
+                               @onchange="e => Yaz(e, v => Secim.Nesne.BicimDeseni = v)" />
+                    </label>
+                </div>
+            </fieldset>
+        }
+
+        @if (Secim.Nesne.Tur is NesneTuru.Resim)
+        {
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_Resim") <span class="rt-kume-not">@Metin.T("Ozellik_ResimNot")</span></legend>
+
+                @if (Secim.Nesne.ResimVerisi is { Length: > 0 } veri)
+                {
+                    <div class="rt-resim-onizleme">
+                        <img src="@veri" alt="" />
+                    </div>
+                }
+
+                <div class="rt-satir">
+                    <label class="rt-acik rt-dosya">
+                        @Metin.T("Ozellik_DosyaSec")
+                        <InputFile OnChange="ResimSecildi" accept="image/*" />
+                    </label>
+                    <button type="button" class="rt-acik rt-tehlike"
+                            disabled="@(Secim.Nesne.ResimVerisi is null or "")"
+                            @onclick="() => Degistir(() => Secim.Nesne.ResimVerisi = null)">
+                        @Metin.T("Ozellik_Kaldir")
+                    </button>
+                </div>
+
+                <label class="rt-tam">@Metin.T("Ozellik_ResimUyum")
+                    <select class="rt-girdi" value="@Secim.Nesne.ResimUyumu"
+                            @onchange="e => Sec<ResimUyumu>(e, v => Secim.Nesne.ResimUyumu = v)">
+                        <option value="@ResimUyumu.Sigdir">@Metin.T("Ozellik_ResimSigdir")</option>
+                        <option value="@ResimUyumu.Uzat">@Metin.T("Ozellik_ResimUzat")</option>
+                    </select>
+                </label>
+
+                @if (resimHatasi is not null)
+                {
+                    <p class="rt-hata">@resimHatasi</p>
+                }
+
+                <p class="rt-ipucu">@Metin.T("Ozellik_ResimIpucu", EnBuyukResim / 1024)</p>
+            </fieldset>
+        }
+
+        @if (Secim.Nesne.Tur is NesneTuru.Barkod)
+        {
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_Barkod")</legend>
+
+                <label class="rt-tam">@Metin.T("Ozellik_BarkodDeger")
+                    <input class="rt-girdi" value="@Secim.Nesne.Metin"
+                           @onchange="e => Yaz(e, v => Secim.Nesne.Metin = v)" />
+                </label>
+                <p class="rt-ipucu">@((MarkupString)Metin.T("Ozellik_BarkodDegerIpucu"))</p>
+
+                <div class="rt-ikili">
+                    <label>@Metin.T("Ozellik_Simgelem")
+                        <select class="rt-girdi" value="@Secim.Nesne.BarkodTuru"
+                                @onchange="e => Sec<BarkodTuru>(e, v => Secim.Nesne.BarkodTuru = v)">
+                            <option value="@BarkodTuru.Code128">Code 128</option>
+                            <option value="@BarkodTuru.Ean13">EAN-13</option>
+                        </select>
+                    </label>
+                    <label class="rt-onay">
+                        <input type="checkbox" checked="@Secim.Nesne.BarkodYazisi"
+                               @onchange="e => Onay(e, v => Secim.Nesne.BarkodYazisi = v)" /> @Metin.T("Ozellik_BarkodYazisi")
+                    </label>
+                </div>
+
+                @if (Barkod.Kodla(Secim.Nesne.Metin, Secim.Nesne.BarkodTuru) is null)
+                {
+                    <p class="rt-hata">
+                        @Metin.T("Ozellik_BarkodHata", Etiketler.Barkod(Secim.Nesne.BarkodTuru))
+                        @(Secim.Nesne.BarkodTuru is BarkodTuru.Ean13
+                            ? Metin.T("Ozellik_BarkodEanHata")
+                            : Metin.T("Ozellik_BarkodCodeHata"))
+                    </p>
+                }
+
+                <p class="rt-ipucu">@Metin.T("Ozellik_BarkodEnIpucu")</p>
+            </fieldset>
+        }
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Ozellik_Cerceve")</legend>
+
+            <div class="rt-satir">
+                @foreach (var (kenar, ad) in Kenarlar)
+                {
+                    <button type="button" class="rt-acik" aria-pressed="@Secim.Nesne.Cerceve.HasFlag(kenar)"
+                            title="@Metin.T("Ozellik_KenarIpucu", ad)" @onclick="() => KenarDegistir(kenar)">@ad[..1]</button>
+                }
+                <button type="button" class="rt-acik" title="@Metin.T("Ozellik_DortKenar")"
+                        @onclick="() => Degistir(() => Secim.Nesne.Cerceve = CerceveKenari.Tumu)">@Metin.T("Tumu")</button>
+                <button type="button" class="rt-acik" title="@Metin.T("Ozellik_CerceveKaldir")"
+                        @onclick="() => Degistir(() => Secim.Nesne.Cerceve = CerceveKenari.Yok)">@Metin.T("Yok")</button>
+            </div>
+
+            <div class="rt-ikili">
+                <label>@Metin.T("Ozellik_Kalinlik")
+                    <input type="number" step="0.25" min="0" class="rt-girdi rt-sayi"
+                           value="@Yuvarla(Secim.Nesne.CerceveKalinligiPt)"
+                           @onchange="e => Say(e, v => Secim.Nesne.CerceveKalinligiPt = v)" />
+                </label>
+                <label class="rt-renk" title="@Metin.T("Ozellik_CerceveRengi")">
+                    <input type="color" value="@(Secim.Nesne.CerceveRengi ?? "#000000")"
+                           @onchange="e => Yaz(e, v => Secim.Nesne.CerceveRengi = v)" />
+                    @Metin.T("Ozellik_Cerceve")
+                </label>
+            </div>
+
+            <div class="rt-satir">
+                <label class="rt-renk" title="@Metin.T("Ozellik_ZeminRengi")">
+                    <input type="color" value="@(Secim.Nesne.ZeminRengi ?? "#ffffff")"
+                           @onchange="e => Yaz(e, v => Secim.Nesne.ZeminRengi = v)" />
+                    @Metin.T("Ozellik_Zemin")
+                </label>
+                @* Zemin saydam olabilir ve bunun renk seçicide karşılığı yok:
+                   beyaz zemin ile zeminsizlik kâğıtta aynı görünür, üst üste
+                   binen kutularda görünmez. *@
+                <button type="button" class="rt-acik" title="@Metin.T("Ozellik_SaydamIpucu")"
+                        @onclick="() => Degistir(() => Secim.Nesne.ZeminRengi = null)">@Metin.T("Ozellik_Saydam")</button>
+            </div>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Ozellik_Kutu")</legend>
+            <div class="rt-satir">
+                <button type="button" class="rt-acik" @onclick="() => Kopyala.InvokeAsync()">
+                    @Metin.T("Kopyala")
+                </button>
+                <button type="button" class="rt-acik rt-tehlike" @onclick="() => Sil.InvokeAsync()">
+                    @Metin.T("Sil")
+                </button>
+            </div>
+            <p class="rt-ipucu">@Metin.T("Ozellik_SilIpucu")</p>
+        </fieldset>
+    </div>
+</div>
+
+@code {
+    /// <summary>Düzenlenecek kutu.</summary>
+    [Parameter, EditorRequired] public required KutuSecimi Secim { get; set; }
+
+    /// <summary>
+    /// Değişikliği uygulayan taraf.
+    /// </summary>
+    /// <remarks>
+    /// Panel kutuya doğrudan yazmaz, yazma işini bu temsilciye verir. Sebebi
+    /// geri alma: değişiklikten <b>önceki</b> hâlin kopyasını almak gerekiyor
+    /// ve onu alacak yer, geri alma yığınını tutan taraftır. Panel kendi başına
+    /// yazsaydı panelden yapılan değişiklikler geri alınamazdı.
+    /// </remarks>
+    [Parameter, EditorRequired] public required Func<Action, Task> Uygula { get; set; }
+
+    /// <summary>"Veri alanı" kutusuna önerilecek adlar.</summary>
+    [Parameter] public IReadOnlyList<string> Alanlar { get; set; } = [];
+
+    /// <summary>Kutu silinsin.</summary>
+    [Parameter] public EventCallback Sil { get; set; }
+
+    /// <summary>Kutunun bir kopyası çıkarılsın.</summary>
+    [Parameter] public EventCallback Kopyala { get; set; }
+
+    // ---------------------------------------------------------------- resim
+
+    /// <summary>Gömülecek resmin üst sınırı.</summary>
+    /// <remarks>
+    /// Sınır düzeltme dosyası içindir: resim base64 olarak oraya yazılıyor ve
+    /// dosya kaynak ağacında duruyor. Birkaç yüz KB'lık bir logo, her açılışta
+    /// ayrıştırılan ve sürüm geçmişine giren bir yük demek.
+    /// </remarks>
+    private const long EnBuyukResim = 512 * 1024;
+
+    private string? resimHatasi;
+
+    /// <remarks>
+    /// Dosya belleğe alınıp veri URI'sine çevriliyor: kütüphane dosya sistemine
+    /// dokunmaz ve resmin nereye yazılacağını bilmez — düzenin içinde durması
+    /// bu yüzden hem daha basit hem daha taşınabilir.
+    /// </remarks>
+    private async Task ResimSecildi(InputFileChangeEventArgs e)
+    {
+        resimHatasi = null;
+
+        var dosya = e.File;
+        if (dosya is null) return;
+
+        if (dosya.Size > EnBuyukResim)
+        {
+            resimHatasi = Metin.T("Ozellik_ResimBuyuk", dosya.Size / 1024, EnBuyukResim / 1024);
+            return;
+        }
+
+        try
+        {
+            using var akis = dosya.OpenReadStream(EnBuyukResim);
+            using var bellek = new MemoryStream();
+            await akis.CopyToAsync(bellek);
+
+            // Tür tarayıcıdan geldiği gibi yazılıyor; boşsa PNG varsayılıyor:
+            // yanlış başlık, resmin hiç görünmemesi demek.
+            var tur = string.IsNullOrEmpty(dosya.ContentType) ? "image/png" : dosya.ContentType;
+            var veri = $"data:{tur};base64,{Convert.ToBase64String(bellek.ToArray())}";
+
+            await Degistir(() => Secim.Nesne.ResimVerisi = veri);
+        }
+        catch (Exception ex)
+        {
+            resimHatasi = Metin.T("Ozellik_ResimOkunamadi", ex.Message);
+        }
+    }
+
+    private static readonly (CerceveKenari Kenar, string Ad)[] Kenarlar =
+    [
+        (CerceveKenari.Sol, "Sol"),
+        (CerceveKenari.Ust, "Üst"),
+        (CerceveKenari.Sag, "Sağ"),
+        (CerceveKenari.Alt, "Alt"),
+    ];
+
+    /// <remarks>
+    /// Ondalık kuyruk kırpılır: dönüşüm punto değerlerini piksel × 0,75 ile
+    /// üretiyor ve kutuya <c>2,8346475</c> yazmak sayıyı okunmaz yapıyor.
+    /// Kırpma yalnızca GÖSTERİMDEDİR — kullanıcı dokunmadıkça alan
+    /// değişmez, çünkü değişiklik onchange ile gelir.
+    /// </remarks>
+    private static string Yuvarla(double deger)
+        => Math.Round(deger, 2).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    // Değişiklikler tek kapıdan geçer: her biri hem kutuyu günceller hem
+    // tasarımcıya haber verir. Ayrı ayrı yazılsaydı biri unutulur ve o alan
+    // düzeltmeye girmezdi.
+
+    private Task Degistir(Action islem) => Uygula(islem);
+
+    private Task Say(ChangeEventArgs e, Action<double> yaz)
+        => double.TryParse(e.Value?.ToString(),
+               System.Globalization.NumberStyles.Float,
+               System.Globalization.CultureInfo.InvariantCulture, out var v)
+            ? Degistir(() => yaz(v))
+            : Task.CompletedTask;
+
+    private Task Yaz(ChangeEventArgs e, Action<string?> yaz)
+        => Degistir(() => yaz(e.Value?.ToString()));
+
+    private Task Onay(ChangeEventArgs e, Action<bool> yaz)
+        => Degistir(() => yaz(e.Value is true));
+
+    private Task Sec<T>(ChangeEventArgs e, Action<T> yaz) where T : struct, Enum
+        => Enum.TryParse<T>(e.Value?.ToString(), out var v)
+            ? Degistir(() => yaz(v))
+            : Task.CompletedTask;
+
+    private Task KenarDegistir(CerceveKenari kenar)
+        => Degistir(() => Secim.Nesne.Cerceve ^= kenar);
+}

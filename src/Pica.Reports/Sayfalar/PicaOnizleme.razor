@@ -1,0 +1,114 @@
+@page "/pica/onizleme/{Anahtar}"
+
+@using Pica.Reports.Servisler
+
+@inject IDuzenDeposu Depo
+@inject IRaporAraci Rapor
+@inject NavigationManager Gezinme
+
+@*
+    Hazır önizleme ekranı: düzenin veriyle basılmış hâli.
+
+    Tasarımcıdan farkı, düzenlemeye hiç girmemesi — kullanıcıya çıktıyı
+    göstermek için. Düzen HAM hâliyle değil, düzeltmesi uygulanmış hâliyle
+    açılıyor: basılacak olan odur.
+*@
+
+<PageTitle>@(duzen?.Ad ?? Anahtar) · Önizleme</PageTitle>
+
+<div class="pica-ekran">
+    <div class="rt-kok rt-tasarimci" style="grid-template-columns: minmax(0, 1fr)">
+        <div class="rt-cubuk">
+            <span class="rt-cubuk-baslik">@(duzen?.Ad ?? Anahtar)</span>
+
+            @if (hata is not null)
+            {
+                <span class="rt-cubuk-kaynak" style="color: var(--rt-vurgu)">
+                    <Ikon Ad="uyari" /> @hata
+                </span>
+            }
+
+            <span class="rt-cubuk-ara"></span>
+
+            @if (duzen is { Sayfalar.Count: > 1 })
+            {
+                <label class="rt-etiket" for="pica-cetvel">@Metin.T("Tasarimci_Cetvel")</label>
+                <select id="pica-cetvel" class="rt-secim" value="@indeks"
+                        @onchange="e => indeks = int.TryParse(e.Value?.ToString(), out var i) ? i : 0">
+                    @for (var i = 0; i < duzen.Sayfalar.Count; i++)
+                    {
+                        <option value="@i">@Metin.T("Tasarimci_CetvelNo", i + 1)</option>
+                    }
+                </select>
+            }
+
+            <button type="button" class="rt-dugme" title="@Metin.T("Onizleme_TasarlaIpucu")"
+                    @onclick="() => Rapor.TasarimAc(Anahtar ?? string.Empty)">
+                <Ikon Ad="duzenle" /> @Metin.T("Onizleme_Tasarla")
+            </button>
+
+            @* Yazdırma düğmesi önizlemenin kendi çubuğunda da var; burada
+               olması, tasarımcıdan gelenin ikinci kez aramasını önlüyor. *@
+
+            <button type="button" class="rt-dugme" @onclick="() => Rapor.ListeAc()">
+                <Ikon Ad="kapat" /> @Metin.T("Kapat")
+            </button>
+        </div>
+
+        <div class="rt-bolme" style="grid-column: 1">
+            <div class="rt-tezgah">
+                <Onizleme Sayfa="Sayfa" Veri="Rapor.VeriAl(Anahtar ?? string.Empty)"
+                          HemenYazdir="hemenYazdir" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Anahtar { get; set; }
+
+    /// <summary>
+    /// <c>?yazdir=1</c> ile açıldıysa önizleme kendini yazdırma kutusuna verir.
+    /// </summary>
+    /// <remarks>
+    /// Listedeki "Yazdır" düğmesi buraya böyle geliyor: kullanıcı önce
+    /// önizlemeyi açıp ayrıca yazdır demek zorunda kalmıyor. Adres çubuğunda
+    /// durduğu için bağlantı paylaşılabilir ve yenilendiğinde aynı şeyi yapar.
+    /// </remarks>
+    [SupplyParameterFromQuery(Name = "yazdir")]
+    public string? YazdirIstegi { get; set; }
+
+    private bool hemenYazdir => YazdirIstegi is "1" or "true";
+
+    private CetvelDuzeni? duzen;
+    private string? hata;
+    private int indeks;
+    private string? yuklenen;
+
+    private DuzenSayfasi? Sayfa
+        => duzen is not null && indeks < duzen.Sayfalar.Count ? duzen.Sayfalar[indeks] : null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Anahtar == yuklenen) return;
+
+        yuklenen = Anahtar;
+        duzen = null;
+        hata = null;
+        indeks = 0;
+
+        if (string.IsNullOrEmpty(Anahtar)) return;
+
+        duzen = await Depo.HamGetirAsync(Anahtar);
+
+        if (duzen is null)
+        {
+            hata = Metin.T("Tasarimci_Bulunamadi", Anahtar);
+            return;
+        }
+
+        // Düzeltme uygulanır: kullanıcının göreceği çıktı, elle yapılmış
+        // düzeltmelerle birlikte basılan hâldir.
+        if (await Depo.DuzeltmeGetirAsync(Anahtar) is { } duzeltme) duzeltme.Uygula(duzen);
+    }
+}

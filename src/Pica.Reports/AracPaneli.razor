@@ -1,0 +1,214 @@
+@*
+    Araç paleti — tasarımcının sol kenarı.
+
+    Ekleme işleri araç çubuğundaydı: bir açılır liste ve iki düğme. Oradan
+    çıkarıldılar çünkü çubuk yatay ve dar; nesne türleri arttıkça (yazı, çizgi,
+    şekil, resim, barkod) sığmıyorlardı ve hangi türün eklendiği seçili listeye
+    bakmadan görünmüyordu. Palette her tür kendi düğmesi, kendi ikonuyla durur.
+
+    Panel kutuyu KENDİSİ eklemez, hangi türün istendiğini söyler: eklemenin
+    nereye yapılacağı (seçili bandın neresi, hangi adla) ve geri alınabilir
+    olması tasarımcının işi.
+*@
+
+<div class="rt-arac">
+
+    <p class="rt-arac-baslik">@Metin.T("Palet_Nesne")</p>
+
+    <div class="rt-arac-liste">
+        @foreach (var (tur, ikon, ipucu) in Nesneler)
+        {
+            @* Düğmeler HİÇ kapanmıyor: sürükleyerek eklemek için bant seçili
+               olması gerekmiyor ve kapalı (disabled) bir düğme sürüklenemez. *@
+            <button type="button" class="rt-arac-dugme" draggable="true"
+                    title="@(SeciliBant is null
+                                ? Metin.T("Palet_NesneIpucu", Metin.T(ipucu))
+                                : Metin.T("Palet_NesneIpucuBant", Metin.T(ipucu), SeciliBant.Ad))"
+                    @ondragstart="() => SurukleBasladi.InvokeAsync(tur)"
+                    @ondragend="() => SurukleBitti.InvokeAsync()"
+                    @onclick="() => Tikla(tur)">
+                <Ikon Ad="@ikon" /> @Etiketler.Nesne(tur)
+            </button>
+        }
+    </div>
+
+    @* Yardım metinleri kaynak dosyasından geliyor ve içinde <b> gibi imler
+       var; MarkupString onları im olarak basar. Metinler kütüphanenin kendi
+       dosyalarında, dışarıdan gelmiyor. *@
+    <p class="rt-ipucu">@((MarkupString)Metin.T("Palet_SurukleIpucu"))</p>
+
+    @if (uyari is not null)
+    {
+        <p class="rt-hata">@uyari</p>
+    }
+
+    @if (Kumeler.Count > 0)
+    {
+        <p class="rt-arac-baslik">@Metin.T("Palet_Veri")</p>
+
+        @foreach (var kume in Kumeler)
+        {
+            @* Küme tek ise açık gelir; birden çoksa hangisiyle çalışıldığı
+               kullanıcının kararı ve iki uzun listeyi alt alta açmak paneli
+               kullanılmaz yapardı. *@
+            <details class="rt-kume-agac" open="@(Kumeler.Count == 1)">
+                <summary title="@Metin.T("Palet_AlanSayisi", kume.Alanlar.Count)">
+                    @* Kümesiz alanların başlığı çeviriden geliyor; katalogdaki
+                       anahtar (AlanKatalogu.Kumesiz) dile göre değişmiyor,
+                       yoksa dil değişince gruplama bozulurdu. *@
+                    <Ikon Ad="veri" Boyut="13" />
+                    @(kume.Ad == AlanKatalogu.Kumesiz ? Metin.T("Kumesiz") : kume.Ad)
+                </summary>
+
+                @foreach (var alan in kume.Alanlar)
+                {
+                    var kaynak = kume.Ad == AlanKatalogu.Kumesiz ? null : kume.Ad;
+                    var bicim = AlanSezgisi.Bicim(alan);
+
+                    <button type="button" class="rt-alan-dugme" draggable="true"
+                            title="@(bicim is BicimTuru.Yok
+                                        ? Metin.T("Palet_AlanSurukleIpucu", alan)
+                                        : Metin.T("Palet_AlanBicimIpucu", alan, Etiketler.Bicim(bicim)))"
+                            @ondragstart="() => AlanSurukleBasladi.InvokeAsync(new AlanSurukleme(kaynak, alan))"
+                            @ondragend="() => SurukleBitti.InvokeAsync()"
+                            @onclick="() => AlanTikla(kaynak, alan)">
+                        @alan
+                    </button>
+                }
+            </details>
+        }
+
+        <p class="rt-ipucu">@Metin.T("Palet_AlanIpucu")</p>
+    }
+
+    <p class="rt-arac-baslik">@Metin.T("Palet_Bant")</p>
+
+    <div class="rt-arac-liste">
+        @foreach (var tur in Bantlar)
+        {
+            <button type="button" class="rt-arac-dugme" data-tur="@tur"
+                    title="@(SeciliBant is null
+                                ? Metin.T("Palet_BantIpucuSon")
+                                : Metin.T("Palet_BantIpucuAlt", SeciliBant.Ad))"
+                    @onclick="() => BantEkle.InvokeAsync(tur)">
+                <span class="rt-arac-nokta"></span> @Etiketler.Bant(tur)
+            </button>
+        }
+    </div>
+
+    <p class="rt-ipucu">@Metin.T("Palet_BantIpucu")</p>
+</div>
+
+@code {
+    /// <summary>
+    /// Kutunun ekleneceği bant — kanalda seçili olan ya da seçili kutunun bandı.
+    /// </summary>
+    [Parameter] public DuzenBandi? SeciliBant { get; set; }
+
+    /// <summary>Bu türde bir kutu eklensin — tıklamayla, seçili banda.</summary>
+    [Parameter] public EventCallback<NesneTuru> NesneEkle { get; set; }
+
+    /// <summary>Alan ağacında gösterilecek veri kümeleri.</summary>
+    [Parameter] public IReadOnlyList<VeriKumesiTanimi> Kumeler { get; set; } = [];
+
+    /// <summary>Alan ağacından bir alan eklensin — tıklamayla, seçili banda.</summary>
+    [Parameter] public EventCallback<AlanSurukleme> AlanEkle { get; set; }
+
+    /// <summary>Alan ağacından bir alan sürüklenmeye başladı.</summary>
+    [Parameter] public EventCallback<AlanSurukleme> AlanSurukleBasladi { get; set; }
+
+    /// <summary>Bu türde bir nesne sürüklenmeye başladı.</summary>
+    /// <remarks>
+    /// Sürüklenen şey <c>dataTransfer</c> ile taşınmıyor, bileşen durumunda
+    /// tutuluyor: kaynak da hedef de aynı uygulamada ve Blazor'ın olay
+    /// nesnesinden <c>dataTransfer</c>'e yazılamıyor.
+    /// </remarks>
+    [Parameter] public EventCallback<NesneTuru> SurukleBasladi { get; set; }
+
+    /// <summary>Sürükleme bitti (bırakıldı ya da vazgeçildi).</summary>
+    [Parameter] public EventCallback SurukleBitti { get; set; }
+
+    /// <summary>Bant seçili değilken tıklanınca gösterilen uyarı.</summary>
+    /// <remarks>
+    /// Sessizce hiçbir şey yapmamak en kötüsü: kullanıcı düğmenin bozuk
+    /// olduğunu düşünür ve tekrar tekrar tıklar.
+    /// </remarks>
+    private string? uyari;
+
+    /// <remarks>Bant seçilince uyarı kalkar: gösterdiği eksik giderilmiştir.</remarks>
+    protected override void OnParametersSet()
+    {
+        if (SeciliBant is not null) uyari = null;
+    }
+
+    private async Task Tikla(NesneTuru tur)
+    {
+        if (SeciliBant is null)
+        {
+            uyari = Metin.T("Palet_BantSecin");
+            return;
+        }
+
+        uyari = null;
+        await NesneEkle.InvokeAsync(tur);
+    }
+
+    private async Task AlanTikla(string? kume, string alan)
+    {
+        if (SeciliBant is null)
+        {
+            uyari = Metin.T("Palet_AlanBantSecin");
+            return;
+        }
+
+        uyari = null;
+        await AlanEkle.InvokeAsync(new AlanSurukleme(kume, alan));
+    }
+
+    /// <summary>Bu türde bir bant eklensin.</summary>
+    [Parameter] public EventCallback<BantTuru> BantEkle { get; set; }
+
+    /// <summary>Palette sunulan nesne türleri.</summary>
+    /// <remarks>
+    /// <c>Bilinmeyen</c> yok: o bir tür değil, dönüştürücünün tanımadığı
+    /// nesnenin işaretidir — elle eklenebilseydi kâğıda hiç basılmayan bir
+    /// kutu üretilirdi.
+    /// <para>
+    /// Üçüncü alan bir <b>kaynak anahtarı</b>, metnin kendisi değil: ipucu
+    /// kullanıcının diliyle gösteriliyor.
+    /// </para>
+    /// </remarks>
+    private static readonly (NesneTuru Tur, string Ikon, string Ipucu)[] Nesneler =
+    [
+        (NesneTuru.Yazi, "yazi", "Palet_IpucuYazi"),
+        (NesneTuru.Cizgi, "cizgi", "Palet_IpucuCizgi"),
+        (NesneTuru.Sekil, "sekil", "Palet_IpucuSekil"),
+        (NesneTuru.Resim, "resim", "Palet_IpucuResim"),
+        (NesneTuru.Barkod, "barkod", "Palet_IpucuBarkod"),
+    ];
+
+    /// <summary>
+    /// Palette sunulan bant türleri.
+    /// </summary>
+    /// <remarks>
+    /// Tamamı değil: <c>Bilinmeyen</c> bir tür değil, dönüştürücünün tanımadığı
+    /// bandın işaretidir; sütun bantları ise taşınan 137 düzenin hiçbirinde
+    /// kullanılmıyor. Listeye konsalardı seçilebilir ama karşılığı olmayan
+    /// bantlar üretilirdi.
+    /// </remarks>
+    private static readonly BantTuru[] Bantlar =
+    [
+        BantTuru.RaporBasligi,
+        BantTuru.SayfaBasligi,
+        BantTuru.Baslik,
+        BantTuru.GrupBasligi,
+        BantTuru.Veri,
+        BantTuru.AltVeri,
+        BantTuru.GrupSonu,
+        BantTuru.Alt,
+        BantTuru.RaporSonu,
+        BantTuru.SayfaSonu,
+        BantTuru.Yan,
+        BantTuru.Ust,
+    ];
+}

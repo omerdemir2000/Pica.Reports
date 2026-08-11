@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "//": "Ortam Development olmalı: kütüphanenin CSS ve JS dosyaları (_content/Pica.Reports/...) pakete gömülüdür ve geliştirme kipinde derleme çıktısındaki varlık listesinden servis edilir. Production'da yayımlanmamış bir çıktı o dosyaları bulamaz, tasarımcı biçemsiz açılır ve sürükleme çalışmaz. Yayımlanmış (dotnet publish) çıktıda böyle bir sorun yoktur.",
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5099",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7099;http://localhost:5099",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

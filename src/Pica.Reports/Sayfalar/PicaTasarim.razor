@@ -1,0 +1,31 @@
+@page "/pica/tasarim/{Anahtar}"
+
+@using Pica.Reports.Servisler
+
+@inject IDuzenDeposu Depo
+@inject IRaporAraci Rapor
+@inject NavigationManager Gezinme
+
+@*
+    Hazır tasarım ekranı.
+
+    Uygulamanın kendi sayfasını yazmasına gerek yok: AddPicaReports() ile
+    servisler kaydolur, yönlendiriciye bu derleme tanıtılır ve
+    Rapor.TasarimAc("fatura", veri) çağrısı buraya getirir.
+
+    Veri adres çubuğundan değil, rapor aracından geliyor — bir cetvelin
+    satırları adrese sığmaz.
+*@
+
+<PageTitle>@Anahtar · Tasarım</PageTitle>
+
+<div class="pica-ekran">
+    <RaporTasarimci Depo="Depo"
+                    SeciliAnahtar="@Anahtar"
+                    Veri="Rapor.VeriAl(Anahtar ?? string.Empty)"
+                    Kapat="() => Rapor.ListeAc()" />
+</div>
+
+@code {
+    [Parameter] public string? Anahtar { get; set; }
+}

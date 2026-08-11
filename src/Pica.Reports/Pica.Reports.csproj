@@ -1,0 +1,82 @@
+<!--
+  Pica.Reports — FastReport'tan çevrilmiş JSON rapor düzenleri için Blazor
+  tasarım aracı. Papirus Yazılım Ltd. Şti.
+
+  Kütüphane KENDİ BAŞINA durur: barındıran uygulamaya hiç bakmaz. PBM2027'nin
+  içinde geliştirildi ve 11 Ağustos 2026'da buraya ayrıldı; bağımlılık her
+  zaman tek yönlü oldu (uygulama → kütüphane). Kural budur ve tek kural budur.
+
+  Bu yüzden burada BULUNMAYACAK şeyler:
+    - Barındıran uygulamanın CSS çatısı (Tailwind gibi). Kütüphane kendi
+      CSS'ini getirir: wwwroot/rapor-tasarim.css.
+    - Dışarıdan ikon paketi. İkonlar satır içi SVG olarak burada.
+    - PDF motoru (QuestPDF vb.). Çizici uygulamada kalır; kütüphane
+      önizlemeyi uygulamadan bir adres olarak alır.
+-->
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Pica.Reports</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- CS1591 "XML yorumu eksik": düzen modeli açıklama gerektirmeyen onlarca
+         özellikten oluşuyor (SolPt, Kalin, Egik...). Hepsine tek satırlık
+         yorum yazmak dosyayı okunmaz yapar; açıklanması gereken alanların
+         zaten yorumu var. Uyarı kapalı, belge dosyası açık kalır. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- Paket kimliği.
+
+       PackageId DEĞİŞTİRİLMEMELİ: statik varlıklar _content/{PackageId}/
+       altından servis ediliyor ve Tuval, JS modülünü
+       "./_content/Pica.Reports/tasarimci.js" adresinden yüklüyor. Başka bir ad
+       verilirse sürükleme sessizce çalışmaz — hata da vermez, çünkü modül
+       yüklenemediğinde yalnızca olay dinleyicileri kurulmamış olur. -->
+  <PropertyGroup>
+    <PackageId>Pica.Reports</PackageId>
+    <!-- 0.9.0: yayına hazır ama 1.0 değil. 1.0 "API donmuştur" sözüdür ve API
+         henüz Türkçe/İngilizce kararını beklediği için o söz verilemez. -->
+    <Version>0.9.0</Version>
+    <Product>Pica.Reports</Product>
+    <Authors>Papirus Yazılım Ltd. Şti.</Authors>
+    <Company>Papirus Yazılım Ltd. Şti.</Company>
+    <Copyright>© 2026 Papirus Yazılım Ltd. Şti.</Copyright>
+    <Description>Blazor report designer / Blazor rapor tasarım aracı. Banded report layouts designed in the browser: drag-and-drop placement, data field tree, barcode and image objects, paginated preview with real data, printing at the layout's own paper size. No dependencies — brings its own CSS and icons, does not produce PDF. A product of Papirus Yazılım Ltd. Şti.</Description>
+    <PackageTags>blazor;report;report-designer;reporting;banded-report;fastreport;barcode;razor-class-library;dotnet;rapor;rapor-tasarim;tasarimci</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://www.papirusbilisim.com</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <!-- Depo adresi paketleme sırasında git'ten okunuyor; elle yazılmıyor ki
+         depo taşındığında yanlış adres kalmasın. -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <!-- Pica tipografide bir ölçü birimidir (1/6 inç). Ad, aynı adı taşıyan
+         başka ürünlerle bir ilişki iddia etmez; bkz. README. -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!-- Sınamalar iç ayrıntılara da bakabilsin: bant sırası önbelleği gibi
+       parçalar dışarıya açılmamalı ama sınanmalı — tazelenmediğinde ekranda
+       "düğme çalışmıyor" gibi görünen bir hataya yol açıyor. -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pica.Reports.Testleri" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+    <!-- FrameworkReference değil PackageReference: kütüphane ASP.NET Core
+         paylaşılan çatısını şart koşmasın, Blazor WebAssembly barındıran bir
+         uygulama da kullanabilsin. -->
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>

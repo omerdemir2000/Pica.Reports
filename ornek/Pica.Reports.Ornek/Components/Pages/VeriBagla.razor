@@ -1,0 +1,114 @@
+@page "/veri"
+
+@using Pica.Reports.Servisler
+@using Pica.Reports.Veri
+
+@inject IRaporAraci Rapor
+
+@*
+    "DesignRep" akışı: kendi ekranında sorguyu çalıştır, veriyi rapordaki
+    KÜME ADIYLA bağla, tasarım ya da önizleme ekranını aç.
+
+    Burada veri elle kuruldu; gerçek uygulamada Dapper'dan gelir:
+
+        var fisler = await baglanti.QueryAsync("select FisNo, Aciklama, Tutar from fis");
+        veri.Ekle("Fisler", fisler);
+
+    Dapper'ın satırları sözlüktür ve doğrudan girer; kendi sınıflarınızın
+    listesi de aynı şekilde verilir (özellikler alan olur).
+*@
+
+<PageTitle>Veri bağla · Pica.Reports örneği</PageTitle>
+
+<div class="ornek-yazi">
+    <h1>Veriyle rapor açma</h1>
+
+    <p>
+        Bu sayfa <code>iki-veri-kumesi</code> düzenini iki veri kümesiyle
+        besliyor: <b>Fisler</b> ve <b>Ozet</b>. Adlar düzendeki bant ve kutu
+        başvurularıyla birebir aynı olmak zorunda — eşleşme ada göre.
+    </p>
+
+    <div class="ornek-dugmeler">
+        <button class="ornek-dugme" @onclick="Onizle">Önizle</button>
+        <button class="ornek-dugme" @onclick="Tasarla">Tasarımcıda aç</button>
+    </div>
+
+    <p class="ornek-not">
+        İkisi de kütüphanenin hazır ekranlarına gidiyor
+        (<code>/pica/onizleme/…</code>, <code>/pica/tasarim/…</code>).
+        Tasarımcının alan ağacında iki küme de görünür; önizleme aşağıdaki
+        gerçek satırlarla basar.
+    </p>
+
+    <h2>Bağlanan veri</h2>
+
+    <table class="ornek-tablo">
+        <thead>
+            <tr><th>Fiş no</th><th>Açıklama</th><th>Tarih</th><th>Tutar</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var f in Fisler)
+            {
+                <tr>
+                    <td>@f["FisNo"]</td>
+                    <td>@f["Aciklama"]</td>
+                    <td>@(((DateTime)f["Tarih"]!).ToString("dd.MM.yyyy"))</td>
+                    <td class="ornek-sag">@(((decimal)f["Tutar"]!).ToString("#,##0.00"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private const string Anahtar = "iki-veri-kumesi";
+
+    /// <summary>
+    /// Dapper'ın döndüreceği satırların aynısı: her satır bir sözlük.
+    /// </summary>
+    /// <remarks>
+    /// Gerçek uygulamada <c>await baglanti.QueryAsync(...)</c> sonucu buraya
+    /// olduğu gibi verilir; kütüphane satırın türüne değil <b>şekline</b> bakar.
+    /// </remarks>
+    private static readonly Dictionary<string, object?>[] Fisler =
+    [
+        Satir(1001, "Kırtasiye alımı", new DateTime(2027, 1, 12), 4250.75m, "Doğrudan Temin"),
+        Satir(1002, "Bilgisayar bakımı", new DateTime(2027, 1, 18), 12800.00m, "Doğrudan Temin"),
+        Satir(1003, "Akaryakıt", new DateTime(2027, 2, 3), 31500.40m, "Açık İhale"),
+        Satir(1004, "Temizlik hizmeti", new DateTime(2027, 2, 14), 78900.00m, "Açık İhale"),
+        Satir(1005, "Yazılım lisansı", new DateTime(2027, 3, 1), 26400.00m, "Pazarlık"),
+    ];
+
+    private static Dictionary<string, object?> Satir(int no, string aciklama, DateTime tarih,
+                                                    decimal tutar, string ihale)
+        => new()
+        {
+            ["FisNo"] = no,
+            ["Aciklama"] = aciklama,
+            ["Tarih"] = tarih,
+            ["Tutar"] = tutar,
+            ["IhaleTuru"] = ihale,
+        };
+
+    /// <summary>Fişlerden türetilen özet — ikinci veri kümesi.</summary>
+    private static IEnumerable<object> Ozet()
+        => Fisler
+            .GroupBy(f => (string)f["IhaleTuru"]!)
+            .Select(g => new
+            {
+                IhaleTuru = g.Key,
+                Sayi = g.Count(),
+                Tutar = g.Sum(f => (decimal)f["Tutar"]!),
+            });
+
+    private RaporVerisi Veri() => new RaporVerisi()
+        .Ekle("Fisler", Fisler)      // Dapper biçimi: sözlük satırları
+        .Ekle("Ozet", Ozet())        // nesne biçimi: özellikler alan olur
+        .Degisken("KurumAdi", "Papirus Yazılım Ltd. Şti.")
+        .Degisken("Yil", 2027);
+
+    private Task Onizle() => Rapor.Onizle(Anahtar, Veri());
+
+    private Task Tasarla() => Rapor.TasarimAc(Anahtar, Veri());
+}

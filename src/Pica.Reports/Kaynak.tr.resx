@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pica.Reports — arayüz metinleri, TÜRKÇE.
+
+  Varsayılan (nötr) dil İngilizcedir; bu dosya onun çevirisidir ve uydu
+  derlemeye (tr/Pica.Reports.resources.dll) çıkar. Anahtarı burada olmayan bir
+  metin İngilizce görünür — eksik çeviri ekranı bozmaz.
+-->
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ============================================================ ortak -->
+  <data name="YeniKutuMetni"><value>Yeni kutu</value></data>
+  <data name="Kapat"><value>Kapat</value></data>
+  <data name="Vazgec"><value>Vazgeç</value></data>
+  <data name="Sil"><value>Sil</value></data>
+  <data name="Kopyala"><value>Kopyala</value></data>
+  <data name="Tumu"><value>Tümü</value></data>
+  <data name="Yok"><value>Yok</value></data>
+  <data name="Ozel"><value>(özel)</value></data>
+  <data name="Kumesiz"><value>(küme adsız)</value></data>
+
+  <!-- ====================================================== bant türleri -->
+  <data name="Bant_RaporBasligi"><value>Rapor başlığı</value></data>
+  <data name="Bant_SayfaBasligi"><value>Sayfa başlığı</value></data>
+  <data name="Bant_Baslik"><value>Başlık</value></data>
+  <data name="Bant_SutunBasligi"><value>Sütun başlığı</value></data>
+  <data name="Bant_GrupBasligi"><value>Grup başlığı</value></data>
+  <data name="Bant_Veri"><value>Veri</value></data>
+  <data name="Bant_AltVeri"><value>Ayrıntı</value></data>
+  <data name="Bant_AltAltVeri"><value>Alt ayrıntı</value></data>
+  <data name="Bant_GrupSonu"><value>Grup sonu</value></data>
+  <data name="Bant_SutunSonu"><value>Sütun sonu</value></data>
+  <data name="Bant_Alt"><value>Alt</value></data>
+  <data name="Bant_RaporSonu"><value>Rapor sonu</value></data>
+  <data name="Bant_SayfaSonu"><value>Sayfa altı</value></data>
+  <data name="Bant_Ust"><value>Örtü</value></data>
+  <data name="Bant_Yan"><value>Yan</value></data>
+  <data name="Bant_Bilinmeyen"><value>Bilinmeyen</value></data>
+
+  <!-- ============================================================ roller -->
+  <data name="Rol_SayfaBasi"><value>Her sayfanın üstünde yinelenir</value></data>
+  <data name="Rol_SayfaAlti"><value>Her sayfanın altında yinelenir</value></data>
+  <data name="Rol_Ortu"><value>Sayfaya mutlak konumda basılır, akışa girmez</value></data>
+  <data name="Rol_Icerik"><value>Akışın içinde basılır</value></data>
+
+  <!-- ===================================================== nesne türleri -->
+  <data name="Nesne_Yazi"><value>Yazı</value></data>
+  <data name="Nesne_Cizgi"><value>Çizgi</value></data>
+  <data name="Nesne_Sekil"><value>Şekil</value></data>
+  <data name="Nesne_Resim"><value>Resim</value></data>
+  <data name="Nesne_Barkod"><value>Barkod</value></data>
+  <data name="Nesne_Bilinmeyen"><value>Bilinmeyen</value></data>
+
+  <!-- ============================================================ biçim -->
+  <data name="Bicim_Yok"><value>Yok</value></data>
+  <data name="Bicim_Sayi"><value>Sayı</value></data>
+  <data name="Bicim_Tarih"><value>Tarih</value></data>
+  <data name="Bicim_Saat"><value>Saat</value></data>
+  <data name="Bicim_Metin"><value>Metin</value></data>
+  <data name="Bicim_Boolean"><value>Evet/Hayır</value></data>
+  <data name="Bicim_Bicimsiz"><value>biçimsiz</value></data>
+  <data name="Bicim_SayiKucuk"><value>sayı</value></data>
+  <data name="Bicim_TarihKucuk"><value>tarih</value></data>
+  <data name="Bicim_SaatKucuk"><value>saat</value></data>
+  <data name="Bicim_MetinKucuk"><value>metin</value></data>
+  <data name="Bicim_BooleanKucuk"><value>evet/hayır</value></data>
+
+  <!-- ============================================================= liste -->
+  <data name="Liste_Baslik"><value>Rapor düzenleri</value></data>
+  <data name="Liste_Ara"><value>Düzen ara</value></data>
+  <data name="Liste_Sayi"><value>{0} düzen</value></data>
+  <data name="Liste_SayiSuzulmus"><value>{0} / {1} düzen</value></data>
+  <data name="Liste_Okunuyor"><value>Düzenler okunuyor…</value></data>
+  <data name="Liste_Bos"><value>Henüz düzen yok. “Yeni düzen” ile bir tane açabilirsiniz.</value></data>
+  <data name="Liste_BulunamadiSuzgec"><value>“{0}” aramasına uyan düzen yok.</value></data>
+  <data name="Liste_SutunDuzen"><value>Düzen</value></data>
+  <data name="Liste_SutunAnahtar"><value>Anahtar</value></data>
+  <data name="Liste_SutunKaynak"><value>Kaynak</value></data>
+  <data name="Liste_Duzenle"><value>Düzenle</value></data>
+  <data name="Liste_Onizle"><value>Önizle</value></data>
+  <data name="Liste_Yazdir"><value>Yazdır</value></data>
+  <data name="Liste_OnizleIpucu"><value>Veriyle basılmış hâlini göster</value></data>
+  <data name="Liste_YazdirIpucu"><value>Önizlemeyi yazıcıya gönder</value></data>
+  <data name="Liste_Yama"><value>yama</value></data>
+  <data name="Liste_YamaIpucu"><value>Bu düzenin elle yazılmış bir düzeltmesi var</value></data>
+  <data name="Liste_YeniDuzen"><value>Yeni düzen</value></data>
+  <data name="Yeni_Baslik"><value>Yeni düzen</value></data>
+  <data name="Yeni_Ad"><value>Ad</value></data>
+  <data name="Yeni_Anahtar"><value>Anahtar</value></data>
+  <data name="Yeni_Olustur"><value>Oluştur ve aç</value></data>
+  <data name="Yeni_AnahtarIpucu"><value>Anahtar dosya adına ve adrese giriyor: yalnızca İngiliz harfleri, rakam ve tire. Ad yazdıkça kendiliğinden önerilir, elle değiştirilebilir.</value></data>
+  <data name="Yeni_AdBos"><value>Ada bir şey yazın.</value></data>
+  <data name="Yeni_AnahtarBos"><value>Anahtar boş olamaz.</value></data>
+  <data name="Yeni_AnahtarGecersiz"><value>Anahtarda yalnızca İngiliz harfleri, rakam ve tire olabilir.</value></data>
+  <data name="Yeni_AnahtarKullanimda"><value>“{0}” zaten kullanılıyor.</value></data>
+  <data name="Yeni_Olusturulamadi"><value>Oluşturulamadı: {0}</value></data>
+
+  <!-- ========================================================= tasarımcı -->
+  <data name="Tasarimci_Baslik"><value>Rapor düzeni tasarımcısı</value></data>
+  <data name="Tasarimci_Cetvel"><value>Cetvel</value></data>
+  <data name="Tasarimci_CetvelNo"><value>{0}. sayfa</value></data>
+  <data name="Tasarimci_Izgara"><value>Izgara</value></data>
+  <data name="Tasarimci_Yakinlik"><value>Yakınlık</value></data>
+  <data name="Tasarimci_OrnekVeri"><value>Örnek veri</value></data>
+  <data name="Tasarimci_OrnekVeriIpucu"><value>Kutuları örnek (test) değerlerle, biçimleri uygulanmış olarak göster</value></data>
+  <data name="Tasarimci_Onizle"><value>Önizle</value></data>
+  <data name="Tasarimci_OnizleIpucu"><value>Düzeni veriyle sayfalara dizip göster</value></data>
+  <data name="Tasarimci_Sayfa"><value>Sayfa</value></data>
+  <data name="Tasarimci_SayfaIpucu"><value>Kâğıt boyu, yön ve kenar boşlukları</value></data>
+  <data name="Tasarimci_PdfIpucu"><value>Barındıran uygulamanın ürettiği PDF</value></data>
+  <data name="Tasarimci_Tasinmayanlar"><value>Taşınmayanlar</value></data>
+  <data name="Tasarimci_TasinmayanlarIpucu"><value>Taşınmayan betikler, dönüşüm uyarıları ve alan listesi</value></data>
+  <data name="Tasarimci_GeriAl"><value>Geri al (Ctrl+Z)</value></data>
+  <data name="Tasarimci_Yinele"><value>Yinele (Ctrl+Y)</value></data>
+  <data name="Tasarimci_OrijinaleDon"><value>Orijinale dön</value></data>
+  <data name="Tasarimci_Kaydet"><value>Düzeltmeyi kaydet</value></data>
+  <data name="Tasarimci_KapatIpucu"><value>Tasarımcıyı kapat, düzen listesine dön</value></data>
+  <data name="Tasarimci_BosBaslik"><value>Düzen açık değil</value></data>
+  <data name="Tasarimci_BosAlt"><value>Listeden bir düzen açtığınızda kâğıt, bantlar ve kutular burada görünür.</value></data>
+  <data name="Tasarimci_Bulunamadi"><value>Düzen bulunamadı: {0}</value></data>
+  <data name="Tasarimci_Kaydedildi"><value>{0} değişiklik düzeltmeye yazıldı.</value></data>
+  <data name="Tasarimci_DuzeltmeKalkti"><value>Düzeltme kaldırıldı; düzen üretilmiş hâline döndü.</value></data>
+  <data name="Tasarimci_Kaydedilemedi"><value>Kaydedilemedi: {0}</value></data>
+  <data name="Izgara_Yok"><value>Yok</value></data>
+
+  <!-- ============================================================ palet -->
+  <data name="Palet_Nesne"><value>Nesne</value></data>
+  <data name="Palet_Bant"><value>Bant</value></data>
+  <data name="Palet_Veri"><value>Veri</value></data>
+  <data name="Palet_NesneIpucu"><value>{0}. Kâğıda sürükleyip bırakın</value></data>
+  <data name="Palet_NesneIpucuBant"><value>{0}. Kâğıda sürükleyip bırakın, ya da tıklayıp “{1}” bandına ekleyin</value></data>
+  <data name="Palet_BantIpucuAlt"><value>“{0}” bandının hemen altına eklenir</value></data>
+  <data name="Palet_BantIpucuSon"><value>En alta eklenir</value></data>
+  <data name="Palet_SurukleIpucu"><value>Nesneyi kâğıdın üstüne &lt;b&gt;sürükleyip bırakın&lt;/b&gt;: bıraktığınız bandın, bıraktığınız noktasına girer. Tıklamak da ekler, ama o zaman bir bandın (ya da o bantta duran bir kutunun) seçili olması gerekir.</value></data>
+  <data name="Palet_BantIpucu"><value>Yeni bant seçili bandın hemen altına, seçim yoksa en alta girer. Bandın dikey konumu basım sırasını belirler.</value></data>
+  <data name="Palet_AlanIpucu"><value>Alanlar düzenin kendisinden çıkarılır: bantların bağlı olduğu kümeler ve kutulardaki başvurular. Düzende hiç geçmeyen bir alan burada görünmez.</value></data>
+  <data name="Palet_AlanSurukleIpucu"><value>{0} — kâğıda sürükleyin ya da tıklayın</value></data>
+  <data name="Palet_AlanBicimIpucu"><value>{0} — kâğıda sürükleyin ya da tıklayın ({1} biçimiyle eklenir)</value></data>
+  <data name="Palet_AlanSayisi"><value>{0} alan</value></data>
+  <data name="Palet_IpucuYazi"><value>Metin kutusu; veri alanına da bağlanabilir</value></data>
+  <data name="Palet_IpucuCizgi"><value>Yatay çizgi</value></data>
+  <data name="Palet_IpucuSekil"><value>Çerçeveli/zeminli kutu</value></data>
+  <data name="Palet_IpucuResim"><value>Düzene gömülü resim</value></data>
+  <data name="Palet_IpucuBarkod"><value>Code 128 ya da EAN-13 barkod</value></data>
+  <data name="Palet_BantSecin"><value>Ekleneceği bant belli değil. Nesneyi kâğıda sürükleyin ya da önce bir bant seçin.</value></data>
+  <data name="Palet_AlanBantSecin"><value>Ekleneceği bant belli değil. Alanı kâğıda sürükleyin ya da önce bir bant seçin.</value></data>
+
+  <!-- ============================================================= tuval -->
+  <data name="Tuval_Basmaz"><value>basılmaz</value></data>
+  <data name="Tuval_BasmazIpucu"><value>Yüksekliği ve içeriği yok — kâğıda hiç basılmaz</value></data>
+  <data name="Tuval_Gizli"><value>{0} gizli</value></data>
+  <data name="Tuval_GizliIpucu"><value>{0} kutunun eni ya da boyu sıfır; basılmazlar</value></data>
+  <data name="Tuval_BantTutamak"><value>Yüksekliği çek — en az {0}</value></data>
+  <data name="Tuval_ResimYok"><value>Resim yok</value></data>
+  <data name="Tuval_Kodlanamadi"><value>{0} kodlanamadı</value></data>
+
+  <!-- ==================================================== özellik paneli -->
+  <data name="Ozellik_Yerlesim"><value>Yerleşim</value></data>
+  <data name="Ozellik_YerlesimNot"><value>bandın sol üstüne göre, punto</value></data>
+  <data name="Ozellik_Sol"><value>Sol</value></data>
+  <data name="Ozellik_Ust"><value>Üst</value></data>
+  <data name="Ozellik_Sag"><value>Sağ</value></data>
+  <data name="Ozellik_Alt"><value>Alt</value></data>
+  <data name="Ozellik_En"><value>En</value></data>
+  <data name="Ozellik_Boy"><value>Boy</value></data>
+  <data name="Ozellik_Icerik"><value>İçerik</value></data>
+  <data name="Ozellik_Metin"><value>Metin</value></data>
+  <data name="Ozellik_MetinIpucu"><value>Köşeli parantez içindekiler basımda veriden gelen değerle değişir: &lt;code&gt;[yevdefds."yevno"]&lt;/code&gt;, &lt;code&gt;[Page#]&lt;/code&gt;.</value></data>
+  <data name="Ozellik_VeriAlani"><value>Veri alanı</value></data>
+  <data name="Ozellik_VeriAlaniIpucu"><value>Metin boşken kutuya basılacak alan. Metin doluysa metin kazanır.</value></data>
+  <data name="Ozellik_Yazi"><value>Yazı</value></data>
+  <data name="Ozellik_YaziTipi"><value>Yazı tipi</value></data>
+  <data name="Ozellik_Punto"><value>Punto</value></data>
+  <data name="Ozellik_Kalin"><value>Kalın</value></data>
+  <data name="Ozellik_Egik"><value>Eğik</value></data>
+  <data name="Ozellik_AltiCizili"><value>Altı çizili</value></data>
+  <data name="Ozellik_KalinKisa"><value>K</value></data>
+  <data name="Ozellik_EgikKisa"><value>E</value></data>
+  <data name="Ozellik_AltiCiziliKisa"><value>A</value></data>
+  <data name="Ozellik_YaziRengi"><value>Yazı rengi</value></data>
+  <data name="Ozellik_YatayHiza"><value>Yatay hiza</value></data>
+  <data name="Ozellik_DikeyHiza"><value>Dikey hiza</value></data>
+  <data name="Hiza_Sol"><value>Sol</value></data>
+  <data name="Hiza_Orta"><value>Orta</value></data>
+  <data name="Hiza_Sag"><value>Sağ</value></data>
+  <data name="Hiza_Yasli"><value>İki yana yaslı</value></data>
+  <data name="Hiza_Ust"><value>Üst</value></data>
+  <data name="Hiza_Alt"><value>Alt</value></data>
+  <data name="Ozellik_KelimeKaydir"><value>Kelime kaydır</value></data>
+  <data name="Ozellik_Uzayabilir"><value>Uzayabilir</value></data>
+  <data name="Ozellik_Bicim"><value>Biçim</value></data>
+  <data name="Ozellik_BicimNot"><value>sayı ve tarih</value></data>
+  <data name="Ozellik_Tur"><value>Tür</value></data>
+  <data name="Ozellik_Desen"><value>Desen</value></data>
+  <data name="Ozellik_Resim"><value>Resim</value></data>
+  <data name="Ozellik_ResimNot"><value>düzene gömülür</value></data>
+  <data name="Ozellik_DosyaSec"><value>Dosya seç</value></data>
+  <data name="Ozellik_Kaldir"><value>Kaldır</value></data>
+  <data name="Ozellik_ResimUyum"><value>Kutuya uyum</value></data>
+  <data name="Ozellik_ResimSigdir"><value>Oranı koru (sığdır)</value></data>
+  <data name="Ozellik_ResimUzat"><value>Kutuyu doldur (uzat)</value></data>
+  <data name="Ozellik_ResimIpucu"><value>Resim dosya yolu olarak değil, düzenin içinde saklanır — düzeltme dosyası tek başına taşınabilsin diye. En çok {0} KB.</value></data>
+  <data name="Ozellik_ResimBuyuk"><value>Dosya çok büyük ({0} KB). En çok {1} KB.</value></data>
+  <data name="Ozellik_ResimOkunamadi"><value>Resim okunamadı: {0}</value></data>
+  <data name="Ozellik_Barkod"><value>Barkod</value></data>
+  <data name="Ozellik_BarkodDeger"><value>Değer</value></data>
+  <data name="Ozellik_BarkodDegerIpucu"><value>Köşeli parantezli başvuru burada da çalışır: &lt;code&gt;[stokds."barkod"]&lt;/code&gt; basımda satırın değerini kodlar.</value></data>
+  <data name="Ozellik_Simgelem"><value>Simgelem</value></data>
+  <data name="Ozellik_BarkodYazisi"><value>Yazıyı bas</value></data>
+  <data name="Ozellik_BarkodHata"><value>Bu değer {0} ile kodlanamıyor; kutu kâğıda boş basar.</value></data>
+  <data name="Ozellik_BarkodEanHata"><value>EAN-13 tam 12 ya da 13 rakam ister (13 haneli verirseniz sağlama hanesi de tutmalı).</value></data>
+  <data name="Ozellik_BarkodCodeHata"><value>Code 128 yalnızca ASCII taşır: Türkçe harfler girmez.</value></data>
+  <data name="Ozellik_BarkodEnIpucu"><value>Barkodun eni kutunun enidir. Çok dar bir kutuda çubuklar birbirine girer ve okuyucu barkodu okuyamaz.</value></data>
+  <data name="Ozellik_Cerceve"><value>Çerçeve ve zemin</value></data>
+  <data name="Ozellik_KenarIpucu"><value>{0} kenar</value></data>
+  <data name="Ozellik_DortKenar"><value>Dört kenar</value></data>
+  <data name="Ozellik_CerceveKaldir"><value>Çerçeveyi kaldır</value></data>
+  <data name="Ozellik_Kalinlik"><value>Kalınlık</value></data>
+  <data name="Ozellik_CerceveRengi"><value>Çerçeve rengi</value></data>
+  <data name="Ozellik_Zemin"><value>Zemin</value></data>
+  <data name="Ozellik_ZeminRengi"><value>Zemin rengi</value></data>
+  <data name="Ozellik_Saydam"><value>Saydam</value></data>
+  <data name="Ozellik_SaydamIpucu"><value>Zemini saydam yap</value></data>
+  <data name="Ozellik_Kutu"><value>Kutu</value></data>
+  <data name="Ozellik_SilIpucu"><value>Silinen kutu düzeltmeye yazılır; üretilmiş dosya değişmez ve Ctrl+Z ile geri alınabilir.</value></data>
+
+  <!-- ======================================================= bant paneli -->
+  <data name="BantP_Yukseklik"><value>Yükseklik</value></data>
+  <data name="BantP_YukseklikNot"><value>punto</value></data>
+  <data name="BantP_Bildirilen"><value>Bildirilen</value></data>
+  <data name="BantP_Basilan"><value>Basılan</value></data>
+  <data name="BantP_YukseklikIpucu"><value>Basılan yükseklik, bildirilen değer ile en alttaki kutunun altı — hangisi büyükse. Bandın alt kenarını kâğıtta fareyle de çekebilirsiniz.</value></data>
+  <data name="BantP_Uzayabilir"><value>Uzayabilir</value></data>
+  <data name="BantP_YeniSayfa"><value>Sonrasında yeni sayfa</value></data>
+  <data name="BantP_TasmaIpucu"><value>İçindeki kutular bildirilen yüksekliğin altına taşıyor, o yüzden bant kutuların eriştiği yere kadar basılıyor. Bildirilen değeri büyütmek bandı uzatır, küçültmek bir şeyi değiştirmez.</value></data>
+  <data name="BantP_Baglantilar"><value>Bağlantılar</value></data>
+  <data name="BantP_VeriKumesi"><value>Veri kümesi</value></data>
+  <data name="BantP_VeriKumesiIpucu"><value>Bant, bu kümenin her satırı için bir kez basılır. Ad, uygulamanın kaydettiği adla aynı olmalı.</value></data>
+  <data name="BantP_GrupKosulu"><value>Grup koşulu</value></data>
+  <data name="BantP_GrupKosuluIpucu"><value>Bu değer değiştiğinde grup kırılır.</value></data>
+  <data name="BantP_YanBant"><value>Yan bant</value></data>
+  <data name="BantP_YanBantIpucu"><value>Yan bant sahibine yapışık basılır: kâğıtta kendi başına bir yeri yoktur.</value></data>
+  <data name="BantP_KutuEkle"><value>Kutu ekle</value></data>
+  <data name="BantP_SilIpucu"><value>Yeni kutu bandın sol üstüne, boş bir yazı kutusu olarak konur. Bandı silmek içindeki {0} kutuyu da götürür; üretilmiş dosya değişmez ve Ctrl+Z ile geri alınabilir.</value></data>
+
+  <!-- ====================================================== sayfa paneli -->
+  <data name="SayfaP_Baslik"><value>Sayfa düzeni</value></data>
+  <data name="SayfaP_Kagit"><value>Kâğıt</value></data>
+  <data name="SayfaP_Boy"><value>Boy</value></data>
+  <data name="SayfaP_Dikey"><value>Dikey</value></data>
+  <data name="SayfaP_Yatay"><value>Yatay</value></data>
+  <data name="SayfaP_YonIpucu"><value>Yön kâğıdın enini ve boyunu yer değiştirir. &lt;b&gt;Kutular yerinde kalır&lt;/b&gt;: taşanları kendiliğinden taşımak, koyduğunuz hizayı bozardı — taşma tuvalde görünür.</value></data>
+  <data name="SayfaP_EnMm"><value>En (mm)</value></data>
+  <data name="SayfaP_BoyMm"><value>Boy (mm)</value></data>
+  <data name="SayfaP_KenarBosluk"><value>Kenar boşluğu</value></data>
+  <data name="SayfaP_KenarIpucu"><value>Kutular &lt;b&gt;yazı alanına&lt;/b&gt; göre konumlanır: sol boşluğu değiştirmek bütün kutuları birlikte kaydırır.</value></data>
+  <data name="SayfaP_Sutun"><value>Sütun</value></data>
+  <data name="SayfaP_SutunSayi"><value>Sayı</value></data>
+  <data name="SayfaP_SutunAralik"><value>Aralık (mm)</value></data>
+  <data name="SayfaP_SutunIpucu"><value>0 ve 1 aynı anlama gelir: tek sütun. Çok sütunlu basım &lt;b&gt;çizicinin&lt;/b&gt; işidir; tasarımcı sayıyı taşır, kâğıdı bölmez.</value></data>
+  <data name="SayfaP_KaydetIpucu"><value>Sayfa ayarları da düzeltme dosyasına yazılır; “Orijinale dön” ile geri alınır.</value></data>
+
+  <!-- =================================================== hizalama paneli -->
+  <data name="Hizalama_Sol"><value>Sola hizala</value></data>
+  <data name="Hizalama_YatayOrta"><value>Yatayda ortala</value></data>
+  <data name="Hizalama_Sag"><value>Sağa hizala</value></data>
+  <data name="Hizalama_Ust"><value>Üste hizala</value></data>
+  <data name="Hizalama_DikeyOrta"><value>Dikeyde ortala</value></data>
+  <data name="Hizalama_Alt"><value>Alta hizala</value></data>
+  <data name="Hizalama_AyniEn"><value>Enleri eşitle</value></data>
+  <data name="Hizalama_AyniBoy"><value>Boyları eşitle</value></data>
+  <data name="Hizalama_YatayDagit"><value>Yatayda eşit aralıkla</value></data>
+  <data name="Hizalama_DikeyDagit"><value>Dikeyde eşit aralıkla</value></data>
+  <data name="Hizalama_Hizala"><value>Hizala</value></data>
+  <data name="Hizalama_HizalaNot"><value>seçimin sınırlarına göre</value></data>
+  <data name="Hizalama_Esitle"><value>Eşitle</value></data>
+  <data name="Hizalama_EsitleIpucu"><value>En büyük kutunun ölçüsü alınır — küçültmek, en geniş hücrenin içeriğini kırpardı.</value></data>
+  <data name="Hizalama_Dagit"><value>Eşit aralıkla</value></data>
+  <data name="Hizalama_DagitIpucu"><value>İki uçtaki kutular yerinde kalır, aradakiler eşit boşluklarla yeniden dizilir. En az üç kutu gerekir.</value></data>
+  <data name="Hizalama_SecimAlt"><value>Ctrl ile tıklayarak ekleyin ya da çıkarın</value></data>
+  <data name="Hizalama_Baslik"><value>Hizalama</value></data>
+  <data name="Hizalama_Secim"><value>{0} kutu seçili</value></data>
+  <data name="Hizalama_Birak"><value>Seçimi bırak</value></data>
+
+  <!-- ====================================================== betik paneli -->
+  <data name="Betik_Ozet"><value>{0} betik · {1} uyarı · {2} alan</value></data>
+  <data name="Betik_Betikler2"><value>Betikler</value></data>
+  <data name="Betik_BetikYok"><value>Şablonda betik yok. Bu düzendeki her kutu içeriğini doğrudan veriden ya da sabit metninden alıyor.</value></data>
+  <data name="Betik_Uyarilar2"><value>Dönüşüm uyarıları</value></data>
+  <data name="Betik_Alanlar2"><value>Alanlar</value></data>
+  <data name="Betik_AlanlarNot"><value>düzende geçenler</value></data>
+  <data name="Betik_AlanYok"><value>Bu düzende veri alanı başvurusu yok.</value></data>
+  <data name="Betik_Baslik"><value>Taşınmayanlar</value></data>
+  <data name="Betik_Alt"><value>betikler, uyarılar ve alanlar</value></data>
+  <data name="Betik_Betikler"><value>Betikler ({0})</value></data>
+  <data name="Betik_BetikIpucu"><value>Aşağıdaki Pascal kodu &lt;b&gt;taşınmadı ve çalıştırılmıyor&lt;/b&gt;. Her biri, elle karşılığı yazılması gereken bir davranıştır; yazılmadıysa ilgili kutu kâğıtta boş çıkar.</value></data>
+  <data name="Betik_Uyarilar"><value>Uyarılar ({0})</value></data>
+  <data name="Betik_Alanlar"><value>Alanlar ({0})</value></data>
+  <data name="Betik_AlanIpucu"><value>Bu düzenin kullandığı alan adları.</value></data>
+  <data name="Betik_Bos"><value>Bu düzende geride kalan bir şey yok.</value></data>
+
+  <!-- ========================================================= önizleme -->
+  <data name="Onizleme_SayfaSayisi"><value>{0} sayfa</value></data>
+  <data name="Onizleme_Yazdir"><value>Yazdır</value></data>
+  <data name="Onizleme_YazdirIpucu"><value>Tarayıcının yazdırma kutusunu aç</value></data>
+  <data name="Onizleme_OrnekVeri"><value>örnek veri</value></data>
+  <data name="Onizleme_OrnekVeriIpucu"><value>Veri verilmedi; kutular örnek değerlerle dolduruldu</value></data>
+  <data name="Onizleme_Bos"><value>Gösterilecek sayfa yok.</value></data>
+  <data name="Onizleme_Tasarla"><value>Tasarla</value></data>
+  <data name="Onizleme_TasarlaIpucu"><value>Bu düzeni tasarımcıda aç</value></data>
+</root>

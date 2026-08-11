@@ -1,0 +1,303 @@
+@*
+    Düzen listesi — kütüphanenin ikinci giriş bileşeni.
+
+    Liste bir zamanlar tasarımcının solundaki kenar çubuğuydu. Kendi ekranına
+    çıkmasının iki sebebi var: tasarımcı o 260 pikseli kâğıda kazandı, liste de
+    dar sütunda kesilen adı, anahtarı ve kaynak dosyayı yan yana gösterebiliyor.
+
+    Bileşen düzeni AÇMAZ: hangi adresin tasarımcıya gittiğini bilmez, yalnızca
+    "şu düzen düzenlenecek" diye haber verir (Duzenle). Yeni düzeni ise kendisi
+    oluşturur — kutuyu gösteren, adı anahtara çeviren ve depoya yazan taraf
+    burasıdır — ve ardından yine Duzenle'yi çağırır.
+*@
+
+@* Süzülmüş liste bir kez hesaplanır: hem sayaç hem tablo aynı listeyi
+   kullanıyor, özellik olarak iki kez okunsa 137 kayıt iki kez süzülürdü. *@
+@{
+    var gorunen = Gorunenler;
+}
+
+<div class="rt-kok rt-sayfa">
+
+    <div class="rt-cubuk">
+        <span class="rt-cubuk-baslik">@Metin.T("Liste_Baslik")</span>
+
+        <div class="rt-suzgec">
+            <Ikon Ad="ara" Boyut="13" />
+            <input class="rt-girdi" type="search" placeholder="@Metin.T("Liste_Ara")" autocomplete="off"
+                   aria-label="@Metin.T("Liste_Ara")" value="@suzgec" @oninput="SuzgecDegisti" />
+        </div>
+
+        @if (kayitlar is not null)
+        {
+            <span class="rt-liste-sayi">
+                @(gorunen.Count == kayitlar.Count
+                    ? Metin.T("Liste_Sayi", kayitlar.Count)
+                    : Metin.T("Liste_SayiSuzulmus", gorunen.Count, kayitlar.Count))
+            </span>
+        }
+
+        <span class="rt-cubuk-ara"></span>
+
+        <button type="button" class="rt-dugme rt-dugme-birincil" @onclick="YeniAc">
+            <Ikon Ad="arti" /> @Metin.T("Liste_YeniDuzen")
+        </button>
+    </div>
+
+    <div class="rt-tablo-sarma">
+        @if (kayitlar is null)
+        {
+            <p class="rt-liste-bos">@Metin.T("Liste_Okunuyor")</p>
+        }
+        else if (gorunen.Count == 0)
+        {
+            <p class="rt-liste-bos">
+                @(kayitlar.Count == 0
+                    ? Metin.T("Liste_Bos")
+                    : Metin.T("Liste_BulunamadiSuzgec", suzgec.Trim()))
+            </p>
+        }
+        else
+        {
+            <table class="rt-tablo">
+                <thead>
+                    <tr>
+                        <th scope="col">@Metin.T("Liste_SutunDuzen")</th>
+                        <th scope="col">@Metin.T("Liste_SutunAnahtar")</th>
+                        <th scope="col">@Metin.T("Liste_SutunKaynak")</th>
+                        <th scope="col" class="rt-tablo-islem"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var kayit in gorunen)
+                    {
+                        <tr @key="kayit.Anahtar">
+                            <td class="rt-tablo-ad">
+                                @kayit.Ad
+                                @if (kayit.Duzeltmeli)
+                                {
+                                    <span class="rt-yama" title="@Metin.T("Liste_YamaIpucu")">@Metin.T("Liste_Yama")</span>
+                                }
+                            </td>
+                            <td class="rt-tablo-mono">@kayit.Anahtar</td>
+                            <td class="rt-tablo-mono">@kayit.Kaynak</td>
+                            <td class="rt-tablo-islem">
+                                @* Önizle ve Yazdır yalnızca uygulama bağladıysa
+                                   çıkıyor: kütüphane gezinmeyi bilmiyor ve
+                                   bağlanmamış bir düğme, basılınca hiçbir şey
+                                   olmayan bir düğmedir. *@
+                                @if (Onizle.HasDelegate)
+                                {
+                                    <button type="button" class="rt-dugme" title="@Metin.T("Liste_OnizleIpucu")"
+                                            @onclick="() => Onizle.InvokeAsync(kayit.Anahtar)">
+                                        <Ikon Ad="onizleme" /> @Metin.T("Liste_Onizle")
+                                    </button>
+                                }
+                                @if (Yazdir.HasDelegate)
+                                {
+                                    <button type="button" class="rt-dugme" title="@Metin.T("Liste_YazdirIpucu")"
+                                            @onclick="() => Yazdir.InvokeAsync(kayit.Anahtar)">
+                                        <Ikon Ad="yazdir" /> @Metin.T("Liste_Yazdir")
+                                    </button>
+                                }
+                                <button type="button" class="rt-dugme"
+                                        @onclick="() => Duzenle.InvokeAsync(kayit.Anahtar)">
+                                    <Ikon Ad="duzenle" /> @Metin.T("Liste_Duzenle")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    @if (yeniAcik)
+    {
+        @* Perdeye tıklamak kutuyu kapatır; kutunun kendisine tıklamak kapatmasın
+           diye olay orada durduruluyor. *@
+        <div class="rt-perde" @onclick="Vazgec">
+            <div class="rt-iletisim" role="dialog" aria-modal="true" aria-labelledby="rt-yeni-baslik"
+                 @onclick:stopPropagation="true" @onkeydown="KutuTusu">
+                <h2 id="rt-yeni-baslik">@Metin.T("Yeni_Baslik")</h2>
+
+                <label for="rt-yeni-ad">@Metin.T("Yeni_Ad")</label>
+                <input id="rt-yeni-ad" class="rt-girdi" autocomplete="off" @ref="adKutusu"
+                       value="@yeniAd" @oninput="AdDegisti" />
+
+                <label for="rt-yeni-anahtar">@Metin.T("Yeni_Anahtar")</label>
+                <input id="rt-yeni-anahtar" class="rt-girdi rt-mono" autocomplete="off"
+                       value="@yeniAnahtar" @oninput="AnahtarDegisti" />
+
+                <p class="rt-ipucu">@Metin.T("Yeni_AnahtarIpucu")</p>
+
+                @if (yeniHata is not null)
+                {
+                    <p class="rt-hata"><Ikon Ad="uyari" /> @yeniHata</p>
+                }
+
+                <div class="rt-iletisim-dugmeler">
+                    <button type="button" class="rt-dugme" @onclick="Vazgec">@Metin.T("Vazgec")</button>
+                    <button type="button" class="rt-dugme rt-dugme-birincil" @onclick="Olustur">
+                        @Metin.T("Yeni_Olustur")
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>Düzenlerin okunduğu ve yazıldığı depo.</summary>
+    [Parameter, EditorRequired] public required IDuzenDeposu Depo { get; set; }
+
+    /// <summary>
+    /// Bir düzen düzenlenmek istendiğinde çağrılır; barındıran uygulama
+    /// tasarımcıya gider.
+    /// </summary>
+    /// <remarks>
+    /// Yeni oluşturulan düzen için de bu çağrılır: "oluştur" düğmesinin işi
+    /// dosyayı açmakla bitmez, kullanıcı boş bir listeye değil tasarımcıya
+    /// düşmek ister.
+    /// </remarks>
+    [Parameter] public EventCallback<string> Duzenle { get; set; }
+
+    /// <summary>
+    /// Bir düzen önizlenmek istendiğinde çağrılır. Bağlanmazsa düğme görünmez.
+    /// </summary>
+    [Parameter] public EventCallback<string> Onizle { get; set; }
+
+    /// <summary>
+    /// Bir düzen yazdırılmak istendiğinde çağrılır. Bağlanmazsa düğme görünmez.
+    /// </summary>
+    /// <remarks>
+    /// Yazdırma tarayıcının işi: uygulama önizlemeyi açar, önizleme kendini
+    /// yazdırma kutusuna verir. Kütüphane yazıcıya doğrudan bir şey göndermez.
+    /// </remarks>
+    [Parameter] public EventCallback<string> Yazdir { get; set; }
+
+    private IReadOnlyList<DuzenKaydi>? kayitlar;
+    private string suzgec = "";
+
+    private bool yeniAcik;
+    private string yeniAd = "";
+    private string yeniAnahtar = "";
+    private string? yeniHata;
+
+    /// <summary>Anahtar kutusuna elle dokunuldu mu?</summary>
+    /// <remarks>
+    /// Dokunulduysa ad değiştikçe anahtar artık güncellenmez: kullanıcının
+    /// yazdığı anahtarın üstüne yazmak, adın sonuna bir harf eklerken anahtarın
+    /// sessizce başkalaşması demekti.
+    /// </remarks>
+    private bool anahtarElle;
+
+    private ElementReference adKutusu;
+    private bool odaklanacak;
+
+    protected override async Task OnInitializedAsync()
+        => kayitlar = await Depo.ListeleAsync();
+
+    private List<DuzenKaydi> Gorunenler
+    {
+        get
+        {
+            if (kayitlar is null) return [];
+            if (suzgec.Trim() is not { Length: > 0 } arama) return [.. kayitlar];
+
+            // Ad ve anahtarın ikisinde birden aranır: düzenler kimi zaman Delphi
+            // dosya adıyla ("dmizanu-frxreport1"), kimi zaman ekrandaki adıyla
+            // ("Aylık Mizan Cetveli") hatırlanır.
+            return [.. kayitlar.Where(k =>
+                k.Ad.Contains(arama, StringComparison.OrdinalIgnoreCase) ||
+                k.Anahtar.Contains(arama, StringComparison.OrdinalIgnoreCase))];
+        }
+    }
+
+    private void SuzgecDegisti(ChangeEventArgs e) => suzgec = e.Value?.ToString() ?? "";
+
+    // ------------------------------------------------------------- yeni düzen
+
+    private void YeniAc()
+    {
+        yeniAcik = true;
+        yeniAd = "";
+        yeniAnahtar = "";
+        yeniHata = null;
+        anahtarElle = false;
+        odaklanacak = true;
+    }
+
+    private void Vazgec() => yeniAcik = false;
+
+    private void AdDegisti(ChangeEventArgs e)
+    {
+        yeniAd = e.Value?.ToString() ?? "";
+        if (!anahtarElle) yeniAnahtar = YeniDuzen.Anahtarla(yeniAd);
+    }
+
+    private void AnahtarDegisti(ChangeEventArgs e)
+    {
+        yeniAnahtar = e.Value?.ToString() ?? "";
+        anahtarElle = true;
+    }
+
+    private async Task KutuTusu(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") Vazgec();
+        else if (e.Key == "Enter") await Olustur();
+    }
+
+    /// <remarks>
+    /// Denetimler kutuda yapılıyor ki hata kullanıcının düzeltebileceği yerde
+    /// görünsün; depo yine de kendi denetimini yapar ve oradan gelen hata da
+    /// aynı satıra basılır.
+    /// </remarks>
+    private async Task Olustur()
+    {
+        var ad = yeniAd.Trim();
+        var anahtar = yeniAnahtar.Trim();
+
+        yeniHata = Kusur(ad, anahtar);
+        if (yeniHata is not null) return;
+
+        try
+        {
+            await Depo.OlusturAsync(anahtar, YeniDuzen.Bos(anahtar, ad));
+        }
+        catch (Exception ex)
+        {
+            yeniHata = Metin.T("Yeni_Olusturulamadi", ex.Message);
+            return;
+        }
+
+        yeniAcik = false;
+        await Duzenle.InvokeAsync(anahtar);
+    }
+
+    private string? Kusur(string ad, string anahtar)
+    {
+        if (ad.Length == 0) return Metin.T("Yeni_AdBos");
+        if (anahtar.Length == 0) return Metin.T("Yeni_AnahtarBos");
+
+        if (!anahtar.All(c => char.IsAsciiLetterOrDigit(c) || c == '-'))
+            return Metin.T("Yeni_AnahtarGecersiz");
+
+        if (kayitlar?.Any(k => string.Equals(k.Anahtar, anahtar, StringComparison.OrdinalIgnoreCase)) == true)
+            return Metin.T("Yeni_AnahtarKullanimda", anahtar);
+
+        return null;
+    }
+
+    /// <remarks>
+    /// Odak elle veriliyor: <c>autofocus</c> özniteliği sayfayla birlikte gelen
+    /// öğeler içindir, sonradan çizilen kutuda çalışmaz.
+    /// </remarks>
+    protected override async Task OnAfterRenderAsync(bool ilk)
+    {
+        if (!odaklanacak) return;
+
+        odaklanacak = false;
+        await adKutusu.FocusAsync();
+    }
+}

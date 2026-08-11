@@ -1,0 +1,36 @@
+@page "/tasarim/{Anahtar}"
+
+@using Pica.Reports.Servisler
+
+@inject IDuzenDeposu Depo
+@inject IRaporAraci Rapor
+@inject NavigationManager Gezinme
+
+@*
+    Tasarımcı.
+
+    Düzen ADRESTE durur: sayfa yenilenince aynı düzen açılır ve bağlantı
+    paylaşılabilir. Bileşen düzen seçmez, verileni açar.
+
+    OnizlemeAdresi VERİLMEDİ: kütüphane PDF üretmiyor ve bu örnek de bir PDF
+    motoru taşımıyor, dolayısıyla önizleme düğmesi hiç görünmüyor. Kendi
+    uygulamanızda bir basım ucu varsa adres kalıbını verin:
+
+        OnizlemeAdresi="/cikti/duzen/{0}.pdf"
+*@
+
+<PageTitle>@Anahtar · Pica.Reports örneği</PageTitle>
+
+@* Veri, rapor aracına bağlanmışsa oradan geliyor: alan ağacı ondan dolar ve
+   önizleme onunla basar. Bağlanmamışsa tasarımcı yine çalışır — örnek
+   satırlarla. *@
+<RaporTasarimci Depo="Depo"
+                SeciliAnahtar="@Anahtar"
+                Veri="Rapor.VeriAl(Anahtar ?? string.Empty)"
+                Kapat="Listeye" />
+
+@code {
+    [Parameter] public string? Anahtar { get; set; }
+
+    private void Listeye() => Gezinme.NavigateTo("/");
+}

@@ -1,0 +1,469 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+@*
+    Tuval — sayfanın kâğıdı, bantları ve kutuları.
+
+    Gösterilen şey basılmış belge DEĞİL, o belgeyi üreten sıradır: veri bantları
+    kâğıtta satır sayısı kadar yinelenir, burada bir kez görünür. Buna karşılık
+    SIRA kâğıttakiyle birebir aynıdır — hem tuval hem çizici BantSirasi'nı
+    kullanır, ikisi ayrışamaz.
+
+    Kâğıdın solundaki kanal, düzenin JSON'una bakarak görülemeyen tek şeyi
+    söyler: hangi bandın hangi sırada, hangi görevle ve neye bağlı olarak
+    basıldığını.
+*@
+
+@* Boşluğa tıklamak seçimi bırakır: seçili kutunun özellik panelinden çıkmanın
+   başka yolu olmasın diye.
+
+   data-olcek ve data-izgara JS'in okuduğu değerlerdir. Parametre olarak
+   geçirilseydi her yakınlaştırma değişiminde modülü yeniden bağlamak
+   gerekirdi; öznitelik olarak Blazor kendiliğinden günceller. *@
+@* data-birakma: paletten bir nesne sürükleniyor. Bu kipte kutular tıklamayı
+   geçirir (CSS), böylece bırakma her zaman BANDIN alanına düşer ve bırakma
+   noktası bandın köşesine göre okunur — kutunun köşesine göre değil. *@
+<div class="rt-sahne" @ref="sahne" @onclick="() => Sec(null, null)"
+     data-olcek="@Olcu.Sayi(Olcek)" data-izgara="@Olcu.Sayi(Izgara)"
+     data-birakma="@(Surukleniyor ? "true" : null)">
+    <div class="rt-olcek" style="@OlcekBicemi">
+        <div class="rt-yigin" style="@YiginBicemi">
+
+            <div class="rt-kagit" style="width:@Olcu.Px(Sayfa.GenislikPt)">
+
+                @* Kenar boşluğu kılavuzu: kutular bandın soluna göre konumlanır,
+                   bandın solu da kâğıdın sol boşluğudur. Çizgi olmadan kutunun
+                   kâğıt kenarına mı yoksa yazı alanına mı hizalandığı görünmez. *@
+                <div class="rt-kilavuz" style="@KilavuzBicemi"></div>
+
+                @foreach (var (sirali, indeks) in Bantlar.Select((b, i) => (b, i)))
+                {
+                    var bant = sirali.Bant;
+                    var yukseklik = BantSirasi.Yukseklik(bant);
+                    var basar = yukseklik > 0;
+                    var gizli = bant.Nesneler.Count(n => n.GenislikPt <= 0 || n.YukseklikPt <= 0);
+
+                    @* data-boy ve data-enaz: yükseklik tutamağını çeken JS
+                       bunları okuyor. DOM'daki yükseklik yetmiyordu — basmayan
+                       bantta o bir yer tutucu, bildirilen yükseklik ise 0. *@
+                    <div class="rt-bant"
+                         data-tur="@bant.Tur"
+                         data-rol="@sirali.Rol"
+                         data-basmaz="@(basar ? null : "true")"
+                         data-bant="@bant.Ad"
+                         data-boy="@Olcu.Sayi(bant.YukseklikPt)"
+                         data-enaz="@Olcu.Sayi(BantSirasi.EnAz(bant))"
+                         style="height:@(basar ? Olcu.Px(yukseklik) : Olcu.Sayi(BasmazYukseklikPx) + "px")">
+
+                        @* Kanala tıklamak bandı seçer. Bandın kendisinin de
+                           düzenlenecek özellikleri var (yükseklik, veri kümesi,
+                           grup koşulu) ve kâğıtta tıklanacak bir yeri yok. *@
+                        <div class="rt-kanal" style="padding-left:@(6 + sirali.Girinti * 11)px"
+                             title="@Etiketler.Rol(sirali.Rol)"
+                             data-secili="@(ReferenceEquals(SeciliBant, bant) ? "true" : null)"
+                             @onclick="() => BantSecildi.InvokeAsync(bant)"
+                             @onclick:stopPropagation="true">
+                            <span class="rt-kanal-sira">@(indeks + 1)</span>
+                            <span class="rt-kanal-tur">@Etiketler.Bant(bant.Tur)</span>
+                            <span class="rt-kanal-ad">@bant.Ad</span>
+                            <span class="rt-kanal-olcu">
+                                @if (basar)
+                                {
+                                    @Olcu.Punto(yukseklik)
+                                }
+                                else
+                                {
+                                    <span class="rt-kanal-uyari" title="@Metin.T("Tuval_BasmazIpucu")">@Metin.T("Tuval_Basmaz")</span>
+                                }
+                                @if (gizli > 0)
+                                {
+                                    <span class="rt-kanal-uyari" title="@Metin.T("Tuval_GizliIpucu", gizli)">@Metin.T("Tuval_Gizli", gizli)</span>
+                                }
+                            </span>
+                        </div>
+
+                        @* Bırakma hedefi bandın KÂĞITTAKİ alanı. Kanal hedef
+                           değil: kutu kâğıda konur, kanal yalnızca bandın
+                           kimliğini gösterir.
+
+                           dragover'da preventDefault şart — yoksa tarayıcı
+                           bırakmayı hiç kabul etmez ve drop olayı doğmaz. *@
+                        <div class="rt-alan" style="@AlanBicemi"
+                             data-hedef="@(ReferenceEquals(hedefBant, bant) ? "true" : null)"
+                             @ondragover:preventDefault="true"
+                             @ondragenter="() => hedefBant = bant"
+                             @ondrop="e => Birak(bant, e)">
+                            @if (basar)
+                            {
+                                @foreach (var nesne in bant.Nesneler)
+                                {
+                                    if (nesne.GenislikPt <= 0 || nesne.YukseklikPt <= 0) continue;
+
+                                    var n = nesne;   // döngü değişkeni kapanışa girmesin
+
+                                    var secili = Secililer.Contains(nesne);
+
+                                    <div class="rt-kutu" data-nesne-turu="@nesne.Tur"
+                                         data-secili="@(secili ? "true" : null)"
+                                         data-degisti="@(Degisti?.Invoke(nesne) == true ? "true" : null)"
+                                         data-bant="@bant.Ad" data-nesne="@nesne.Ad"
+                                         style="@KutuBicemi(nesne)"
+                                         title="@nesne.Ad"
+                                         @onclick="e => Sec(bant, n, e.CtrlKey || e.MetaKey)"
+                                         @onclick:stopPropagation="true">
+                                        @if (nesne.Tur is NesneTuru.Yazi)
+                                        {
+                                            <div class="rt-kutu-yazi" style="@YaziBicemi(nesne)">
+                                                @if (Ornek)
+                                                {
+                                                    @* Örnek veri kipi: başvurular değil, biçimden
+                                                       geçmiş değerler görünür. Kutunun deseni doğru
+                                                       mu, sayı sığıyor mu — ancak burada okunur. *@
+                                                    @OrnekVeri.Yaz(nesne)
+                                                }
+                                                else
+                                                {
+                                                    foreach (var parca in KutuMetni.Parcala(nesne))
+                                                    {
+                                                        if (parca.Ifade)
+                                                        {
+                                                            <span class="rt-ifade">@parca.Metin</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @parca.Metin
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        }
+                                        else if (nesne.Tur is NesneTuru.Resim)
+                                        {
+                                            @if (nesne.ResimVerisi is { Length: > 0 } veri)
+                                            {
+                                                <img class="rt-resim-icerik" src="@veri" alt=""
+                                                     style="object-fit:@(nesne.ResimUyumu is ResimUyumu.Uzat ? "fill" : "contain")" />
+                                            }
+                                            else
+                                            {
+                                                @* Resmi olmayan kutu: kâğıda boş basar ve tasarımda
+                                                   görünmezdi. İşaret koyulmazsa "resim eklemeyi
+                                                   unuttum" ancak PDF'te fark edilir. *@
+                                                <span class="rt-resim">@Metin.T("Tuval_ResimYok")</span>
+                                            }
+                                        }
+                                        else if (nesne.Tur is NesneTuru.Barkod)
+                                        {
+                                            @* Örnek kipte barkodun değeri de çözülür: bir veri
+                                                alanına bağlı barkod ham hâlde kodlanamıyor ve kutu
+                                                boş görünüyordu. *@
+                                            @if (Barkod.Svg(Ornek ? OrnekVeri.Yaz(nesne) : nesne.Metin,
+                                                            nesne.BarkodTuru, nesne.BarkodYazisi, nesne.Renk,
+                                                            nesne.GenislikPt / nesne.YukseklikPt) is { } svg)
+                                            {
+                                                @* Çizicinin bastığı SVG'nin AYNISI: iki ayrı çizim
+                                                   olsaydı tasarımcıdaki barkod ile kâğıttaki er geç
+                                                   ayrışır, ayrışma da okunmayan bir etiket demek. *@
+                                                <div class="rt-barkod">@((MarkupString)svg)</div>
+                                            }
+                                            else
+                                            {
+                                                <span class="rt-resim">@Metin.T("Tuval_Kodlanamadi", Etiketler.Barkod(nesne.BarkodTuru))</span>
+                                            }
+                                        }
+
+                                        @* Tutamaklar kutunun İÇİNDE duruyor ki seçili kutu
+                                           kaydırılırken onlar da onunla gitsin — JS kutunun
+                                           biçemini oynatıyor, ayrı bir çerçeve geride kalırdı.
+
+                                           Yalnız tek seçimde çizilirler: birden çok kutuyu aynı
+                                           anda boyutlandırmanın tek bir doğru cevabı yok. *@
+                                        @if (secili && Secililer.Count == 1)
+                                        {
+                                            @foreach (var yon in Yonler)
+                                            {
+                                                <span class="rt-tutamak" data-yon="@yon"></span>
+                                            }
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        @* Bandın alt kenarı — fareyle yükseklik. Kanalın da
+                           üstünden geçiyor: bant satırının tamamı tutulabilsin
+                           diye. En alttaki kutunun altına inilemez; bandın
+                           basılacak yüksekliği zaten ona göre hesaplanıyor,
+                           daha aşağı çekmenin kâğıtta karşılığı olmazdı. *@
+                        <div class="rt-bant-tutamak"
+                             title="@Metin.T("Tuval_BantTutamak", Olcu.Punto(BantSirasi.EnAz(bant)))"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>Çizilecek sayfa.</summary>
+    [Parameter, EditorRequired] public required DuzenSayfasi Sayfa { get; set; }
+
+    /// <summary>Yakınlaştırma — 1 = %100.</summary>
+    [Parameter] public double Olcek { get; set; } = 1;
+
+    /// <summary>Yaslama ızgarası, punto. 0 ise yaslama yok.</summary>
+    [Parameter] public double Izgara { get; set; }
+
+    /// <summary>
+    /// Kutular başvurularıyla değil, örnek değerlerle gösterilsin mi?
+    /// </summary>
+    /// <remarks>
+    /// Kapalıyken tuval "hangi kutu neye bağlı" sorusunu cevaplar, açıkken
+    /// "kâğıtta ne görünecek" sorusunu. İkisi bir arada gösterilemez: aynı
+    /// kutuya iki metin sığmaz.
+    /// </remarks>
+    [Parameter] public bool Ornek { get; set; }
+
+    /// <summary>Kutular sürüklenip bırakıldı ya da boyutlandırıldı.</summary>
+    [Parameter] public EventCallback<IReadOnlyList<KutuTasimasi>> Tasindi { get; set; }
+
+    /// <summary>
+    /// Araç paletinden bir şey sürükleniyor mu?
+    /// </summary>
+    /// <remarks>
+    /// Ne sürüklendiği tuvali ilgilendirmiyor (nesne türü de olabilir, veri
+    /// alanı da); tuval yalnızca bırakmayı kabul edecek kipe geçiyor.
+    /// </remarks>
+    [Parameter] public bool Surukleniyor { get; set; }
+
+    /// <summary>Sürüklenen şey bir bandın üstüne bırakıldı.</summary>
+    [Parameter] public EventCallback<NesneBirakma> Birakildi { get; set; }
+
+    /// <summary>Sürükleme sırasında altında durulan bant.</summary>
+    /// <remarks>
+    /// <c>dragenter</c> ile kuruluyor, <c>dragleave</c> ile değil: alanın
+    /// içindeki her kutuya girip çıkmak ayrı bir <c>dragleave</c> doğuruyor ve
+    /// vurgu sürekli sönüp yanardı. Başka bir banda girildiğinde kendiliğinden
+    /// değişiyor, sürükleme bitince de temizleniyor.
+    /// </remarks>
+    private DuzenBandi? hedefBant;
+
+    /// <remarks>
+    /// Ölçüler <c>offsetX/Y</c>'den geliyor: bandın alanının sol üst köşesine
+    /// göre ve yakınlaştırma hesaba katılmış hâlde. Kutunun nereye oturacağına
+    /// (ızgara, kâğıt sınırı) tuval karar vermiyor — o düzeni tutan tarafın işi.
+    /// </remarks>
+    private async Task Birak(DuzenBandi bant, DragEventArgs e)
+    {
+        hedefBant = null;
+
+        if (!Surukleniyor) return;
+
+        await Birakildi.InvokeAsync(
+            new NesneBirakma(bant, Olcu.Puntoya(e.OffsetX), Olcu.Puntoya(e.OffsetY)));
+    }
+
+    /// <summary>
+    /// Tuvalde bir kısayol tuşuna basıldı — ok tuşları ve geri al/yinele.
+    /// </summary>
+    /// <remarks>
+    /// Olay JS'ten gelir, Blazor'ın <c>@@onkeydown</c>'ından değil: yalnız
+    /// JS tarafında olayın hangi öğede doğduğu görülebiliyor ve özellik
+    /// panelindeki bir metin alanına yazarken ok tuşunun kutuyu oynatmaması
+    /// gerekiyor.
+    /// </remarks>
+    [Parameter] public EventCallback<TusVurusu> Tus { get; set; }
+
+    /// <summary>
+    /// Boyutlandırma tutamaklarının yönleri: k(uzey), g(üney), d(oğu), b(atı).
+    /// </summary>
+    /// <remarks>Sıra CSS'teki yerleşimle eşleşir, JS yalnızca harfleri okur.</remarks>
+    private static readonly string[] Yonler = ["kb", "k", "kd", "d", "gd", "g", "gb", "b"];
+
+    private ElementReference sahne;
+    private IJSObjectReference? modul;
+    private IJSObjectReference? bag;
+    private DotNetObjectReference<Tuval>? katman;
+
+    protected override async Task OnAfterRenderAsync(bool ilk)
+    {
+        if (!ilk) return;
+
+        // Modül yolu paketin adına bağlıdır; kütüphane ayrı bir depoya
+        // çıktığında burası değişmez, çünkü _content adı proje adıdır.
+        modul = await JS.InvokeAsync<IJSObjectReference>(
+            "import", "./_content/Pica.Reports/tasarimci.js");
+
+        katman = DotNetObjectReference.Create(this);
+        bag = await modul.InvokeAsync<IJSObjectReference>("bagla", sahne, katman);
+    }
+
+    /// <summary>JS sürüklemeyi bitirdiğinde çağırır. Ölçüler puntodur.</summary>
+    /// <remarks>
+    /// Sürükleme sırasında düzen değişmiş olabilir (başka bir düzene geçildi,
+    /// geri alındı). Karşılığı bulunamayan kutu sessizce atlanır; kullanıcı
+    /// zaten başka bir şeye bakıyor.
+    /// </remarks>
+    [JSInvokable]
+    public async Task KutularTasindi(TasimaGirdisi[] girdiler)
+    {
+        List<KutuTasimasi> tasimalar = [];
+
+        foreach (var g in girdiler)
+        {
+            var bant = Sayfa.Bantlar.FirstOrDefault(b => b.Ad == g.Bant);
+            var nesne = bant?.Nesneler.FirstOrDefault(n => n.Ad == g.Nesne);
+            if (bant is null || nesne is null) continue;
+
+            tasimalar.Add(new KutuTasimasi(bant, nesne, g.SolPt, g.UstPt, g.GenislikPt, g.YukseklikPt));
+        }
+
+        if (tasimalar.Count > 0) await Tasindi.InvokeAsync(tasimalar);
+    }
+
+    /// <summary>JS'in ilettiği kısayol tuşu.</summary>
+    [JSInvokable]
+    public Task TusBasildi(string tus, bool shift, bool ctrl)
+        => Tus.InvokeAsync(new TusVurusu(tus, shift, ctrl));
+
+    /// <summary>Bandın yüksekliği fareyle değiştirildi.</summary>
+    /// <remarks>
+    /// Alt sınır burada da uygulanıyor: JS'in gönderdiği değere güvenilmez.
+    /// Bant adı düzende bulunamazsa (araya başka bir düzen yüklendiyse)
+    /// sessizce geçilir.
+    /// </remarks>
+    [JSInvokable]
+    public Task BantBoyutlandi(string bantAdi, double yukseklikPt)
+    {
+        var bant = Sayfa.Bantlar.FirstOrDefault(b => b.Ad == bantAdi);
+        if (bant is null) return Task.CompletedTask;
+
+        return BantBoyu.InvokeAsync(
+            new BantBoyutlamasi(bant, Math.Max(BantSirasi.EnAz(bant), yukseklikPt)));
+    }
+
+    /// <summary>Bandın yüksekliği fareyle değiştirildi.</summary>
+    /// <remarks>
+    /// Tuval bandı <b>kendisi değiştirmez</b>: geri alma yığınına önceki hâli
+    /// yazacak taraf düzeni tutan taraftır (kutu taşımada olduğu gibi).
+    /// </remarks>
+    [Parameter] public EventCallback<BantBoyutlamasi> BantBoyu { get; set; }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (bag is not null) await bag.InvokeVoidAsync("coz");
+            if (bag is not null) await bag.DisposeAsync();
+            if (modul is not null) await modul.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // Devre kapanmışsa JS'e ulaşılamaz ve zaten temizlenecek bir şey yok.
+        }
+
+        katman?.Dispose();
+    }
+
+    /// <summary>Seçili kutular. Boş küme = seçim yok.</summary>
+    [Parameter] public IReadOnlyCollection<DuzenNesnesi> Secililer { get; set; } = [];
+
+    /// <summary>Bir kutuya (ya da boşluğa) tıklandı.</summary>
+    [Parameter] public EventCallback<SecimIstegi> Secildi { get; set; }
+
+    /// <summary>Kanalda seçili bant.</summary>
+    [Parameter] public DuzenBandi? SeciliBant { get; set; }
+
+    /// <summary>Bant kanalına tıklandı.</summary>
+    [Parameter] public EventCallback<DuzenBandi> BantSecildi { get; set; }
+
+    /// <summary>
+    /// Kutu ham düzendekinden farklı mı? Farklı olanlar tuvalde işaretlenir.
+    /// </summary>
+    /// <remarks>
+    /// Verilmezse hiçbir kutu işaretlenmez. Tuvalin kendisi ham düzeni görmez;
+    /// karşılaştırmayı yapan, ikisini de elinde tutan tasarımcıdır.
+    /// </remarks>
+    [Parameter] public Func<DuzenNesnesi, bool>? Degisti { get; set; }
+
+    private Task Sec(DuzenBandi? bant, DuzenNesnesi? nesne, bool ekle = false)
+        => Secildi.InvokeAsync(new SecimIstegi(bant, nesne, ekle));
+
+    /// <summary>
+    /// Basılma sırası — düzen değişmedikçe yeniden hesaplanmaz.
+    /// </summary>
+    /// <remarks>
+    /// Önbellek bant <b>listesini de</b> izliyor, yalnızca sayfa nesnesini
+    /// değil: bant eklemek/silmek listeyi yerinde değiştirir ve sayfa nesnesi
+    /// aynı kalır (bkz. <see cref="BantOnbellegi"/>).
+    /// </remarks>
+    private readonly BantOnbellegi onbellek = new();
+
+    private List<SiraliBant> Bantlar = [];
+
+    protected override void OnParametersSet()
+    {
+        // Sürükleme bitti (bırakıldı ya da vazgeçildi): vurgu kalmasın.
+        if (!Surukleniyor) hedefBant = null;
+
+        Bantlar = onbellek.Sira(Sayfa);
+    }
+
+    /// <summary>Basmayan bandın kanalda kapladığı yer, piksel.</summary>
+    /// <remarks>
+    /// Kâğıtta yeri yok ama listeden düşürülmesi de doğru değil: düzende duran
+    /// bir bandın hiç basılmadığını ancak burada görebilirsin.
+    /// </remarks>
+    private const double BasmazYukseklikPx = 14;
+
+    // ------------------------------------------------------------------ ölçü
+
+    /// <summary>Bantların bandın soluna göre konumlandığı yazı alanının eni.</summary>
+    private double AlanEni => Math.Max(0, Sayfa.GenislikPt - Sayfa.SolBoslukPt - Sayfa.SagBoslukPt);
+
+    /// <summary>
+    /// Ölçekleme kabının boyu.
+    /// </summary>
+    /// <remarks>
+    /// <c>transform: scale()</c> öğenin kapladığı yeri değiştirmez: yalnız
+    /// bırakılırsa kâğıt büyür ama kaydırma çubukları küçük kalır ve
+    /// yakınlaştırılan kâğıdın altı görülemez. Dıştaki kap büyütülmüş boyutu
+    /// üstlenir, içteki dönüşür.
+    /// </remarks>
+    private string OlcekBicemi
+    {
+        get
+        {
+            var enPx = Olcu.Piksel(Sayfa.GenislikPt) * Olcek;
+
+            // Yığının boyu, çizimdeki yükseklik kuralının aynısıyla toplanır:
+            // basmayan bant kâğıtta yer kaplamaz ama kanalda bir satırı vardır.
+            var boyPx = Bantlar.Sum(b => BantSirasi.Yukseklik(b.Bant) is var y && y > 0
+                                            ? Olcu.Piksel(y)
+                                            : BasmazYukseklikPx) * Olcek;
+
+            return $"width:{Olcu.Sayi(enPx)}px;height:{Olcu.Sayi(boyPx)}px";
+        }
+    }
+
+    /// <remarks>
+    /// <c>--rt-z</c> tutamakların ters ölçeklenmesi için: ölçeğin içinde
+    /// duruyorlar ve %50 yakınlıkta yarı boya inerlerse tutulamaz hâle
+    /// gelirler.
+    /// </remarks>
+    private string YiginBicemi
+        => $"transform:scale({Olcu.Sayi(Olcek)});--rt-z:{Olcu.Sayi(Olcek)}";
+
+    private string KilavuzBicemi
+        => $"left:{Olcu.Px(Sayfa.SolBoslukPt)};width:{Olcu.Px(AlanEni)}";
+
+    private string AlanBicemi
+        => $"margin-left:{Olcu.Px(Sayfa.SolBoslukPt)};width:{Olcu.Px(AlanEni)}";
+
+    // ------------------------------------------------------------------ kutu
+    // Kutunun görünümü Bicem'de: tuval ile önizleme aynı kodu kullanıyor,
+    // yoksa tasarımda görünen kutu ile önizlemedeki ayrışırdı.
+    private static string KutuBicemi(DuzenNesnesi n) => Bicem.Kutu(n, n.SolPt, n.UstPt);
+
+    private static string YaziBicemi(DuzenNesnesi n) => Bicem.Yazi(n);
+}

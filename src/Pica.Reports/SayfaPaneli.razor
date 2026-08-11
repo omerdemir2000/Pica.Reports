@@ -1,0 +1,135 @@
+@*
+    Sayfa düzeni — kâğıt boyu, yön, kenar boşlukları, sütun.
+
+    Ölçüler burada MİLİMETRE girilir, düzende punto saklanır. Sebep basit:
+    kâğıdı milimetreyle tarif ediyoruz ("kenardan 1 cm boşluk"), yazıyı puntoyla.
+    Çevrim tek yerden geçiyor (Olcu).
+*@
+
+<div class="rt-ozellik">
+
+    <div class="rt-ozellik-tepe">
+        <span class="rt-ozellik-ad">@Metin.T("SayfaP_Baslik")</span>
+        <span class="rt-ozellik-alt">@Ad · @Olcu.Sayi(Math.Round(Olcu.Mm(Sayfa.GenislikPt))) × @Olcu.Sayi(Math.Round(Olcu.Mm(Sayfa.YukseklikPt))) mm</span>
+    </div>
+
+    <div class="rt-ozellik-govde">
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("SayfaP_Kagit")</legend>
+
+            <label class="rt-tam">@Metin.T("SayfaP_Boy")
+                <select class="rt-girdi" value="@Ad" @onchange="KagitDegisti">
+                    @foreach (var k in KagitBoyu.Hepsi)
+                    {
+                        <option value="@k.Ad">@k.Ad — @k.Olcu</option>
+                    }
+                    <option value="@Ozel">@Metin.T("Ozel")</option>
+                </select>
+            </label>
+
+            <div class="rt-satir">
+                <button type="button" class="rt-acik" aria-pressed="@(!Sayfa.Yatay)"
+                        title="@Metin.T("SayfaP_Dikey")" @onclick="() => Yon(false)">@Metin.T("SayfaP_Dikey")</button>
+                <button type="button" class="rt-acik" aria-pressed="@Sayfa.Yatay"
+                        title="@Metin.T("SayfaP_Yatay")" @onclick="() => Yon(true)">@Metin.T("SayfaP_Yatay")</button>
+            </div>
+            <p class="rt-ipucu">@((MarkupString)Metin.T("SayfaP_YonIpucu"))</p>
+
+            <div class="rt-ikili">
+                <label>@Metin.T("SayfaP_EnMm")
+                    <input type="number" step="1" min="10" class="rt-girdi rt-sayi"
+                           value="@Mm(Sayfa.GenislikPt)"
+                           @onchange="e => Say(e, v => Sayfa.GenislikPt = Olcu.Puntoya_Mm(v))" />
+                </label>
+                <label>@Metin.T("SayfaP_BoyMm")
+                    <input type="number" step="1" min="10" class="rt-girdi rt-sayi"
+                           value="@Mm(Sayfa.YukseklikPt)"
+                           @onchange="e => Say(e, v => Sayfa.YukseklikPt = Olcu.Puntoya_Mm(v))" />
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("SayfaP_KenarBosluk") <span class="rt-kume-not">mm</span></legend>
+            <div class="rt-dortlu">
+                <label>@Metin.T("Ozellik_Sol")<input type="number" step="1" min="0" class="rt-girdi rt-sayi"
+                                 value="@Mm(Sayfa.SolBoslukPt)"
+                                 @onchange="e => Say(e, v => Sayfa.SolBoslukPt = Olcu.Puntoya_Mm(v))" /></label>
+                <label>@Metin.T("Ozellik_Sag")<input type="number" step="1" min="0" class="rt-girdi rt-sayi"
+                                 value="@Mm(Sayfa.SagBoslukPt)"
+                                 @onchange="e => Say(e, v => Sayfa.SagBoslukPt = Olcu.Puntoya_Mm(v))" /></label>
+                <label>@Metin.T("Ozellik_Ust")<input type="number" step="1" min="0" class="rt-girdi rt-sayi"
+                                 value="@Mm(Sayfa.UstBoslukPt)"
+                                 @onchange="e => Say(e, v => Sayfa.UstBoslukPt = Olcu.Puntoya_Mm(v))" /></label>
+                <label>@Metin.T("Ozellik_Alt")<input type="number" step="1" min="0" class="rt-girdi rt-sayi"
+                                 value="@Mm(Sayfa.AltBoslukPt)"
+                                 @onchange="e => Say(e, v => Sayfa.AltBoslukPt = Olcu.Puntoya_Mm(v))" /></label>
+            </div>
+            <p class="rt-ipucu">@((MarkupString)Metin.T("SayfaP_KenarIpucu"))</p>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("SayfaP_Sutun")</legend>
+            <div class="rt-ikili">
+                <label>@Metin.T("SayfaP_SutunSayi")
+                    <input type="number" step="1" min="0" max="9" class="rt-girdi rt-sayi"
+                           value="@Sayfa.SutunSayisi"
+                           @onchange="e => Say(e, v => Sayfa.SutunSayisi = (int)v)" />
+                </label>
+                <label>@Metin.T("SayfaP_SutunAralik")
+                    <input type="number" step="1" min="0" class="rt-girdi rt-sayi"
+                           value="@Mm(Sayfa.SutunAraligiPt)"
+                           @onchange="e => Say(e, v => Sayfa.SutunAraligiPt = Olcu.Puntoya_Mm(v))" />
+                </label>
+            </div>
+            <p class="rt-ipucu">@((MarkupString)Metin.T("SayfaP_SutunIpucu"))</p>
+        </fieldset>
+
+        <p class="rt-ipucu">@Metin.T("SayfaP_KaydetIpucu")</p>
+    </div>
+</div>
+
+@code {
+    /// <summary>Düzenlenecek sayfa.</summary>
+    [Parameter, EditorRequired] public required DuzenSayfasi Sayfa { get; set; }
+
+    /// <summary>
+    /// Değişikliği uygulayan taraf — geri alma yığınını tutan tasarımcı.
+    /// </summary>
+    /// <remarks>
+    /// Panel sayfaya doğrudan yazmaz: değişiklikten önceki hâli alacak ve geri
+    /// alınabilir kılacak yer, yığını tutan taraftır (bkz. OzellikPaneli).
+    /// </remarks>
+    [Parameter, EditorRequired] public required Func<Action, Task> Uygula { get; set; }
+
+    private const string Ozel = "(özel)";
+
+    /// <summary>Sayfanın ölçüsüne uyan kâğıdın adı; uymuyorsa "(özel)".</summary>
+    private string Ad => KagitBoyu.Bul(Sayfa.GenislikPt, Sayfa.YukseklikPt)?.Ad ?? Ozel;
+
+    private static string Mm(double punto)
+        => Math.Round(Olcu.Mm(punto), 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private Task KagitDegisti(ChangeEventArgs e)
+    {
+        var ad = e.Value?.ToString();
+
+        // "Özel" seçilince ölçüye dokunulmuyor: kullanıcı en/boy kutularını
+        // kendisi dolduracak, mevcut ölçü başlangıç noktası olsun.
+        if (ad is null || ad == Ozel) return Task.CompletedTask;
+
+        return KagitBoyu.Hepsi.FirstOrDefault(k => k.Ad == ad) is { } kagit
+            ? Uygula(() => kagit.Uygula(Sayfa))
+            : Task.CompletedTask;
+    }
+
+    private Task Yon(bool yatay) => Uygula(() => KagitBoyu.YonDegistir(Sayfa, yatay));
+
+    private Task Say(ChangeEventArgs e, Action<double> yaz)
+        => double.TryParse(e.Value?.ToString(),
+               System.Globalization.NumberStyles.Float,
+               System.Globalization.CultureInfo.InvariantCulture, out var v) && v >= 0
+            ? Uygula(() => yaz(v))
+            : Task.CompletedTask;
+}

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Pica.Reports/Pica.Reports.csproj" />
+  <Project Path="src/Pica.Reports.Testleri/Pica.Reports.Testleri.csproj" />
+  <Project Path="ornek/Pica.Reports.Ornek/Pica.Reports.Ornek.csproj" />
+</Solution>

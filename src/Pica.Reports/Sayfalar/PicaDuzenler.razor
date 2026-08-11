@@ -1,0 +1,29 @@
+@page "/pica/duzenler"
+
+@using Pica.Reports.Servisler
+
+@inject IDuzenDeposu Depo
+@inject IRaporAraci Rapor
+
+@*
+    Hazır düzen listesi.
+
+    Üç eylem de rapor aracından geçiyor: hangi adresin hangi ekrana gittiğini
+    araç biliyor, liste bilmiyor. "Yazdır" önizlemeyi ?yazdir=1 ile açıyor,
+    yani ekran açılır açılmaz tarayıcının yazdırma kutusu geliyor.
+*@
+
+<PageTitle>@Metin.T("Liste_Baslik")</PageTitle>
+
+@* Künye yalnızca kütüphanenin KENDİ ekranında: bileşeni kendi sayfasına gömen
+   uygulamanın arayüzüne izinsiz bir imza koymak doğru olmazdı. *@
+<div class="pica-ekran pica-kunyeli">
+    <DuzenListesi Depo="Depo"
+                  Duzenle="a => Rapor.TasarimAc(a)"
+                  Onizle="a => Rapor.Onizle(a)"
+                  Yazdir="a => Rapor.Yazdir(a)" />
+
+    <footer class="pica-kunye">
+        <a href="@Urun.Adres" target="_blank" rel="noopener">@Urun.Kunye</a>
+    </footer>
+</div>

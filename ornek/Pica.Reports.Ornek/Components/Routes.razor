@@ -1,0 +1,22 @@
+@using Pica.Reports.Servisler
+
+@*
+    Tek yerleşim, üç sayfa — artı kütüphanenin HAZIR ekranları.
+
+    AdditionalAssemblies: kütüphanenin kendi sayfaları (/pica/duzenler,
+    /pica/tasarim/{anahtar}, /pica/onizleme/{anahtar}) ayrı bir derlemede
+    duruyor ve Blazor'ın yönlendiricisi kendiliğinden başka derlemelere
+    bakmıyor. Bu satır olmadan IRaporAraci.TasarimAc() "sayfa bulunamadı"
+    verir.
+
+    Etkileşim kipi burada veriliyor: tasarımcı sürükleme, tuş ve JS köprüsü
+    kullanıyor; sunucu tarafı etkileşim olmadan yalnızca durağan bir resim
+    olurdu.
+*@
+<Router AppAssembly="typeof(Program).Assembly"
+        AdditionalAssemblies="new[] { typeof(RaporAraci).Assembly }">
+    <Found Context="yol">
+        <RouteView RouteData="yol" DefaultLayout="typeof(Layout.AnaYerlesim)" />
+        <FocusOnNavigate RouteData="yol" Selector="h1" />
+    </Found>
+</Router>

@@ -1,0 +1,82 @@
+@*
+    Birden çok kutu seçiliyken açılan panel.
+
+    Çoklu seçimin işi kutuları birbirine göre yerleştirmektir; tek tek özellik
+    düzenlemek değil. Bu yüzden özellik paneli değil bu panel açılır.
+*@
+
+<div class="rt-ozellik">
+
+    <div class="rt-ozellik-tepe">
+        <span class="rt-ozellik-ad">@Metin.T("Hizalama_Secim", Sayi)</span>
+        <span class="rt-ozellik-alt">@Metin.T("Hizalama_SecimAlt")</span>
+    </div>
+
+    <div class="rt-ozellik-govde">
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Hizalama_Hizala") <span class="rt-kume-not">@Metin.T("Hizalama_HizalaNot")</span></legend>
+
+            <div class="rt-hizalar">
+                @foreach (var t in Yatay)
+                {
+                    @HizaDugmesi(t)
+                }
+            </div>
+            <div class="rt-hizalar">
+                @foreach (var t in Dikey)
+                {
+                    @HizaDugmesi(t)
+                }
+            </div>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Hizalama_Esitle")</legend>
+            <div class="rt-hizalar">
+                @HizaDugmesi(HizalamaTuru.AyniEn)
+                @HizaDugmesi(HizalamaTuru.AyniBoy)
+            </div>
+            <p class="rt-ipucu">@Metin.T("Hizalama_EsitleIpucu")</p>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Hizalama_Dagit")</legend>
+            <div class="rt-hizalar">
+                @HizaDugmesi(HizalamaTuru.YatayDagit)
+                @HizaDugmesi(HizalamaTuru.DikeyDagit)
+            </div>
+            <p class="rt-ipucu">@Metin.T("Hizalama_DagitIpucu")</p>
+        </fieldset>
+
+        <div class="rt-satir">
+            <button type="button" class="rt-acik" @onclick="() => Birak.InvokeAsync()">
+                @Metin.T("Hizalama_Birak")
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>Kaç kutu seçili.</summary>
+    [Parameter, EditorRequired] public required int Sayi { get; set; }
+
+    /// <summary>Bir hizalama istendi.</summary>
+    [Parameter, EditorRequired] public required EventCallback<HizalamaTuru> Hizala { get; set; }
+
+    /// <summary>Seçim bırakılsın.</summary>
+    [Parameter] public EventCallback Birak { get; set; }
+
+    private static readonly HizalamaTuru[] Yatay =
+        [HizalamaTuru.Sol, HizalamaTuru.YatayOrta, HizalamaTuru.Sag];
+
+    private static readonly HizalamaTuru[] Dikey =
+        [HizalamaTuru.Ust, HizalamaTuru.DikeyOrta, HizalamaTuru.Alt];
+
+    @* Düğmeler yazıyla: on ayrı hizalama simgesi çizmek yerine ne yaptıklarını
+       söylüyorlar. Araç günde birkaç kez kullanılıyor, simge ezberletmenin
+       karşılığı yok. *@
+    private RenderFragment HizaDugmesi(HizalamaTuru tur) =>@<button type="button" class="rt-hiza"
+            disabled="@(Sayi < Hizalama.EnAzKutu(tur))"
+            @onclick="() => Hizala.InvokeAsync(tur)">@Hizalama.Ad(tur)</button>;
+}

@@ -1,0 +1,201 @@
+@using Pica.Reports.Basim
+@using Pica.Reports.Veri
+
+@inject IJSRuntime JS
+
+@*
+    Önizleme — düzenin veriyle basılmış hâli.
+
+    Tuvalden farkı: tuval "hangi kutu nerede duruyor" sorusunu cevaplar, burası
+    "kâğıtta ne görünecek" sorusunu. Veri bandı satır sayısı kadar yinelenir,
+    sayfa dolunca kırılır, sayfa altı kâğıdın altına yaslanır.
+
+    Bu bir PDF DEĞİLDİR. Tarayıcı ile PDF motoru aynı satır kırmasını yapmaz;
+    burada gördüğünüz yerleşim doğrudur, harflerin tam pikseli değil.
+*@
+
+<div class="rt-onizleme-sahne">
+    @if (Sayfa is null)
+    {
+        <p class="rt-liste-bos">@Metin.T("Onizleme_Bos")</p>
+    }
+    else
+    {
+        @* Yazıcıya kâğıdın ölçüsü söyleniyor. Söylenmezse tarayıcı kendi
+           varsayılanını (çoğunlukla A4 dikey) kullanır ve etiket boyunda ya da
+           yatay bir düzen yanlış kâğıda, kırpılmış basılır. *@
+        <style>
+            @@media print {
+                @@page { size: @Olcu.Sayi(Sayfa.GenislikPt)pt @Olcu.Sayi(Sayfa.YukseklikPt)pt; margin: 0; }
+            }
+        </style>
+
+        <div class="rt-onizleme-cubuk">
+            <span>@Metin.T("Onizleme_SayfaSayisi", sayfalar.Count)</span>
+
+            <button type="button" class="rt-dugme" title="@Metin.T("Onizleme_YazdirIpucu")"
+                    @onclick="Yazdir">
+                <Ikon Ad="yazdir" /> @Metin.T("Onizleme_Yazdir")
+            </button>
+
+            <span class="rt-cubuk-ara"></span>
+            <label class="rt-etiket" for="rt-onizleme-olcek">@Metin.T("Tasarimci_Yakinlik")</label>
+            <select id="rt-onizleme-olcek" class="rt-secim" value="@Olcu.Sayi(olcek)"
+                    @onchange="OlcekDegisti">
+                @foreach (var o in Olcekler)
+                {
+                    <option value="@Olcu.Sayi(o)">%@Olcu.Sayi(o * 100)</option>
+                }
+            </select>
+            @if (Veri is null)
+            {
+                <span class="rt-bilgi" title="@Metin.T("Onizleme_OrnekVeriIpucu")">
+                    @Metin.T("Onizleme_OrnekVeri")
+                </span>
+            }
+        </div>
+
+        <div class="rt-onizleme-akis">
+            @foreach (var basilan in sayfalar)
+            {
+                @* Yakınlaştırma CSS transform ile: kutuların koordinatları
+                   puntodan piksele bir kez çevriliyor, ölçek onların üstünde
+                   duruyor. Dıştaki kap büyütülmüş boyutu üstlenir, yoksa
+                   kaydırma çubukları küçük kalır ve kâğıdın altı görülemez. *@
+                <div class="rt-onizleme-olcek" style="@OlcekBicemi">
+                <div class="rt-onizleme-kagit" style="@KagitBicemi">
+                    @* Kenar boşluğu kılavuzu önizlemede de duruyor: taşan bir
+                       kutunun kâğıdın neresine denk geldiği ancak öyle görünür. *@
+                    <div class="rt-onizleme-kilavuz" style="@KilavuzBicemi"></div>
+
+                    @foreach (var kutu in basilan.Kutular)
+                    {
+                        <div class="rt-kutu" data-nesne-turu="@kutu.Nesne.Tur"
+                             style="@Bicem.Kutu(kutu.Nesne, kutu.SolPt, kutu.UstPt)">
+                            @if (kutu.Nesne.Tur is NesneTuru.Yazi)
+                            {
+                                <div class="rt-kutu-yazi" style="@Bicem.Yazi(kutu.Nesne)">@kutu.Metin</div>
+                            }
+                            else if (kutu.Nesne.Tur is NesneTuru.Resim && kutu.Nesne.ResimVerisi is { Length: > 0 } veri)
+                            {
+                                <img class="rt-resim-icerik" src="@veri" alt=""
+                                     style="object-fit:@(kutu.Nesne.ResimUyumu is ResimUyumu.Uzat ? "fill" : "contain")" />
+                            }
+                            else if (kutu.Nesne.Tur is NesneTuru.Barkod
+                                     && Barkod.Svg(kutu.Metin, kutu.Nesne.BarkodTuru, kutu.Nesne.BarkodYazisi,
+                                                   kutu.Nesne.Renk, kutu.Nesne.GenislikPt / kutu.Nesne.YukseklikPt) is { } svg)
+                            {
+                                <div class="rt-barkod">@((MarkupString)svg)</div>
+                            }
+                        </div>
+                    }
+
+                </div>
+                    <span class="rt-onizleme-no">@basilan.No</span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>Basılacak cetvel sayfası.</summary>
+    [Parameter, EditorRequired] public required DuzenSayfasi? Sayfa { get; set; }
+
+    /// <summary>
+    /// Basılacak veri; verilmezse kutular örnek değerlerle dolar.
+    /// </summary>
+    /// <remarks>
+    /// Tasarım anında veri olmaması normaldir — düzen henüz yazılıyor. Boş
+    /// önizleme göstermektense örnek satırlarla doldurmak, yerleşimi görmenin
+    /// tek yolu.
+    /// </remarks>
+    [Parameter] public RaporVerisi? Veri { get; set; }
+
+    /// <summary>
+    /// Düzenin sürümü: değeri değiştikçe önizleme yeniden dizilir.
+    /// </summary>
+    /// <remarks>
+    /// Düzen <b>yerinde</b> değiştiriliyor (aynı nesne, değişen içerik), o
+    /// yüzden başvuru karşılaştırması değişikliği görmüyor: önizleme açıkken
+    /// kâğıt boyunu değiştiren ya da geri alan biri ekranda hiçbir şey olmadığını
+    /// görürdü. Tasarımcı her değişiklikte bu sayacı artırıyor.
+    /// </remarks>
+    [Parameter] public int Surum { get; set; }
+
+    private static readonly double[] Olcekler = [0.5, 0.75, 1, 1.25, 1.5];
+
+    private double olcek = 0.75;
+    private List<BasilanSayfa> sayfalar = [];
+
+    private DuzenSayfasi? dizilen;
+    private RaporVerisi? dizilenVeri;
+    private int dizilenSurum = -1;
+
+    /// <remarks>
+    /// Dizim pahalı: düzen, veri ya da sürüm değişmedikçe yinelenmiyor. Her
+    /// çizimde yeniden dizilseydi yakınlığı değiştirmek bile bütün sayfaları
+    /// yeniden hesaplatırdı.
+    /// </remarks>
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(dizilen, Sayfa)
+            && ReferenceEquals(dizilenVeri, Veri)
+            && dizilenSurum == Surum)
+            return;
+
+        dizilen = Sayfa;
+        dizilenVeri = Veri;
+        dizilenSurum = Surum;
+
+        sayfalar = Sayfa is null ? [] : SayfaDizici.Diz(Sayfa, Veri);
+    }
+
+    /// <summary>Kâğıdın büyütülmüş hâlinin kapladığı yer.</summary>
+    private string OlcekBicemi
+        => $"width:{Olcu.Px(Sayfa!.GenislikPt * olcek)};height:{Olcu.Px(Sayfa.YukseklikPt * olcek)}";
+
+    private string KagitBicemi
+        => $"width:{Olcu.Px(Sayfa!.GenislikPt)};height:{Olcu.Px(Sayfa.YukseklikPt)};" +
+           $"transform:scale({Olcu.Sayi(olcek)})";
+
+    private string KilavuzBicemi
+        => $"left:{Olcu.Px(Sayfa!.SolBoslukPt)};top:{Olcu.Px(Sayfa.UstBoslukPt)};" +
+           $"width:{Olcu.Px(Sayfa.GenislikPt - Sayfa.SolBoslukPt - Sayfa.SagBoslukPt)};" +
+           $"height:{Olcu.Px(Sayfa.YukseklikPt - Sayfa.UstBoslukPt - Sayfa.AltBoslukPt)}";
+
+    /// <summary>Açılışta kendini yazdırma kutusuna versin mi?</summary>
+    /// <remarks>
+    /// Listedeki "Yazdır" düğmesi için: kullanıcı önce önizlemeyi açıp sonra
+    /// ayrıca yazdır demek zorunda kalmasın.
+    /// </remarks>
+    [Parameter] public bool HemenYazdir { get; set; }
+
+    private bool yazdirildi;
+
+    /// <remarks>
+    /// <c>window.print()</c> doğrudan çağrılıyor; kütüphanenin bu iş için ayrı
+    /// bir JS dosyası taşımasına gerek yok. Yazdırma görünümünü CSS hazırlıyor
+    /// (<c>@@media print</c>): araç çubukları gizlenir, kâğıtlar ölçeksiz ve
+    /// gölgesiz, her biri kendi yaprağında basılır.
+    /// </remarks>
+    private async Task Yazdir() => await JS.InvokeVoidAsync("window.print");
+
+    protected override async Task OnAfterRenderAsync(bool ilk)
+    {
+        // Sayfalar dizilmeden yazdırmak boş kâğıt basardı; ilk çizimden sonra
+        // ve yalnızca bir kez.
+        if (!HemenYazdir || yazdirildi || sayfalar.Count == 0) return;
+
+        yazdirildi = true;
+        await Yazdir();
+    }
+
+    private void OlcekDegisti(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(),
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var o))
+            olcek = o;
+    }
+}

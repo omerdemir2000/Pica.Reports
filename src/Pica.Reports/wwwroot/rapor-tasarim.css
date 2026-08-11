@@ -1,0 +1,1387 @@
+/* ==========================================================================
+   Pica.Reports — bileşenin kendi biçemi
+   --------------------------------------------------------------------------
+   TAILWIND YOK, BAĞIMLILIK YOK. Bu dosya kütüphaneyle birlikte gelir ve
+   _content/Pica.Reports/rapor-tasarim.css adresinden servis edilir.
+
+   Yön: çizim masası. Aracın tek işi "her kutu kâğıdın neresinde duruyor"
+   sorusunu cevaplamak, o yüzden ekrandaki TEK saf beyaz kâğıttır. Çevresi
+   soğuk kurşuni kalır ki kâğıt yüzsün; vurgu rengi (okra) yalnızca seçime
+   ayrılmıştır — kâğıt siyah yazı dolu olduğu için sıcak bir seçim çizgisi
+   tereddütsüz okunur.
+
+   Bütün seçiciler .rt-kok altındadır: kütüphane barındıran uygulamanın
+   biçemine karışmaz, uygulamanın biçemi de buraya sızmaz.
+   ========================================================================== */
+
+/* Kütüphanenin İKİ ekranı var — düzen listesi ve tasarımcı — ve ikisi de aynı
+   renkleri, ölçüleri, yazıyı kullanır. Bu yüzden değişkenler burada durur;
+   .rt-tasarimci üstünde bırakılsalardı liste sayfası renksiz açılırdı. */
+.rt-kok {
+    /* --- yüzeyler --------------------------------------------------------
+       Barındıran uygulama isterse bu değişkenleri kendi tasarım sistemine
+       bağlayabilir; hiçbir şey yapmazsa aşağıdaki değerler geçerlidir. */
+    --rt-tezgah: #59656a; /* kâğıdın arkasındaki çalışma yüzeyi */
+
+    /* Panel BEYAZ. Kırık beyaz denendi ve barındıran uygulamanın tuval
+       zemininden (#eef2f2) ayırt edilemedi: kenar çubuğu yüzey gibi değil,
+       zeminin devamı gibi okundu. Panelin arkasında ne olduğunu bilmiyoruz,
+       o yüzden en ayrık değeri alıyor. */
+    --rt-panel: #ffffff; /* araç çubuğu, kenar çubuğu, özellik paneli */
+    --rt-panel-alt: #eceff0; /* girinti: denetim zemini, seçili satır */
+    --rt-cizgi: #ccd4d5;
+    --rt-cizgi-ince: #e3e9e9;
+
+    --rt-yazi: #162022;
+    --rt-yazi-soluk: #5b6a6d;
+    --rt-yazi-silik: #859597;
+
+    /* Kâğıt tema değiştirmez. Çıktı beyaz kâğıda basılıyor; tasarımcı onu
+       koyu temada gri gösterirse yerleşim kararları yanlış zeminde verilir. */
+    --rt-kagit: #ffffff;
+    --rt-murekkep: #101617;
+    --rt-kagit-golge: 22 32 34;
+
+    --rt-vurgu: #b57811; /* seçim — okra */
+    --rt-vurgu-parlak: #e0a53c;
+    --rt-odak: #2b7f86;
+
+    /* --- ölçü ------------------------------------------------------------ */
+    --rt-cubuk: 38px; /* araç çubuğu yüksekliği */
+
+    /* --- yazı ------------------------------------------------------------
+       Kütüphane yazı tipi taşımaz: kurulumu ağırlaştırır ve intranet
+       dağıtımlarında dış istek demektir. Sayılar ve nesne adları tek aralıklı
+       yüzden okunur — "Memo33" bir kimlik, "142,4 pt" bir ölçüdür; ikisi de
+       alt alta hizalı durmalı. */
+    --rt-aile: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+    --rt-aile-mono: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+
+    font-family: var(--rt-aile);
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--rt-yazi);
+
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--rt-panel);
+    border: 1px solid var(--rt-cizgi);
+}
+
+/* Tasarımcının yerleşimi: üstte araç çubuğu, solda araç paleti, kalanı
+   çalışma alanı. Düzen listesi eskiden soldaydı ve 260 piksel yerdi; ayrı bir
+   ekrana çıkınca yerini palet aldı — o da yarısı kadar. */
+.rt-tasarimci {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: var(--rt-cubuk) minmax(0, 1fr);
+}
+
+/* Palet yoksa (düzen açılmamışsa) tek sütun kalır: boş bir şerit bırakmamak
+   için sütun genişliği auto. */
+.rt-arac {
+    grid-column: 1;
+    width: 156px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 8px 16px;
+    background: var(--rt-panel);
+    border-right: 1px solid var(--rt-cizgi);
+}
+
+.rt-arac-baslik {
+    margin: 8px 0 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-arac-baslik:first-child {
+    margin-top: 0;
+}
+
+.rt-arac-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rt-arac-dugme {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    padding: 4px 7px;
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+    color: var(--rt-yazi-soluk);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.rt-arac-dugme:hover:not(:disabled) {
+    color: var(--rt-yazi);
+    background: var(--rt-panel-alt);
+    border-color: var(--rt-cizgi);
+}
+
+/* Nesne düğmeleri sürüklenebilir; imleç bunu söylesin. */
+.rt-arac-dugme[draggable="true"],
+.rt-alan-dugme[draggable="true"] {
+    cursor: grab;
+}
+
+.rt-arac-dugme[draggable="true"]:active,
+.rt-alan-dugme[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* --------------------------------------------------------------- alan ağacı */
+
+.rt-kume-agac {
+    margin-bottom: 2px;
+}
+
+.rt-kume-agac > summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--rt-yazi-soluk);
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.rt-kume-agac > summary:hover {
+    background: var(--rt-panel-alt);
+}
+
+/* Alan adları tek aralıklı: veritabanı adları öyle okunur ve alt alta
+   dizildiklerinde ortak önekler (borc/borcytl/borcykr) hizalı görünür. */
+.rt-alan-dugme {
+    display: block;
+    width: 100%;
+    padding: 2px 6px 2px 22px;
+    font-family: var(--rt-aile-mono);
+    font-size: 11px;
+    text-align: left;
+    color: var(--rt-yazi-soluk);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rt-alan-dugme:hover {
+    color: var(--rt-yazi);
+    background: var(--rt-panel-alt);
+    border-color: var(--rt-cizgi);
+}
+
+.rt-arac-dugme:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* Bandın kanaldaki rengiyle aynı nokta: palette hangi bandın nereye düştüğü
+   renkten okunuyor, listeyi baştan sona okumaya gerek kalmıyor. */
+.rt-arac-nokta {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--rt-bant-renk, var(--rt-yazi-silik));
+}
+
+/* Koyu tema iki yoldan gelir: barındıran uygulama <html data-theme="dark">
+   yazıyorsa ondan, hiçbir şey yazmıyorsa işletim sisteminin tercihinden.
+   İkisi de tanımlı olmalı; yalnızca medya sorgusu yazılsaydı uygulamanın
+   tema düğmesi bileşeni etkilemezdi. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .rt-kok {
+        --rt-tezgah: #23292b;
+        --rt-panel: #151d1f;
+        --rt-panel-alt: #1c2628;
+        --rt-cizgi: #2b3739;
+        --rt-cizgi-ince: #222d2f;
+        --rt-yazi: #e2ebec;
+        --rt-yazi-soluk: #9fb1b3;
+        --rt-yazi-silik: #6d8082;
+        --rt-kagit-golge: 0 0 0;
+        --rt-vurgu: #d99b2b;
+        --rt-vurgu-parlak: #f0bd61;
+        --rt-odak: #4aa9af;
+    }
+}
+
+[data-theme="dark"] .rt-kok {
+    --rt-tezgah: #23292b;
+    --rt-panel: #151d1f;
+    --rt-panel-alt: #1c2628;
+    --rt-cizgi: #2b3739;
+    --rt-cizgi-ince: #222d2f;
+    --rt-yazi: #e2ebec;
+    --rt-yazi-soluk: #9fb1b3;
+    --rt-yazi-silik: #6d8082;
+    --rt-kagit-golge: 0 0 0;
+    --rt-vurgu: #d99b2b;
+    --rt-vurgu-parlak: #f0bd61;
+    --rt-odak: #4aa9af;
+}
+
+.rt-kok *,
+.rt-kok *::before,
+.rt-kok *::after {
+    box-sizing: border-box;
+}
+
+.rt-kok :focus-visible {
+    outline: 2px solid var(--rt-odak);
+    outline-offset: 1px;
+}
+
+/* --------------------------------------------------------------- araç çubuğu */
+
+.rt-cubuk {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    background: var(--rt-panel);
+    border-bottom: 1px solid var(--rt-cizgi);
+    min-width: 0;
+}
+
+.rt-cubuk-baslik {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rt-cubuk-kaynak {
+    font-family: var(--rt-aile-mono);
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+    white-space: nowrap;
+}
+
+.rt-cubuk-ara {
+    flex: 1;
+    min-width: 0;
+}
+
+.rt-etiket {
+    flex: none;
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-secim {
+    flex: none;
+    height: 24px;
+    padding: 0 4px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--rt-yazi);
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+}
+
+.rt-dugme {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 8px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--rt-yazi-soluk);
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.rt-dugme:hover {
+    color: var(--rt-yazi);
+}
+
+.rt-dugme[aria-pressed="true"] {
+    color: var(--rt-vurgu);
+    border-color: currentColor;
+}
+
+/* Hazır ekranların kabı: bileşen kendisine verilen yüksekliği doldurur,
+   sayfa akışına göre uzamaz. Uygulamanın yerleşimi yükseklik vermiyorsa
+   ekran boş görünürdü. */
+.pica-ekran {
+    height: 100%;
+    min-height: 0;
+}
+
+/* Künyeli ekran: liste kalan yeri alır, künye altta ince bir şerit. */
+.pica-kunyeli {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.pica-kunye {
+    padding: 5px 10px;
+    font-family: var(--rt-aile);
+    font-size: 11px;
+    text-align: right;
+    background: var(--rt-panel);
+    border-top: 1px solid var(--rt-cizgi-ince);
+}
+
+.pica-kunye a {
+    color: var(--rt-yazi-silik);
+    text-decoration: none;
+}
+
+.pica-kunye a:hover {
+    color: var(--rt-odak);
+}
+
+/* ==========================================================================
+   Önizleme — düzenin veriyle basılmış hâli
+   --------------------------------------------------------------------------
+   Kâğıtlar alt alta akar; her biri kendi ölçeğinde ve gölgeli. Tuvalden farkı
+   burada bant kanalı olmamasıdır: önizlemede bantlar yok, sayfalar var.
+   ========================================================================== */
+
+.rt-onizleme-sahne {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    background: var(--rt-tezgah);
+}
+
+.rt-onizleme-cubuk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    height: var(--rt-cubuk);
+    font-size: 12px;
+    color: var(--rt-yazi);
+    background: var(--rt-panel);
+    border-bottom: 1px solid var(--rt-cizgi);
+}
+
+.rt-onizleme-akis {
+    min-height: 0;
+    overflow: auto;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.rt-onizleme-olcek {
+    position: relative;
+    flex: none;
+}
+
+.rt-onizleme-kagit {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+    background: var(--rt-kagit);
+    color: var(--rt-murekkep);
+    box-shadow: 0 1px 3px rgb(var(--rt-kagit-golge) / 0.35), 0 8px 24px rgb(var(--rt-kagit-golge) / 0.18);
+}
+
+.rt-onizleme-kilavuz {
+    position: absolute;
+    border: 1px dashed #dfe6e7;
+    pointer-events: none;
+}
+
+/* Sayfa numarası kâğıdın DIŞINDA: kâğıda basılan bir şey değil, önizlemenin
+   kendi işareti. İçeride olsaydı çıktıda varmış gibi okunurdu. */
+.rt-onizleme-no {
+    position: absolute;
+    right: -6px;
+    bottom: -20px;
+    font-size: 11px;
+    color: #cfd8da;
+}
+
+/* --------------------------------------------------------------- yazdırma
+
+   Yazdırılan şey ÖNİZLEMEDİR: aynı kutular, aynı konumlar — ama ekrana ait
+   ne varsa (araç çubukları, palet, gölge, yakınlaştırma, kılavuz çizgileri)
+   kâğıda çıkmaz. Kâğıdın ölçüsü @page ile bildiriliyor; onu bileşen kendi
+   düzeninden yazıyor.                                                       */
+
+@media print {
+    /* Ekranın kabuğu: hiçbiri kâğıda ait değil. */
+    .rt-onizleme-cubuk,
+    .rt-cubuk,
+    .rt-arac,
+    .rt-ozellik,
+    .rt-onizleme-kilavuz,
+    .rt-onizleme-no {
+        display: none !important;
+    }
+
+    .rt-kok,
+    .rt-tasarimci,
+    .rt-bolme,
+    .rt-tezgah,
+    .rt-onizleme-sahne {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        border: 0 !important;
+        background: #fff !important;
+    }
+
+    .rt-onizleme-akis {
+        display: block;
+        padding: 0;
+        overflow: visible;
+    }
+
+    /* Yakınlaştırma kâğıda gitmez: çıktı 1/1 basılır. Ölçek kabı da yer
+       kaplamaz, kâğıdın kendisi akışa döner. */
+    .rt-onizleme-olcek {
+        width: auto !important;
+        height: auto !important;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .rt-onizleme-olcek:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .rt-onizleme-kagit {
+        position: relative !important;
+        transform: none !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+/* ==========================================================================
+   Düzen listesi — kütüphanenin ikinci ekranı
+   --------------------------------------------------------------------------
+   Liste tasarımcının solundaki dar kenar çubuğuyken adları kesiliyor, kaynak
+   dosya hiç görünmüyordu. Kendi sayfasına çıkınca satır bir tablo satırı
+   oldu: ad, anahtar, kaynak ve "düzenle" yan yana sığıyor.
+   ========================================================================== */
+
+.rt-sayfa {
+    display: grid;
+    grid-template-rows: var(--rt-cubuk) minmax(0, 1fr);
+}
+
+.rt-suzgec {
+    position: relative;
+    flex: 0 1 260px;
+    min-width: 110px;
+}
+
+.rt-suzgec svg {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--rt-yazi-silik);
+    pointer-events: none;
+}
+
+.rt-suzgec .rt-girdi {
+    height: 24px;
+}
+
+.rt-tablo-sarma {
+    min-height: 0;
+    overflow: auto;
+    background: var(--rt-panel);
+}
+
+.rt-tablo {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+/* Başlık satırı kayarken üstte kalır: 137 düzenin dibinde hangi sütunun ne
+   olduğu unutuluyor. */
+.rt-tablo thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 6px 10px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--rt-yazi-silik);
+    background: var(--rt-panel);
+    border-bottom: 1px solid var(--rt-cizgi);
+}
+
+.rt-tablo td {
+    padding: 5px 10px;
+    border-bottom: 1px solid var(--rt-cizgi-ince);
+    vertical-align: middle;
+}
+
+.rt-tablo tbody tr:hover {
+    background: var(--rt-panel-alt);
+}
+
+.rt-tablo-ad {
+    font-weight: 500;
+}
+
+.rt-tablo-mono {
+    font-family: var(--rt-aile-mono);
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+}
+
+/* Düğme sütunu satırın sonunda ve dar: genişliği yazısı kadar. */
+.rt-tablo-islem {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.rt-liste-bos {
+    padding: 24px 10px;
+    text-align: center;
+    color: var(--rt-yazi-silik);
+}
+
+/* -------------------------------------------------------- yeni düzen kutusu */
+
+.rt-perde {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgb(0 0 0 / 0.35);
+}
+
+.rt-iletisim {
+    width: min(420px, 100%);
+    padding: 14px 16px 16px;
+    background: var(--rt-panel);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 3px;
+    box-shadow: 0 12px 32px rgb(var(--rt-kagit-golge) / 0.28);
+}
+
+.rt-iletisim h2 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.rt-iletisim label {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-iletisim .rt-girdi {
+    padding: 0 8px;
+    margin-top: 2px;
+}
+
+.rt-iletisim-dugmeler {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.rt-hata {
+    margin: 10px 0 0;
+    font-size: 11px;
+    color: #a9412c;
+}
+
+[data-theme="dark"] .rt-hata {
+    color: #e07a5f;
+}
+
+.rt-girdi {
+    width: 100%;
+    height: 28px;
+    padding: 0 8px 0 26px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--rt-yazi);
+    /* Girinti: panel beyaz olduğu için beyaz bir kutu görünmezdi. */
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+}
+
+.rt-girdi::placeholder {
+    color: var(--rt-yazi-silik);
+}
+
+.rt-liste-sayi {
+    flex: none;
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+    white-space: nowrap;
+}
+
+/* Düzeltmesi olan düzen: üretilmiş dosyanın üstüne elle yazılmış bir yama var.
+   Listede görünmesi gerekir, çünkü o düzende gördüğün şey dönüştürücünün
+   ürettiği şey değildir. */
+.rt-yama {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 4px;
+    font-family: var(--rt-aile-mono);
+    font-size: 9.5px;
+    line-height: 14px;
+    vertical-align: 1px;
+    color: var(--rt-vurgu);
+    border: 1px solid currentColor;
+    border-radius: 2px;
+}
+
+/* -------------------------------------------------------------- çalışma alanı */
+
+/* Tuval ile PDF önizlemesi yan yana. Önizleme kapalıyken tuval bütün alanı
+   alır; ikisi arasında bölücü yok, çünkü oran ayarlanacak bir şey değil —
+   biri yerleşim, diğeri sonuç. */
+/* Her zaman ikinci sütun: palet yokken (düzen açılmamışken) birinci sütun
+   boş ve genişliği sıfırdır, yerleşim kaymaz. */
+.rt-bolme {
+    grid-column: 2;
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+}
+
+.rt-tezgah {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    background: var(--rt-tezgah);
+}
+
+.rt-onizleme {
+    flex: 0 0 44%;
+    min-width: 0;
+    border: 0;
+    border-left: 1px solid var(--rt-cizgi);
+    background: var(--rt-tezgah);
+}
+
+/* Boş ekran bir davettir, özür değil. */
+.rt-bos {
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 10px;
+    padding: 24px;
+    text-align: center;
+    color: #cfd8da;
+}
+
+.rt-bos svg {
+    color: #8b999c;
+}
+
+.rt-bos-baslik {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.rt-bos-alt {
+    font-size: 12px;
+    color: #a8b4b6;
+    max-width: 34ch;
+}
+
+/* ==========================================================================
+   Tuval
+   ========================================================================== */
+
+/* Sol boşluk bant kanalı içindir: kanal kâğıdın dışına, soluna taşar. */
+.rt-sahne {
+    padding: 22px 28px 60px 200px;
+    width: max-content;
+    min-width: 100%;
+}
+
+.rt-yigin {
+    transform-origin: top left;
+}
+
+.rt-kagit {
+    position: relative;
+    background: var(--rt-kagit);
+    color: var(--rt-murekkep);
+    box-shadow: 0 1px 2px rgb(var(--rt-kagit-golge) / 0.28),
+                0 8px 22px rgb(var(--rt-kagit-golge) / 0.22);
+}
+
+/* Kenar boşluğu kılavuzu — kâğıdın yazı alanının sınırları. */
+.rt-kilavuz {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed #b9c6c8;
+    border-right: 1px dashed #b9c6c8;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* --------------------------------------------------------------- bant */
+
+.rt-bant {
+    position: relative;
+    /* Bantların birbirinden ayrıldığı yer. FastReport'ta bant sınırı bir
+       çizgi değil, sadece bir sınırdır; burada saç teli kadar gösterilir
+       ki hangi kutunun hangi banda ait olduğu görünsün. */
+    border-bottom: 1px solid rgb(80 110 115 / 0.16);
+}
+
+.rt-bant:last-child {
+    border-bottom: 0;
+}
+
+.rt-bant[data-basmaz] {
+    background: repeating-linear-gradient(135deg,
+            transparent 0 4px, rgb(150 120 60 / 0.14) 4px 8px);
+}
+
+.rt-alan {
+    position: relative;
+    height: 100%;
+}
+
+/* Bandın alt kenarı: yüksekliği fareyle çekmek için.
+
+   Bant satırının tamamı boyunca uzanıyor (kanal dahil) ve kutuların ÜSTÜNDE
+   duruyor — en alttaki kutu kenara yapışıksa yine de bandı tutabilmelisiniz.
+   Yüksekliği 5 piksel: daha incesi yakalanmıyor, daha kalını en alttaki
+   kutuya tıklamayı zorlaştırıyor. */
+.rt-bant-tutamak {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 5px;
+    z-index: 4;
+    cursor: ns-resize;
+}
+
+.rt-bant-tutamak::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 2px;
+    height: 1px;
+    background: transparent;
+}
+
+/* Üstüne gelince kenar belli olsun: tutulacak yerin görünmesi gerekiyor. */
+.rt-bant-tutamak:hover::after {
+    background: var(--rt-odak);
+}
+
+/* Çekilirken bütün bant satırı işaretli: hangi bandın boyunu değiştirdiğiniz
+   kutuların arasında kaybolmasın. */
+.rt-sahne[data-surukleniyor] .rt-bant-tutamak::after {
+    background: transparent;
+}
+
+/* ------------------------------------------------- paletten sürükleyip bırakma */
+
+/* Sürükleme sırasında kutular tıklamayı geçirir: bırakma her zaman BANDIN
+   alanına düşsün ki bırakma noktası bandın köşesine göre okunsun. Kutunun
+   üstüne düşseydi koordinat kutunun köşesine göre gelir ve nesne bambaşka bir
+   yere otururdu. */
+.rt-sahne[data-birakma] .rt-kutu {
+    pointer-events: none;
+}
+
+/* Hedef bant: nesnenin hangi bandın içine gireceği, bırakmadan önce görünmeli.
+   Bant seçimi (okra) ile karışmasın diye odak rengi ve kesikli çizgi. */
+.rt-alan[data-hedef] {
+    outline: 1.5px dashed var(--rt-odak);
+    outline-offset: -1px;
+    background: rgb(43 127 134 / 0.07);
+}
+
+/* ----------------------------------------------------------- bant kanalı */
+
+/* Kanal aracın imzasıdır: bantları KÂĞITTAKİ SIRAYLA, görevleriyle ve
+   bağımlılıklarıyla listeler. Dosyadaki sıra bu değildir ve JSON'a bakarak
+   görülemez. */
+.rt-kanal {
+    position: absolute;
+    right: 100%;
+    top: 0;
+    bottom: 0;
+    width: 186px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-right: 8px;
+    font-size: 10.5px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;   /* tıklamak bandı seçer */
+
+    /* Kanal HER İKİ TEMADA DA koyu tezgâhın üstünde durur, panelin değil.
+       Renkleri bu yüzden panel paletinden alınmaz — açık temada panel yazısı
+       koyu gridir ve koyu zeminde okunmaz. Kendi koyu plakası ve açık yazısı
+       var; tema değiştiğinde değişmezler, çünkü altındaki zemin değişmiyor. */
+    background: rgb(16 24 26 / 0.55);
+    color: #cfdadc;
+    border-right: 3px solid var(--rt-bant-renk, #9aa9ac);
+    border-bottom: 1px solid rgb(0 0 0 / 0.2);
+}
+
+.rt-kanal-sira {
+    flex: none;
+    min-width: 15px;
+    text-align: right;
+    font-family: var(--rt-aile-mono);
+    color: #8fa0a3;
+}
+
+.rt-kanal-tur {
+    flex: none;
+    font-weight: 600;
+    color: var(--rt-bant-renk, #cfdadc);
+}
+
+.rt-kanal-ad {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--rt-aile-mono);
+    color: #a8b7ba;
+}
+
+.rt-kanal-olcu {
+    flex: none;
+    font-family: var(--rt-aile-mono);
+    color: #8fa0a3;
+}
+
+.rt-kanal-uyari {
+    color: #e8b455;
+}
+
+/* Bant türü renkleri. Süs değil: türü aynı olan bantlar kâğıtta aynı işi
+   yapar ve renk, on beş bantlık bir düzende onları tek bakışta ayırır.
+   Tonlar koyu plakada okunacak parlaklıkta seçildi ve temayla değişmez —
+   kanalın zemini de değişmiyor. */
+/* Renkler bandın kendisine değil, data-tur taşıyan HERHANGİ bir öğeye
+   bağlanıyor: araç paletindeki nokta da aynı değişkeni okuyor ve iki liste
+   ayrı ayrı boyanmıyor. */
+.rt-kok [data-tur="RaporBasligi"], .rt-kok [data-tur="RaporSonu"] { --rt-bant-renk: #a98ce6; }
+.rt-kok [data-tur="SayfaBasligi"], .rt-kok [data-tur="SayfaSonu"] { --rt-bant-renk: #79aee4; }
+.rt-kok [data-tur="Baslik"], .rt-kok [data-tur="SutunBasligi"], .rt-kok [data-tur="SutunSonu"] { --rt-bant-renk: #56bcc3; }
+.rt-kok [data-tur="GrupBasligi"], .rt-kok [data-tur="GrupSonu"] { --rt-bant-renk: #e0a83c; }
+.rt-kok [data-tur="Veri"] { --rt-bant-renk: #6cc47e; }
+.rt-kok [data-tur="AltVeri"], .rt-kok [data-tur="AltAltVeri"] { --rt-bant-renk: #99d6a5; }
+.rt-kok [data-tur="Alt"] { --rt-bant-renk: #ec9a5c; }
+.rt-kok [data-tur="Ust"] { --rt-bant-renk: #e084a8; }
+.rt-kok [data-tur="Yan"] { --rt-bant-renk: #9aa9ac; }
+
+/* --------------------------------------------------------------- kutu */
+
+/* Taşma kutuda değil yazıda kesilir: kutu görünür kalmalı ki seçildiğinde
+   kenarına konan boyutlandırma tutamakları kırpılmasın. */
+.rt-kutu {
+    position: absolute;
+    display: flex;
+}
+
+.rt-kutu-yazi {
+    width: 100%;
+    max-height: 100%;
+    line-height: 1.18;
+    overflow: hidden;
+}
+
+/* İfade — basımda veriden gelen bir değerle değişecek başvuru. Sabit metinle
+   aynı görünseydi hangi kutunun veriye bağlı olduğu anlaşılmazdı. */
+.rt-ifade {
+    background: rgb(181 120 17 / 0.15);
+    box-shadow: 0 0 0 1px rgb(181 120 17 / 0.35);
+    border-radius: 1px;
+}
+
+/* Çizgi ve şekil bir zamanlar tıklamayı geçiriyordu (pointer-events: none):
+   metinleri yok, düzenlenecek bir şeyleri de yok sayılıyordu. Palete eklenince
+   yanlış hâle geldi — eklenen şekil seçilemiyor, dolayısıyla taşınamıyor ve
+   silinemiyordu. Kural kaldırıldı; taşınan 137 düzende toplam 2 şekil ve 5
+   çizgi var ve hiçbiri başka bir kutunun üstünü örtmüyor, yani geçirgenlik
+   kimsenin tıklamasını kurtarmıyordu. */
+
+/* Çizgi bir punto boyunda olabilir — ekranda 1-2 piksel, fareyle tutulmaz.
+   Görünmez bir tutma alanı veriliyor; çizginin kendisi büyümüyor, kâğıtta
+   hiçbir şey değişmiyor. */
+.rt-kutu[data-nesne-turu="Cizgi"]::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+}
+
+.rt-resim {
+    margin: auto;
+    padding: 0 2px;
+    font-size: 8px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8a9698;
+    border: 1px dashed currentColor;
+}
+
+/* Resim ve barkod kutuyu tamamen kaplar: ikisinin de kâğıttaki ölçüsü kutunun
+   ölçüsüdür, içerik kutuya göre gerilir. */
+.rt-resim-icerik,
+.rt-barkod {
+    width: 100%;
+    height: 100%;
+}
+
+.rt-barkod svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---------------------------------------------------------- kutu durumları */
+
+.rt-kutu {
+    cursor: pointer;
+}
+
+/* Seçim okra: kâğıt siyah yazı dolu, sıcak bir çizgi tereddütsüz okunur.
+   Dış gölge kullanılıyor çünkü çerçeve kutunun boyunu değiştirirdi ve
+   seçilen kutu kâğıtta yerinden oynamış gibi görünürdü. */
+.rt-kutu[data-secili] {
+    outline: 1.5px solid var(--rt-vurgu);
+    outline-offset: 0;
+    box-shadow: 0 0 0 3px rgb(181 120 17 / 0.22);
+    z-index: 2;
+}
+
+.rt-kutu[data-secili] {
+    cursor: move;
+}
+
+/* Sürüklenirken imleç kutunun üstünden kaçmasın diye tıklama hedefleri kapanır;
+   ayrıca metin seçimi engellenir, yoksa sürükleme yazıyı boyar. */
+.rt-sahne[data-surukleniyor] {
+    user-select: none;
+}
+
+.rt-sahne[data-surukleniyor] .rt-kutu:not([data-secili]) {
+    pointer-events: none;
+}
+
+/* Tutamaklar ölçeğin içinde duruyor; yakınlaştırma azalınca kaybolmasınlar
+   diye ters çevriliyor. --rt-z tuvalden geliyor. */
+.rt-tutamak {
+    --rt-t: calc(7px / var(--rt-z, 1));
+    position: absolute;
+    width: var(--rt-t);
+    height: var(--rt-t);
+    background: var(--rt-kagit);
+    border: calc(1px / var(--rt-z, 1)) solid var(--rt-vurgu);
+    z-index: 4;
+}
+
+.rt-tutamak[data-yon="kb"] { top: calc(var(--rt-t) / -2); left: calc(var(--rt-t) / -2); cursor: nwse-resize; }
+.rt-tutamak[data-yon="k"]  { top: calc(var(--rt-t) / -2); left: calc(50% - var(--rt-t) / 2); cursor: ns-resize; }
+.rt-tutamak[data-yon="kd"] { top: calc(var(--rt-t) / -2); right: calc(var(--rt-t) / -2); cursor: nesw-resize; }
+.rt-tutamak[data-yon="d"]  { top: calc(50% - var(--rt-t) / 2); right: calc(var(--rt-t) / -2); cursor: ew-resize; }
+.rt-tutamak[data-yon="gd"] { bottom: calc(var(--rt-t) / -2); right: calc(var(--rt-t) / -2); cursor: nwse-resize; }
+.rt-tutamak[data-yon="g"]  { bottom: calc(var(--rt-t) / -2); left: calc(50% - var(--rt-t) / 2); cursor: ns-resize; }
+.rt-tutamak[data-yon="gb"] { bottom: calc(var(--rt-t) / -2); left: calc(var(--rt-t) / -2); cursor: nesw-resize; }
+.rt-tutamak[data-yon="b"]  { top: calc(50% - var(--rt-t) / 2); left: calc(var(--rt-t) / -2); cursor: ew-resize; }
+
+/* Ham düzenden farklı kutu: gördüğün şey dönüştürücünün ürettiği şey değil. */
+.rt-kutu[data-degisti]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top: 5px solid var(--rt-vurgu);
+    border-left: 5px solid transparent;
+    pointer-events: none;
+}
+
+/* ================================================================ özellikler */
+
+.rt-ozellik {
+    flex: 0 0 268px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--rt-panel);
+    border-left: 1px solid var(--rt-cizgi);
+}
+
+.rt-ozellik-tepe {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--rt-cizgi);
+}
+
+.rt-ozellik-ad {
+    display: block;
+    font-family: var(--rt-aile-mono);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.rt-ozellik-alt {
+    display: block;
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-ozellik-govde {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.rt-kume {
+    margin: 0 0 10px;
+    padding: 6px 8px 8px;
+    border: 1px solid var(--rt-cizgi-ince);
+    border-radius: 2px;
+}
+
+.rt-kume > legend {
+    padding: 0 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--rt-yazi-soluk);
+}
+
+.rt-kume-not {
+    font-weight: 400;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-kume label {
+    display: block;
+    font-size: 11px;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-dortlu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.rt-ikili {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.rt-tam {
+    margin-top: 6px;
+}
+
+.rt-satir {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.rt-ara {
+    flex: 1;
+}
+
+.rt-kume .rt-girdi {
+    height: 25px;
+    padding: 0 5px;
+    margin-top: 2px;
+    color: var(--rt-yazi);
+}
+
+.rt-sayi {
+    font-family: var(--rt-aile-mono);
+}
+
+.rt-mono {
+    font-family: var(--rt-aile-mono);
+}
+
+.rt-kume textarea.rt-girdi {
+    height: auto;
+    padding: 4px 5px;
+    font-family: var(--rt-aile-mono);
+    font-size: 11.5px;
+    line-height: 1.35;
+    resize: vertical;
+}
+
+.rt-kume select.rt-girdi {
+    width: 100%;
+}
+
+.rt-ipucu {
+    margin: 4px 0 0;
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--rt-yazi-silik);
+}
+
+.rt-ipucu code {
+    font-family: var(--rt-aile-mono);
+    font-size: 10.5px;
+    color: var(--rt-yazi-soluk);
+}
+
+/* Açma/kapama düğmesi — kalın, eğik, çerçeve kenarları. */
+.rt-acik {
+    min-width: 25px;
+    height: 25px;
+    padding: 0 6px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--rt-yazi-soluk);
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.rt-acik[aria-pressed="true"] {
+    color: var(--rt-kagit);
+    background: var(--rt-odak);
+    border-color: var(--rt-odak);
+}
+
+.rt-hizalar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.rt-hiza {
+    padding: 5px 6px;
+    font: inherit;
+    font-size: 11px;
+    text-align: left;
+    color: var(--rt-yazi-soluk);
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.rt-hiza:hover:not(:disabled) {
+    color: var(--rt-yazi);
+    border-color: var(--rt-odak);
+}
+
+.rt-hiza:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.rt-tehlike {
+    color: #a9412c;
+}
+
+[data-theme="dark"] .rt-tehlike {
+    color: #e07a5f;
+}
+
+/* Kanal seçimi: bandın kendisi de düzenlenebilir. Koyu plakanın üstünde
+   durduğu için okra saydamlığı yetmez, dolu bir ton gerekiyor. */
+.rt-kanal[data-secili] {
+    background: #6b4a12;
+    color: #f3e3c4;
+}
+
+.rt-kanal[data-secili] .rt-kanal-ad,
+.rt-kanal[data-secili] .rt-kanal-olcu,
+.rt-kanal[data-secili] .rt-kanal-sira {
+    color: #d9c49a;
+}
+
+.rt-katlanir {
+    margin-top: 6px;
+    border: 1px solid var(--rt-cizgi-ince);
+    border-radius: 2px;
+}
+
+.rt-katlanir > summary {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+    padding: 4px 6px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.rt-kod {
+    margin: 0;
+    padding: 6px 8px;
+    max-height: 320px;
+    overflow: auto;
+    font-family: var(--rt-aile-mono);
+    font-size: 10.5px;
+    line-height: 1.4;
+    white-space: pre;
+    color: var(--rt-yazi-soluk);
+    background: var(--rt-panel-alt);
+    border-top: 1px solid var(--rt-cizgi-ince);
+}
+
+.rt-uyarilar,
+.rt-alanlar {
+    margin: 6px 0 0;
+    padding-left: 16px;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--rt-yazi-soluk);
+}
+
+.rt-alanlar {
+    max-height: 240px;
+    overflow-y: auto;
+    list-style: none;
+    padding-left: 0;
+}
+
+.rt-alanlar li {
+    padding: 1px 0;
+}
+
+.rt-renk {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 5px;
+}
+
+.rt-renk input[type="color"] {
+    width: 26px;
+    height: 25px;
+    padding: 1px;
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.rt-onay {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Dosya seçici: tarayıcının kendi düğmesi biçemlenemiyor, o yüzden gizlenip
+   etiketin kendisi düğme gibi görünüyor. */
+.rt-dosya {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+}
+
+.rt-dosya input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.rt-resim-onizleme {
+    display: grid;
+    place-items: center;
+    height: 84px;
+    margin-top: 4px;
+    padding: 4px;
+    background: var(--rt-panel-alt);
+    border: 1px solid var(--rt-cizgi);
+    border-radius: 2px;
+}
+
+.rt-resim-onizleme img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* ------------------------------------------------------------ araç çubuğu ek */
+
+.rt-dugme-birincil {
+    color: var(--rt-kagit);
+    background: var(--rt-odak);
+    border-color: var(--rt-odak);
+}
+
+.rt-dugme-birincil:hover {
+    color: var(--rt-kagit);
+}
+
+.rt-dugme:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.rt-bilgi {
+    flex: none;
+    font-size: 11px;
+    color: var(--rt-odak);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .rt-tablo tbody tr {
+        transition: background-color 90ms linear;
+    }
+}

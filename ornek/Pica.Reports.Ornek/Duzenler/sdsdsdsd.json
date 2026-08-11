@@ -1,0 +1,80 @@
+{
+  "Anahtar": "sdsdsdsd",
+  "Ad": "sdsdsdsd",
+  "Kaynak": "",
+  "Sayfalar": [
+    {
+      "GenislikPt": 595.28,
+      "YukseklikPt": 841.89,
+      "SolBoslukPt": 28.35,
+      "SagBoslukPt": 28.35,
+      "UstBoslukPt": 28.35,
+      "AltBoslukPt": 28.35,
+      "Yatay": false,
+      "SutunSayisi": 0,
+      "SutunAraligiPt": 0,
+      "Bantlar": [
+        {
+          "Ad": "RaporBasligi1",
+          "Tur": "RaporBasligi",
+          "YukseklikPt": 32,
+          "UstPt": 0,
+          "VeriKumesi": null,
+          "GrupKosulu": null,
+          "Uzayabilir": false,
+          "SonrasindaYeniSayfa": false,
+          "YanBant": null,
+          "Nesneler": [
+            {
+              "Ad": "Baslik",
+              "Tur": "Yazi",
+              "SolPt": 0,
+              "UstPt": 0,
+              "GenislikPt": 538.5799999999999,
+              "YukseklikPt": 18,
+              "Metin": "sdsdsdsd",
+              "VeriAlani": null,
+              "ResimVerisi": null,
+              "ResimUyumu": "Sigdir",
+              "BarkodTuru": "Code128",
+              "BarkodYazisi": true,
+              "YaziTipi": "Arial",
+              "PuntoPt": 12,
+              "Kalin": true,
+              "Egik": false,
+              "AltiCizili": false,
+              "Renk": null,
+              "ZeminRengi": null,
+              "Yatay": "Orta",
+              "Dikey": "Orta",
+              "Cerceve": "Yok",
+              "CerceveKalinligiPt": 1,
+              "CerceveRengi": null,
+              "Bicim": "Yok",
+              "BicimDeseni": null,
+              "OndalikAyraci": null,
+              "BinlikAyraci": null,
+              "KelimeKaydir": false,
+              "Uzayabilir": false,
+              "Sigdir": false
+            }
+          ]
+        },
+        {
+          "Ad": "Veri1",
+          "Tur": "Veri",
+          "YukseklikPt": 18,
+          "UstPt": 48,
+          "VeriKumesi": null,
+          "GrupKosulu": null,
+          "Uzayabilir": false,
+          "SonrasindaYeniSayfa": false,
+          "YanBant": null,
+          "Nesneler": []
+        }
+      ]
+    }
+  ],
+  "Betikler": [],
+  "Uyarilar": []
+}

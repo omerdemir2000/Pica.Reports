@@ -1,0 +1,27 @@
+@page "/"
+
+@using Pica.Reports.Servisler
+
+@inject IDuzenDeposu Depo
+@inject IRaporAraci Rapor
+@inject NavigationManager Gezinme
+
+@*
+    Düzen listesi.
+
+    Sayfanın tamamı bu: bileşene depoyu ver, "düzenle" dendiğinde tasarımcının
+    adresine git. Listeleme, arama, yeni düzen oluşturma kütüphanenin içinde.
+*@
+
+<PageTitle>Düzenler · Pica.Reports örneği</PageTitle>
+
+@* Düzenle kendi sayfamıza gidiyor (gömme örneği), önizle ve yazdır ise
+   kütüphanenin hazır ekranlarına — ikisi bir arada kullanılabiliyor. *@
+<DuzenListesi Depo="Depo"
+              Duzenle="Ac"
+              Onizle="a => Rapor.Onizle(a)"
+              Yazdir="a => Rapor.Yazdir(a)" />
+
+@code {
+    private void Ac(string anahtar) => Gezinme.NavigateTo($"/tasarim/{anahtar}");
+}

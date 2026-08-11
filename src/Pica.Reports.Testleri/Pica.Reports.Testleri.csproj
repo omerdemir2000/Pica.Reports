@@ -1,0 +1,38 @@
+<!--
+  Pica.Reports'ın sınamaları.
+
+  Kütüphaneyle birlikte taşınır: ayrı bir depoya çıkarken bu proje de gider,
+  çünkü sınadığı şey kütüphanenin kendi sözleşmesidir.
+
+  Sınamaların bir kısmı gerçek düzen dosyaları üzerinde çalışır ama onlara
+  BAĞIMLI DEĞİLDİR: dosyalar bulunamazsa o sınamalar atlanır (bkz.
+  DuzeltmeDosyaSinamalari). Böylece kütüphane tek başına da sınanabilir.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Pica.Reports.Testleri</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Pica.Reports/Pica.Reports.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Pica.Reports" />
+    <Using Include="Pica.Reports.Duzen" />
+  </ItemGroup>
+
+</Project>

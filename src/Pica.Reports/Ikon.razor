@@ -1,0 +1,62 @@
+@*
+    Kütüphanenin ikonları — satır içi SVG.
+
+    Bir ikon paketi kurmuyoruz ve barındıran uygulamanınkini de kullanmıyoruz:
+    ikisi de kütüphaneyi dışarıya bağlar. Araç bir avuç ikon kullanıyor,
+    hepsi burada duruyor.
+
+    Çizim MIT lisanslı Lucide setinden alınmıştır (24×24, stroke 2, yuvarlak uç).
+*@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="@Boyut" height="@Boyut"
+     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="@(Etiket is null ? "true" : null)"
+     role="@(Etiket is null ? null : "img")"
+     focusable="false">
+    @if (Etiket is not null)
+    {
+        <title>@Etiket</title>
+    }
+    @((MarkupString)Cizim)
+</svg>
+
+@code {
+    /// <summary>İkon adı. Bilinmeyen ad boş bir kare çizer.</summary>
+    [Parameter, EditorRequired] public required string Ad { get; set; }
+
+    /// <summary>Kenar uzunluğu, piksel.</summary>
+    [Parameter] public int Boyut { get; set; } = 14;
+
+    /// <summary>
+    /// Ekran okuyucuya verilecek ad. Boş bırakılırsa ikon süs sayılır ve
+    /// gizlenir — yanında zaten yazı varsa doğru olan budur.
+    /// </summary>
+    [Parameter] public string? Etiket { get; set; }
+
+    private string Cizim => Ad switch
+    {
+        "ara" => """<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>""",
+        "kagit" => """<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>""",
+        "kapat" => """<path d="M18 6 6 18"/><path d="m6 6 12 12"/>""",
+        "uyari" => """<path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>""",
+        "onizleme" => """<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>""",
+        "kaydet" => """<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/>""",
+        "duzenle" => """<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.9.5l-2.9.9a.5.5 0 0 1-.6-.6l.8-2.9a2 2 0 0 1 .5-.9Z"/>""",
+
+        // --- palet: nesne türleri --------------------------------------
+        "yazi" => """<path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>""",
+        "cizgi" => """<path d="M4 18 20 6"/>""",
+        "sekil" => """<rect x="3" y="4" width="18" height="16" rx="1"/>""",
+        "resim" => """<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.6"/><path d="m21 15-4-4a2 2 0 0 0-2.8 0L4 21"/>""",
+        "barkod" => """<path d="M3 5v14"/><path d="M6.5 5v14"/><path d="M10 5v14"/><path d="M14 5v14"/><path d="M17.5 5v10"/><path d="M21 5v14"/>""",
+        "bant" => """<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18"/><path d="M3 15h18"/>""",
+        "ornek" => """<path d="M14 2v6a2 2 0 0 0 .2.9l5.5 11a2 2 0 0 1-1.8 2.9H6.1a2 2 0 0 1-1.8-2.9l5.5-11A2 2 0 0 0 10 8V2"/><path d="M6.5 15h11"/><path d="M8.5 2h7"/>""",
+        "veri" => """<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>""",
+        "yazdir" => """<path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/>""",
+        "arti" => """<path d="M5 12h14"/><path d="M12 5v14"/>""",
+        "geri" => """<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>""",
+        "yinele" => """<path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>""",
+        _ => """<rect x="4" y="4" width="16" height="16" rx="1"/>""",
+    };
+}

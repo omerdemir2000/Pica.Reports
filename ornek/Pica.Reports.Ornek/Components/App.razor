@@ -1,0 +1,48 @@
+@*
+    Uygulamanın kabuğu.
+
+    Dikkat edilecek üç şey var:
+
+    1. @rendermode="InteractiveServer" ŞART. Verilmezse uygulama tamamen
+       durağan sunucu çizimiyle çalışır: sayfalar gelir, görünüşte her şey
+       yerindedir ama arkada Blazor devresi kurulmadığı için HİÇBİR TIKLAMA iş
+       görmez — tasarımcı açılmaz, düğmeler ölüdür. Hata da vermez; sessizce
+       hiçbir şey olmaz.
+
+    2. Kütüphanenin biçemi <head> içinde, sayfanın kendi HeadContent'inde
+       DEĞİL: sayfaya konduğunda gezinmeyle gelen ilk çizimde uygulanmıyor ve
+       tasarımcı bir an çıplak görünüyor.
+
+    3. html/body yüksekliği %100: tasarımcı kendisine verilen yüksekliği
+       doldurur, sayfa akışına göre uzamaz. Yükseklik verilmezse kâğıt
+       görünmez, çünkü kabın boyu sıfır olur.
+*@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <title>Pica.Reports örneği</title>
+
+    <link rel="stylesheet" href="_content/Pica.Reports/rapor-tasarim.css" />
+    <link rel="stylesheet" href="ornek.css" />
+</head>
+
+<body>
+    <Routes @rendermode="InteractiveServer" />
+
+    @* Hata kutusu: devrede bir istisna çıkarsa kullanıcı bunu görür. Olmadan
+       ekran öylece durur ve "tıklıyorum bir şey olmuyor" denir — hatanın
+       kendisi tarayıcı konsolunda kalır. *@
+    <div id="blazor-error-ui">
+        Bir hata oluştu. Sayfayı yenilemek gerekiyor.
+        <a href="" class="reload">Yenile</a>
+        <span class="dismiss">🗙</span>
+    </div>
+
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>

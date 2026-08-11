@@ -1,0 +1,44 @@
+@inherits LayoutComponentBase
+
+@*
+    Yerleşim bilerek çıplak: örneğin işi kütüphaneyi göstermek, kendi
+    arayüzünü değil. Tek yaptığı, tasarımcıya doldurabileceği bir yükseklik
+    vermek.
+*@
+
+<div class="ornek-kabuk">
+    <header class="ornek-tepe">
+        <a href="/"><b>Pica.Reports</b> örneği</a>
+        <a href="/veri">Veriyle aç</a>
+        <a href="/pica/duzenler">Hazır liste</a>
+        <span class="ornek-ara"></span>
+
+        @* Dil değiştirme TAM SAYFA yenilemesiyle: Blazor Server'da devrenin
+           kültürü ilk istekten geliyor, devre içinde değiştirmek yalnızca o
+           anki akışı etkilerdi. Bağlantı, çerezi yazan uca gidiyor. *@
+        <nav class="ornek-dil">
+            <a href="@($"/dil/en?donus={Adres}")" class="@(Dil == "en" ? "secili" : null)">EN</a>
+            <a href="@($"/dil/tr?donus={Adres}")" class="@(Dil == "tr" ? "secili" : null)">TR</a>
+        </nav>
+
+        <span class="ornek-not">Papirus Yazılım Ltd. Şti. · MIT</span>
+    </header>
+
+    <main class="ornek-govde">
+        @Body
+    </main>
+</div>
+
+@code {
+    [Inject] private NavigationManager Gezinme { get; set; } = default!;
+
+    /// <summary>Yürürlükteki arayüz dili — iki harfli kod.</summary>
+    private static string Dil => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    /// <summary>Dil değişince dönülecek adres.</summary>
+    /// <remarks>
+    /// Kullanıcı hangi ekranda dil değiştirdiyse orada kalmalı; başa dönmek,
+    /// açık düzeni kapatmak olurdu.
+    /// </remarks>
+    private string Adres => Uri.EscapeDataString("/" + Gezinme.ToBaseRelativePath(Gezinme.Uri));
+}

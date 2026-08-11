@@ -1,0 +1,95 @@
+@*
+    Taşınmayanlar: şablonun içindeki PascalScript'ler, dönüştürücünün uyarıları
+    ve düzende geçen alan adları.
+
+    Bu panel aracın en sessiz ama en gerekli parçası. Delphi şablonlarının bir
+    kısmında kutunun içeriğini betik dolduruyordu; betik taşınmadığı için o
+    kutular kâğıtta BOŞ çıkıyor ve bunun sebebi düzene bakınca görünmüyor.
+    Burada görünüyor.
+*@
+
+<div class="rt-ozellik">
+
+    <div class="rt-ozellik-tepe">
+        <span class="rt-ozellik-ad">@Metin.T("Betik_Baslik")</span>
+        <span class="rt-ozellik-alt">
+            @Metin.T("Betik_Ozet", Duzen.Betikler.Count, Duzen.Uyarilar.Count, alanlar.Count)
+        </span>
+    </div>
+
+    <div class="rt-ozellik-govde">
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Betik_Betikler2")</legend>
+
+            @if (Duzen.Betikler.Count == 0)
+            {
+                <p class="rt-ipucu">@Metin.T("Betik_BetikYok")</p>
+            }
+            else
+            {
+                <p class="rt-ipucu">@((MarkupString)Metin.T("Betik_BetikIpucu"))</p>
+
+                @foreach (var betik in Duzen.Betikler)
+                {
+                    <details class="rt-katlanir">
+                        <summary>
+                            <span class="rt-mono">@betik.Nerede</span>
+                            <span class="rt-kume-not">@betik.Olay</span>
+                        </summary>
+                        <pre class="rt-kod">@betik.Kod</pre>
+                    </details>
+                }
+            }
+        </fieldset>
+
+        @if (Duzen.Uyarilar.Count > 0)
+        {
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Betik_Uyarilar2")</legend>
+                <ul class="rt-uyarilar">
+                    @foreach (var uyari in Duzen.Uyarilar)
+                    {
+                        <li>@uyari</li>
+                    }
+                </ul>
+            </fieldset>
+        }
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Betik_Alanlar2") <span class="rt-kume-not">@Metin.T("Betik_AlanlarNot")</span></legend>
+
+            @if (alanlar.Count == 0)
+            {
+                <p class="rt-ipucu">@Metin.T("Betik_AlanYok")</p>
+            }
+            else
+            {
+                <ul class="rt-alanlar">
+                    @foreach (var alan in alanlar)
+                    {
+                        <li class="rt-mono">@alan</li>
+                    }
+                </ul>
+                <p class="rt-ipucu">@Metin.T("Betik_AlanIpucu")</p>
+            }
+        </fieldset>
+    </div>
+</div>
+
+@code {
+    /// <summary>Görüntülenen düzen.</summary>
+    [Parameter, EditorRequired] public required CetvelDuzeni Duzen { get; set; }
+
+    private List<string> alanlar = [];
+
+    private CetvelDuzeni? okunan;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(okunan, Duzen)) return;
+
+        okunan = Duzen;
+        alanlar = AlanKatalogu.Cikar(Duzen);
+    }
+}

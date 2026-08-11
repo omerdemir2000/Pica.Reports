@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Pica.Reports — arayüz metinleri, VARSAYILAN DİL (İngilizce).
+
+  Çeviriler: Kaynak.<dil>.resx (örn. Kaynak.tr.resx). Yeni dil eklemek yeni bir
+  dosya demek; kod değişmez. Anahtarlar Türkçedir çünkü kod da Türkçe — anahtar
+  bir kimliktir, kullanıcı onu görmez.
+
+  Kural: kullanıcının gördüğü HER metin burada. Hata iletileri (exception)
+  burada DEĞİL: onların okuru geliştirici, yeri günlük dosyası.
+-->
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="0" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- ============================================================ ortak -->
+  <data name="YeniKutuMetni"><value>New box</value></data>
+  <data name="Kapat"><value>Close</value></data>
+  <data name="Vazgec"><value>Cancel</value></data>
+  <data name="Sil"><value>Delete</value></data>
+  <data name="Kopyala"><value>Duplicate</value></data>
+  <data name="Tumu"><value>All</value></data>
+  <data name="Yok"><value>None</value></data>
+  <data name="Ozel"><value>(custom)</value></data>
+  <data name="Kumesiz"><value>(no dataset)</value></data>
+
+  <!-- ====================================================== bant türleri -->
+  <data name="Bant_RaporBasligi"><value>Report title</value></data>
+  <data name="Bant_SayfaBasligi"><value>Page header</value></data>
+  <data name="Bant_Baslik"><value>Header</value></data>
+  <data name="Bant_SutunBasligi"><value>Column header</value></data>
+  <data name="Bant_GrupBasligi"><value>Group header</value></data>
+  <data name="Bant_Veri"><value>Data</value></data>
+  <data name="Bant_AltVeri"><value>Detail</value></data>
+  <data name="Bant_AltAltVeri"><value>Sub-detail</value></data>
+  <data name="Bant_GrupSonu"><value>Group footer</value></data>
+  <data name="Bant_SutunSonu"><value>Column footer</value></data>
+  <data name="Bant_Alt"><value>Footer</value></data>
+  <data name="Bant_RaporSonu"><value>Report summary</value></data>
+  <data name="Bant_SayfaSonu"><value>Page footer</value></data>
+  <data name="Bant_Ust"><value>Overlay</value></data>
+  <data name="Bant_Yan"><value>Child</value></data>
+  <data name="Bant_Bilinmeyen"><value>Unknown</value></data>
+
+  <!-- ============================================================ roller -->
+  <data name="Rol_SayfaBasi"><value>Repeats at the top of every page</value></data>
+  <data name="Rol_SayfaAlti"><value>Repeats at the bottom of every page</value></data>
+  <data name="Rol_Ortu"><value>Printed at an absolute position; outside the flow</value></data>
+  <data name="Rol_Icerik"><value>Printed within the flow</value></data>
+
+  <!-- ===================================================== nesne türleri -->
+  <data name="Nesne_Yazi"><value>Text</value></data>
+  <data name="Nesne_Cizgi"><value>Line</value></data>
+  <data name="Nesne_Sekil"><value>Shape</value></data>
+  <data name="Nesne_Resim"><value>Image</value></data>
+  <data name="Nesne_Barkod"><value>Barcode</value></data>
+  <data name="Nesne_Bilinmeyen"><value>Unknown</value></data>
+
+  <!-- ============================================================ biçim -->
+  <data name="Bicim_Yok"><value>None</value></data>
+  <data name="Bicim_Sayi"><value>Number</value></data>
+  <data name="Bicim_Tarih"><value>Date</value></data>
+  <data name="Bicim_Saat"><value>Time</value></data>
+  <data name="Bicim_Metin"><value>Text</value></data>
+  <data name="Bicim_Boolean"><value>Yes/No</value></data>
+  <data name="Bicim_Bicimsiz"><value>unformatted</value></data>
+  <data name="Bicim_SayiKucuk"><value>number</value></data>
+  <data name="Bicim_TarihKucuk"><value>date</value></data>
+  <data name="Bicim_SaatKucuk"><value>time</value></data>
+  <data name="Bicim_MetinKucuk"><value>text</value></data>
+  <data name="Bicim_BooleanKucuk"><value>yes/no</value></data>
+
+  <!-- ============================================================= liste -->
+  <data name="Liste_Baslik"><value>Report layouts</value></data>
+  <data name="Liste_Ara"><value>Search layouts</value></data>
+  <data name="Liste_Sayi"><value>{0} layouts</value></data>
+  <data name="Liste_SayiSuzulmus"><value>{0} / {1} layouts</value></data>
+  <data name="Liste_Okunuyor"><value>Loading layouts…</value></data>
+  <data name="Liste_Bos"><value>No layouts yet. Use “New layout” to create one.</value></data>
+  <data name="Liste_BulunamadiSuzgec"><value>No layout matches “{0}”.</value></data>
+  <data name="Liste_SutunDuzen"><value>Layout</value></data>
+  <data name="Liste_SutunAnahtar"><value>Key</value></data>
+  <data name="Liste_SutunKaynak"><value>Source</value></data>
+  <data name="Liste_Duzenle"><value>Edit</value></data>
+  <data name="Liste_Onizle"><value>Preview</value></data>
+  <data name="Liste_Yazdir"><value>Print</value></data>
+  <data name="Liste_OnizleIpucu"><value>Show it laid out with data</value></data>
+  <data name="Liste_YazdirIpucu"><value>Send the preview to the printer</value></data>
+  <data name="Liste_Yama"><value>patch</value></data>
+  <data name="Liste_YamaIpucu"><value>This layout has a hand-written patch</value></data>
+  <data name="Liste_YeniDuzen"><value>New layout</value></data>
+  <data name="Yeni_Baslik"><value>New layout</value></data>
+  <data name="Yeni_Ad"><value>Name</value></data>
+  <data name="Yeni_Anahtar"><value>Key</value></data>
+  <data name="Yeni_Olustur"><value>Create and open</value></data>
+  <data name="Yeni_AnahtarIpucu"><value>The key goes into the file name and the address: letters, digits and hyphens only. It is suggested as you type the name and can be edited.</value></data>
+  <data name="Yeni_AdBos"><value>Please enter a name.</value></data>
+  <data name="Yeni_AnahtarBos"><value>The key cannot be empty.</value></data>
+  <data name="Yeni_AnahtarGecersiz"><value>The key may contain only letters, digits and hyphens.</value></data>
+  <data name="Yeni_AnahtarKullanimda"><value>“{0}” is already in use.</value></data>
+  <data name="Yeni_Olusturulamadi"><value>Could not create: {0}</value></data>
+
+  <!-- ========================================================= tasarımcı -->
+  <data name="Tasarimci_Baslik"><value>Report layout designer</value></data>
+  <data name="Tasarimci_Cetvel"><value>Sheet</value></data>
+  <data name="Tasarimci_CetvelNo"><value>sheet {0}</value></data>
+  <data name="Tasarimci_Izgara"><value>Grid</value></data>
+  <data name="Tasarimci_Yakinlik"><value>Zoom</value></data>
+  <data name="Tasarimci_OrnekVeri"><value>Sample data</value></data>
+  <data name="Tasarimci_OrnekVeriIpucu"><value>Show boxes filled with sample values, formats applied</value></data>
+  <data name="Tasarimci_Onizle"><value>Preview</value></data>
+  <data name="Tasarimci_OnizleIpucu"><value>Lay the report out with data, page by page</value></data>
+  <data name="Tasarimci_Sayfa"><value>Page</value></data>
+  <data name="Tasarimci_SayfaIpucu"><value>Paper size, orientation and margins</value></data>
+  <data name="Tasarimci_PdfIpucu"><value>PDF produced by the host application</value></data>
+  <data name="Tasarimci_Tasinmayanlar"><value>Not migrated</value></data>
+  <data name="Tasarimci_TasinmayanlarIpucu"><value>Scripts that were not migrated, conversion warnings and the field list</value></data>
+  <data name="Tasarimci_GeriAl"><value>Undo (Ctrl+Z)</value></data>
+  <data name="Tasarimci_Yinele"><value>Redo (Ctrl+Y)</value></data>
+  <data name="Tasarimci_OrijinaleDon"><value>Revert</value></data>
+  <data name="Tasarimci_Kaydet"><value>Save patch</value></data>
+  <data name="Tasarimci_KapatIpucu"><value>Close the designer and return to the list</value></data>
+  <data name="Tasarimci_BosBaslik"><value>No layout open</value></data>
+  <data name="Tasarimci_BosAlt"><value>Open a layout from the list and the paper, bands and boxes appear here.</value></data>
+  <data name="Tasarimci_Bulunamadi"><value>Layout not found: {0}</value></data>
+  <data name="Tasarimci_Kaydedildi"><value>{0} changes written to the patch.</value></data>
+  <data name="Tasarimci_DuzeltmeKalkti"><value>Patch removed; the layout is back to its generated state.</value></data>
+  <data name="Tasarimci_Kaydedilemedi"><value>Could not save: {0}</value></data>
+  <data name="Izgara_Yok"><value>None</value></data>
+
+  <!-- ============================================================ palet -->
+  <data name="Palet_Nesne"><value>Object</value></data>
+  <data name="Palet_Bant"><value>Band</value></data>
+  <data name="Palet_Veri"><value>Data</value></data>
+  <data name="Palet_NesneIpucu"><value>{0}. Drag it onto the paper</value></data>
+  <data name="Palet_NesneIpucuBant"><value>{0}. Drag it onto the paper, or click to add it to “{1}”</value></data>
+  <data name="Palet_BantIpucuAlt"><value>Added below “{0}”</value></data>
+  <data name="Palet_BantIpucuSon"><value>Added at the bottom</value></data>
+  <data name="Palet_SurukleIpucu"><value>&lt;b&gt;Drag and drop&lt;/b&gt; the object onto the paper: it lands in the band and at the spot where you drop it. Clicking adds it too, but then a band (or a box in one) must be selected.</value></data>
+  <data name="Palet_BantIpucu"><value>A new band goes right below the selected one, or at the bottom if nothing is selected. A band's vertical position determines the print order.</value></data>
+  <data name="Palet_AlanIpucu"><value>Fields are derived from the layout itself: the datasets its bands are bound to and the references in its boxes. A field that never appears in the layout is not listed here.</value></data>
+  <data name="Palet_AlanSurukleIpucu"><value>{0} — drag it onto the paper or click it</value></data>
+  <data name="Palet_AlanBicimIpucu"><value>{0} — drag it onto the paper or click it (added with {1} format)</value></data>
+  <data name="Palet_AlanSayisi"><value>{0} fields</value></data>
+  <data name="Palet_IpucuYazi"><value>Text box; can also be bound to a data field</value></data>
+  <data name="Palet_IpucuCizgi"><value>Horizontal line</value></data>
+  <data name="Palet_IpucuSekil"><value>Box with a border or fill</value></data>
+  <data name="Palet_IpucuResim"><value>Image embedded in the layout</value></data>
+  <data name="Palet_IpucuBarkod"><value>Code 128 or EAN-13 barcode</value></data>
+  <data name="Palet_BantSecin"><value>Where to add it is not clear. Drag the object onto the paper, or select a band first.</value></data>
+  <data name="Palet_AlanBantSecin"><value>Where to add it is not clear. Drag the field onto the paper, or select a band first.</value></data>
+
+  <!-- ============================================================= tuval -->
+  <data name="Tuval_Basmaz"><value>not printed</value></data>
+  <data name="Tuval_BasmazIpucu"><value>No height and no content — never printed</value></data>
+  <data name="Tuval_Gizli"><value>{0} hidden</value></data>
+  <data name="Tuval_GizliIpucu"><value>{0} box(es) have zero width or height; they are not printed</value></data>
+  <data name="Tuval_BantTutamak"><value>Drag to resize — minimum {0}</value></data>
+  <data name="Tuval_ResimYok"><value>No image</value></data>
+  <data name="Tuval_Kodlanamadi"><value>{0} could not be encoded</value></data>
+
+  <!-- ==================================================== özellik paneli -->
+  <data name="Ozellik_Yerlesim"><value>Position</value></data>
+  <data name="Ozellik_YerlesimNot"><value>relative to the band's top-left corner, in points</value></data>
+  <data name="Ozellik_Sol"><value>Left</value></data>
+  <data name="Ozellik_Ust"><value>Top</value></data>
+  <data name="Ozellik_Sag"><value>Right</value></data>
+  <data name="Ozellik_Alt"><value>Bottom</value></data>
+  <data name="Ozellik_En"><value>Width</value></data>
+  <data name="Ozellik_Boy"><value>Height</value></data>
+  <data name="Ozellik_Icerik"><value>Content</value></data>
+  <data name="Ozellik_Metin"><value>Text</value></data>
+  <data name="Ozellik_MetinIpucu"><value>Anything in square brackets is replaced by data at print time: &lt;code&gt;[Invoices."No"]&lt;/code&gt;, &lt;code&gt;[Page#]&lt;/code&gt;.</value></data>
+  <data name="Ozellik_VeriAlani"><value>Data field</value></data>
+  <data name="Ozellik_VeriAlaniIpucu"><value>Printed when the text is empty. If there is text, the text wins.</value></data>
+  <data name="Ozellik_Yazi"><value>Font</value></data>
+  <data name="Ozellik_YaziTipi"><value>Typeface</value></data>
+  <data name="Ozellik_Punto"><value>Size</value></data>
+  <data name="Ozellik_Kalin"><value>Bold</value></data>
+  <data name="Ozellik_Egik"><value>Italic</value></data>
+  <data name="Ozellik_AltiCizili"><value>Underline</value></data>
+  <data name="Ozellik_KalinKisa"><value>B</value></data>
+  <data name="Ozellik_EgikKisa"><value>I</value></data>
+  <data name="Ozellik_AltiCiziliKisa"><value>U</value></data>
+  <data name="Ozellik_YaziRengi"><value>Text colour</value></data>
+  <data name="Ozellik_YatayHiza"><value>Horizontal</value></data>
+  <data name="Ozellik_DikeyHiza"><value>Vertical</value></data>
+  <data name="Hiza_Sol"><value>Left</value></data>
+  <data name="Hiza_Orta"><value>Centre</value></data>
+  <data name="Hiza_Sag"><value>Right</value></data>
+  <data name="Hiza_Yasli"><value>Justified</value></data>
+  <data name="Hiza_Ust"><value>Top</value></data>
+  <data name="Hiza_Alt"><value>Bottom</value></data>
+  <data name="Ozellik_KelimeKaydir"><value>Wrap words</value></data>
+  <data name="Ozellik_Uzayabilir"><value>Can grow</value></data>
+  <data name="Ozellik_Bicim"><value>Format</value></data>
+  <data name="Ozellik_BicimNot"><value>numbers and dates</value></data>
+  <data name="Ozellik_Tur"><value>Kind</value></data>
+  <data name="Ozellik_Desen"><value>Pattern</value></data>
+  <data name="Ozellik_Resim"><value>Image</value></data>
+  <data name="Ozellik_ResimNot"><value>embedded in the layout</value></data>
+  <data name="Ozellik_DosyaSec"><value>Choose file</value></data>
+  <data name="Ozellik_Kaldir"><value>Remove</value></data>
+  <data name="Ozellik_ResimUyum"><value>Fit to box</value></data>
+  <data name="Ozellik_ResimSigdir"><value>Keep ratio (fit)</value></data>
+  <data name="Ozellik_ResimUzat"><value>Fill the box (stretch)</value></data>
+  <data name="Ozellik_ResimIpucu"><value>The image is stored inside the layout, not as a file path, so the patch file can travel on its own. Maximum {0} KB.</value></data>
+  <data name="Ozellik_ResimBuyuk"><value>The file is too large ({0} KB). Maximum {1} KB.</value></data>
+  <data name="Ozellik_ResimOkunamadi"><value>Could not read the image: {0}</value></data>
+  <data name="Ozellik_Barkod"><value>Barcode</value></data>
+  <data name="Ozellik_BarkodDeger"><value>Value</value></data>
+  <data name="Ozellik_BarkodDegerIpucu"><value>Bracketed references work here too: &lt;code&gt;[Stock."Barcode"]&lt;/code&gt; encodes the row's value at print time.</value></data>
+  <data name="Ozellik_Simgelem"><value>Symbology</value></data>
+  <data name="Ozellik_BarkodYazisi"><value>Print the text</value></data>
+  <data name="Ozellik_BarkodHata"><value>This value cannot be encoded as {0}; the box will print empty.</value></data>
+  <data name="Ozellik_BarkodEanHata"><value>EAN-13 needs exactly 12 or 13 digits (with 13, the check digit must match).</value></data>
+  <data name="Ozellik_BarkodCodeHata"><value>Code 128 carries ASCII only.</value></data>
+  <data name="Ozellik_BarkodEnIpucu"><value>The barcode is as wide as its box. In a very narrow box the bars merge and readers cannot read it.</value></data>
+  <data name="Ozellik_Cerceve"><value>Border and fill</value></data>
+  <data name="Ozellik_KenarIpucu"><value>{0} edge</value></data>
+  <data name="Ozellik_DortKenar"><value>Four edges</value></data>
+  <data name="Ozellik_CerceveKaldir"><value>Remove the border</value></data>
+  <data name="Ozellik_Kalinlik"><value>Thickness</value></data>
+  <data name="Ozellik_CerceveRengi"><value>Border colour</value></data>
+  <data name="Ozellik_Zemin"><value>Fill</value></data>
+  <data name="Ozellik_ZeminRengi"><value>Fill colour</value></data>
+  <data name="Ozellik_Saydam"><value>Transparent</value></data>
+  <data name="Ozellik_SaydamIpucu"><value>Make the fill transparent</value></data>
+  <data name="Ozellik_Kutu"><value>Box</value></data>
+  <data name="Ozellik_SilIpucu"><value>A deleted box is written to the patch; the generated file does not change and Ctrl+Z undoes it.</value></data>
+
+  <!-- ======================================================= bant paneli -->
+  <data name="BantP_Yukseklik"><value>Height</value></data>
+  <data name="BantP_YukseklikNot"><value>points</value></data>
+  <data name="BantP_Bildirilen"><value>Declared</value></data>
+  <data name="BantP_Basilan"><value>Printed</value></data>
+  <data name="BantP_YukseklikIpucu"><value>The printed height is the declared value or the bottom of the lowest box, whichever is greater. You can also drag the band's bottom edge on the paper.</value></data>
+  <data name="BantP_Uzayabilir"><value>Can grow</value></data>
+  <data name="BantP_YeniSayfa"><value>New page after</value></data>
+  <data name="BantP_TasmaIpucu"><value>Its boxes reach below the declared height, so the band is printed down to where they end. Raising the declared value makes the band taller; lowering it changes nothing.</value></data>
+  <data name="BantP_Baglantilar"><value>Bindings</value></data>
+  <data name="BantP_VeriKumesi"><value>Dataset</value></data>
+  <data name="BantP_VeriKumesiIpucu"><value>The band is printed once per row of this dataset. The name must match the one registered by the application.</value></data>
+  <data name="BantP_GrupKosulu"><value>Group condition</value></data>
+  <data name="BantP_GrupKosuluIpucu"><value>The group breaks when this value changes.</value></data>
+  <data name="BantP_YanBant"><value>Child band</value></data>
+  <data name="BantP_YanBantIpucu"><value>A child band is printed stuck to its owner: it has no place of its own on the paper.</value></data>
+  <data name="BantP_KutuEkle"><value>Add a box</value></data>
+  <data name="BantP_SilIpucu"><value>Adding a box puts an empty text box at the top left of the band. Deleting the band takes its {0} box(es) with it; the generated file does not change and Ctrl+Z undoes it.</value></data>
+
+  <!-- ====================================================== sayfa paneli -->
+  <data name="SayfaP_Baslik"><value>Page setup</value></data>
+  <data name="SayfaP_Kagit"><value>Paper</value></data>
+  <data name="SayfaP_Boy"><value>Size</value></data>
+  <data name="SayfaP_Dikey"><value>Portrait</value></data>
+  <data name="SayfaP_Yatay"><value>Landscape</value></data>
+  <data name="SayfaP_YonIpucu"><value>Orientation swaps the paper's width and height. &lt;b&gt;Boxes stay where they are&lt;/b&gt;: moving them automatically would break the alignment you set — overflow is visible on the canvas.</value></data>
+  <data name="SayfaP_EnMm"><value>Width (mm)</value></data>
+  <data name="SayfaP_BoyMm"><value>Height (mm)</value></data>
+  <data name="SayfaP_KenarBosluk"><value>Margins</value></data>
+  <data name="SayfaP_KenarIpucu"><value>Boxes are positioned relative to the &lt;b&gt;printable area&lt;/b&gt;: changing the left margin moves every box with it.</value></data>
+  <data name="SayfaP_Sutun"><value>Columns</value></data>
+  <data name="SayfaP_SutunSayi"><value>Count</value></data>
+  <data name="SayfaP_SutunAralik"><value>Gap (mm)</value></data>
+  <data name="SayfaP_SutunIpucu"><value>0 and 1 mean the same thing: a single column. Multi-column printing is the renderer's job; the designer carries the number, it does not split the paper.</value></data>
+  <data name="SayfaP_KaydetIpucu"><value>Page settings are written to the patch file too and undone by “Revert”.</value></data>
+
+  <!-- =================================================== hizalama paneli -->
+  <data name="Hizalama_Sol"><value>Align left</value></data>
+  <data name="Hizalama_YatayOrta"><value>Centre horizontally</value></data>
+  <data name="Hizalama_Sag"><value>Align right</value></data>
+  <data name="Hizalama_Ust"><value>Align top</value></data>
+  <data name="Hizalama_DikeyOrta"><value>Centre vertically</value></data>
+  <data name="Hizalama_Alt"><value>Align bottom</value></data>
+  <data name="Hizalama_AyniEn"><value>Equalise widths</value></data>
+  <data name="Hizalama_AyniBoy"><value>Equalise heights</value></data>
+  <data name="Hizalama_YatayDagit"><value>Distribute horizontally</value></data>
+  <data name="Hizalama_DikeyDagit"><value>Distribute vertically</value></data>
+  <data name="Hizalama_Hizala"><value>Align</value></data>
+  <data name="Hizalama_HizalaNot"><value>to the selection bounds</value></data>
+  <data name="Hizalama_Esitle"><value>Equalise</value></data>
+  <data name="Hizalama_EsitleIpucu"><value>The largest box sets the size — shrinking to the smallest would clip the widest cell.</value></data>
+  <data name="Hizalama_Dagit"><value>Even spacing</value></data>
+  <data name="Hizalama_DagitIpucu"><value>The two outermost boxes stay put and the ones between them are spaced evenly. At least three boxes are needed.</value></data>
+  <data name="Hizalama_SecimAlt"><value>Ctrl+click to add or remove</value></data>
+  <data name="Hizalama_Baslik"><value>Alignment</value></data>
+  <data name="Hizalama_Secim"><value>{0} boxes selected</value></data>
+  <data name="Hizalama_Birak"><value>Clear selection</value></data>
+
+  <!-- ====================================================== betik paneli -->
+  <data name="Betik_Ozet"><value>{0} scripts · {1} warnings · {2} fields</value></data>
+  <data name="Betik_Betikler2"><value>Scripts</value></data>
+  <data name="Betik_BetikYok"><value>The template has no scripts. Every box in this layout takes its content straight from the data or from its own fixed text.</value></data>
+  <data name="Betik_Uyarilar2"><value>Conversion warnings</value></data>
+  <data name="Betik_Alanlar2"><value>Fields</value></data>
+  <data name="Betik_AlanlarNot"><value>used in this layout</value></data>
+  <data name="Betik_AlanYok"><value>This layout has no data field references.</value></data>
+  <data name="Betik_Baslik"><value>Not migrated</value></data>
+  <data name="Betik_Alt"><value>scripts, warnings and fields</value></data>
+  <data name="Betik_Betikler"><value>Scripts ({0})</value></data>
+  <data name="Betik_BetikIpucu"><value>The Pascal code below was &lt;b&gt;not migrated and is not executed&lt;/b&gt;. Each one is a behaviour that has to be written by hand; until it is, the box it filled prints empty.</value></data>
+  <data name="Betik_Uyarilar"><value>Warnings ({0})</value></data>
+  <data name="Betik_Alanlar"><value>Fields ({0})</value></data>
+  <data name="Betik_AlanIpucu"><value>The field names used by this layout.</value></data>
+  <data name="Betik_Bos"><value>Nothing was left behind in this layout.</value></data>
+
+  <!-- ========================================================= önizleme -->
+  <data name="Onizleme_SayfaSayisi"><value>{0} pages</value></data>
+  <data name="Onizleme_Yazdir"><value>Print</value></data>
+  <data name="Onizleme_YazdirIpucu"><value>Open the browser's print dialog</value></data>
+  <data name="Onizleme_OrnekVeri"><value>sample data</value></data>
+  <data name="Onizleme_OrnekVeriIpucu"><value>No data was supplied; boxes are filled with sample values</value></data>
+  <data name="Onizleme_Bos"><value>Nothing to show.</value></data>
+  <data name="Onizleme_Tasarla"><value>Design</value></data>
+  <data name="Onizleme_TasarlaIpucu"><value>Open this layout in the designer</value></data>
+</root>

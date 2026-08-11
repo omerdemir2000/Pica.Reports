@@ -1,0 +1,121 @@
+@*
+    Seçili bandın özellikleri.
+
+    Bandın TÜRÜ ve tasarımdaki dikey konumu burada yok, bilerek: ikisi de basım
+    sırasını belirliyor (BantSirasi) ve değiştirmek raporu yeniden tasarlamak
+    demek. Öyle bir ihtiyaç varsa doğru yer düzeltme dosyası değil, Delphi
+    şablonu ya da dönüştürücüdür.
+*@
+
+<div class="rt-ozellik">
+
+    <div class="rt-ozellik-tepe">
+        <span class="rt-ozellik-ad">@Bant.Ad</span>
+        <span class="rt-ozellik-alt">
+            @Etiketler.Bant(Bant.Tur) · @Bant.Nesneler.Count kutu
+        </span>
+    </div>
+
+    <div class="rt-ozellik-govde">
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("BantP_Yukseklik") <span class="rt-kume-not">@Metin.T("BantP_YukseklikNot")</span></legend>
+
+            <div class="rt-ikili">
+                <label>@Metin.T("BantP_Bildirilen")
+                    <input type="number" step="0.5" min="0" class="rt-girdi rt-sayi"
+                           value="@Yuvarla(Bant.YukseklikPt)"
+                           @onchange="e => Say(e, v => Bant.YukseklikPt = v)" />
+                </label>
+                <label>@Metin.T("BantP_Basilan")
+                    <input class="rt-girdi rt-sayi" readonly
+                           value="@Olcu.Punto(BantSirasi.Yukseklik(Bant))" />
+                </label>
+            </div>
+
+            @if (BantSirasi.Yukseklik(Bant) > Bant.YukseklikPt + 0.001)
+            {
+                <p class="rt-ipucu">@Metin.T("BantP_TasmaIpucu")</p>
+            }
+
+            <div class="rt-satir">
+                <label class="rt-onay">
+                    <input type="checkbox" checked="@Bant.Uzayabilir"
+                           @onchange="e => Onay(e, v => Bant.Uzayabilir = v)" /> @Metin.T("BantP_Uzayabilir")
+                </label>
+                <label class="rt-onay">
+                    <input type="checkbox" checked="@Bant.SonrasindaYeniSayfa"
+                           @onchange="e => Onay(e, v => Bant.SonrasindaYeniSayfa = v)" /> @Metin.T("BantP_YeniSayfa")
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("BantP_Baglantilar")</legend>
+
+            <label class="rt-tam">@Metin.T("BantP_VeriKumesi")
+                <input class="rt-girdi rt-mono" value="@Bant.VeriKumesi"
+                       @onchange="e => Yaz(e, v => Bant.VeriKumesi = v)" />
+            </label>
+            <p class="rt-ipucu">@Metin.T("BantP_VeriKumesiIpucu")</p>
+
+            @if (Bant.Tur is BantTuru.GrupBasligi or BantTuru.GrupSonu)
+            {
+                <label class="rt-tam">@Metin.T("BantP_GrupKosulu")
+                    <input class="rt-girdi rt-mono" value="@Bant.GrupKosulu"
+                           @onchange="e => Yaz(e, v => Bant.GrupKosulu = v)" />
+                </label>
+                <p class="rt-ipucu">@Metin.T("BantP_GrupKosuluIpucu")</p>
+            }
+
+            <label class="rt-tam">@Metin.T("BantP_YanBant")
+                <input class="rt-girdi rt-mono" value="@Bant.YanBant"
+                       @onchange="e => Yaz(e, v => Bant.YanBant = v)" />
+            </label>
+            <p class="rt-ipucu">@Metin.T("BantP_YanBantIpucu")</p>
+        </fieldset>
+
+        <fieldset class="rt-kume">
+            <legend>@Metin.T("Palet_Bant")</legend>
+            <div class="rt-satir">
+                <button type="button" class="rt-acik" @onclick="() => KutuEkle.InvokeAsync(Bant)">
+                    @Metin.T("BantP_KutuEkle")
+                </button>
+                <button type="button" class="rt-acik rt-tehlike" @onclick="() => Sil.InvokeAsync(Bant)">
+                    @Metin.T("Sil")
+                </button>
+            </div>
+            <p class="rt-ipucu">@Metin.T("BantP_SilIpucu", Bant.Nesneler.Count)</p>
+        </fieldset>
+    </div>
+</div>
+
+@code {
+    /// <summary>Düzenlenecek bant.</summary>
+    [Parameter, EditorRequired] public required DuzenBandi Bant { get; set; }
+
+    /// <summary>Değişikliği uygulayan taraf — gerekçesi OzellikPaneli'ndekiyle aynı.</summary>
+    [Parameter, EditorRequired] public required Func<Action, Task> Uygula { get; set; }
+
+    /// <summary>Banda yeni kutu istendi.</summary>
+    [Parameter] public EventCallback<DuzenBandi> KutuEkle { get; set; }
+
+    /// <summary>Bant silinsin.</summary>
+    [Parameter] public EventCallback<DuzenBandi> Sil { get; set; }
+
+    private static string Yuvarla(double deger)
+        => Math.Round(deger, 2).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private Task Say(ChangeEventArgs e, Action<double> yaz)
+        => double.TryParse(e.Value?.ToString(),
+               System.Globalization.NumberStyles.Float,
+               System.Globalization.CultureInfo.InvariantCulture, out var v)
+            ? Uygula(() => yaz(v))
+            : Task.CompletedTask;
+
+    private Task Yaz(ChangeEventArgs e, Action<string?> yaz)
+        => Uygula(() => yaz(e.Value?.ToString()));
+
+    private Task Onay(ChangeEventArgs e, Action<bool> yaz)
+        => Uygula(() => yaz(e.Value is true));
+}

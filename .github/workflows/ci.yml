@@ -1,0 +1,42 @@
+# Her itmede ve her birleştirme isteğinde derle ve sına.
+#
+# Gerçek düzen külliyatı bu depoda değil (bkz. README → Sınamalar), dolayısıyla
+# burada 170'i aşkın sözleşme sınaması koşuyor; külliyat üzerindeki sınamalar
+# veri bulamadığı için sessizce atlanıyor.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  derle-ve-sina:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Bağımlılıklar
+        run: dotnet restore Pica.Reports.slnx
+
+      - name: Derle
+        run: dotnet build Pica.Reports.slnx --configuration Release --no-restore
+
+      - name: Sına
+        run: dotnet test src/Pica.Reports.Testleri --configuration Release --no-build --verbosity normal
+
+      - name: Paketle
+        run: dotnet pack src/Pica.Reports --configuration Release --no-build --output artifacts
+
+      # Paketi yayımlamıyoruz; yalnızca üretilebildiğini görüyoruz ve
+      # gerekirse indirilebilsin diye saklıyoruz.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg

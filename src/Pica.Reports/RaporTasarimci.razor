@@ -1,0 +1,1151 @@
+@*
+    Rapor düzeni tasarımcısı — kütüphanenin giriş bileşeni.
+
+    Barındıran uygulama yalnızca bir IDuzenDeposu verir; bileşen düzenlerin
+    nerede durduğunu bilmez.
+
+    Kabuk: üstte araç çubuğu, ortada kâğıdın çizildiği tezgâh, sağda seçime
+    göre değişen panel (kutu özellikleri, çoklu seçimde hizalama, bant
+    seçiliyken bant özellikleri, "Taşınmayanlar" açıkken betikler ve alan
+    listesi).
+
+    Düzen SEÇİLMEZ, verilir: hangi düzenin açılacağına barındıran uygulama
+    karar verir (SeciliAnahtar). Liste eskiden buradaydı, artık DuzenListesi
+    ekranında — tasarımcı da o 260 pikseli kâğıda kullanıyor.
+*@
+
+<div class="rt-kok rt-tasarimci">
+
+    <div class="rt-cubuk">
+        @if (secili is null)
+        {
+            <span class="rt-cubuk-baslik">@Metin.T("Tasarimci_Baslik")</span>
+        }
+        else
+        {
+            <span class="rt-cubuk-baslik">@secili.Ad</span>
+            @if (secili.Kaynak is { Length: > 0 } kaynak)
+            {
+                <span class="rt-cubuk-kaynak">@kaynak</span>
+            }
+        }
+
+        <span class="rt-cubuk-ara"></span>
+
+        @if (hata is not null)
+        {
+            <span class="rt-cubuk-kaynak" style="color: var(--rt-vurgu)">
+                <Ikon Ad="uyari" /> @hata
+            </span>
+        }
+
+        @if (secili is { Sayfalar.Count: > 1 })
+        {
+            @* Bir şablondaki sayfalar aynı belgenin sayfaları değil, AYRI
+               cetvellerdir: mizanın birinci sayfası "Aylık Mizan", ikincisi
+               "Aylık Mizan (Ayrıntılı)"dır. Sayfa değil, cetvel seçiliyor. *@
+            <label class="rt-etiket" for="rt-sayfa">@Metin.T("Tasarimci_Cetvel")</label>
+            <select id="rt-sayfa" class="rt-secim" value="@sayfaIndeksi"
+                    @onchange="SayfaDegisti">
+                @for (var i = 0; i < secili.Sayfalar.Count; i++)
+                {
+                    <option value="@i">@Metin.T("Tasarimci_CetvelNo", i + 1)</option>
+                }
+            </select>
+        }
+
+        @if (secili is not null)
+        {
+            <label class="rt-etiket" for="rt-izgara">@Metin.T("Tasarimci_Izgara")</label>
+            <select id="rt-izgara" class="rt-secim" value="@Olcu.Sayi(izgara)" @onchange="IzgaraDegisti">
+                <option value="0">@Metin.T("Izgara_Yok")</option>
+                <option value="0.5">0,5 pt</option>
+                <option value="1">1 pt</option>
+                <option value="2.835">1 mm</option>
+                <option value="7.2">0,1 inç</option>
+            </select>
+
+            <label class="rt-etiket" for="rt-olcek">@Metin.T("Tasarimci_Yakinlik")</label>
+            <select id="rt-olcek" class="rt-secim" value="@Olcu.Sayi(olcek)" @onchange="OlcekDegisti">
+                @foreach (var o in Olcekler)
+                {
+                    <option value="@Olcu.Sayi(o)">%@Olcu.Sayi(o * 100)</option>
+                }
+            </select>
+
+            @* Örnek veri: kutular başvuru yerine biçimden geçmiş değerler
+               gösterir. Biçim deseninin ne yaptığı ancak böyle görünüyor. *@
+            <button type="button" class="rt-dugme" aria-pressed="@ornek"
+                    title="@Metin.T("Tasarimci_OrnekVeriIpucu")"
+                    @onclick="() => ornek = !ornek">
+                <Ikon Ad="ornek" /> @Metin.T("Tasarimci_OrnekVeri")
+            </button>
+
+            @* Önizleme: düzenin veriyle basılmış hâli, sayfa sayfa. Tuvalin
+               yerini alır — ikisi aynı anda gösterilemez, çünkü biri yerleşim
+               yüzeyi diğeri sonuç. *@
+            <button type="button" class="rt-dugme" aria-pressed="@basimOnizleme"
+                    title="@Metin.T("Tasarimci_OnizleIpucu")"
+                    @onclick="() => basimOnizleme = !basimOnizleme">
+                <Ikon Ad="onizleme" /> @Metin.T("Tasarimci_Onizle")
+            </button>
+
+            <button type="button" class="rt-dugme" aria-pressed="@sayfaAyari"
+                    title="@Metin.T("Tasarimci_SayfaIpucu")"
+                    @onclick="() => sayfaAyari = !sayfaAyari">
+                <Ikon Ad="kagit" /> @Metin.T("Tasarimci_Sayfa")
+            </button>
+
+            @if (OnizlemeAdresi is { Length: > 0 })
+            {
+                <button type="button" class="rt-dugme" aria-pressed="@onizleme"
+                        title="@Metin.T("Tasarimci_PdfIpucu")"
+                        @onclick="() => onizleme = !onizleme">
+                    PDF
+                </button>
+            }
+
+            <button type="button" class="rt-dugme" aria-pressed="@betikler"
+                    title="@Metin.T("Tasarimci_TasinmayanlarIpucu")"
+                    @onclick="() => betikler = !betikler">
+                @Metin.T("Tasarimci_Tasinmayanlar")@(secili.Betikler.Count + secili.Uyarilar.Count is var n && n > 0 ? $" ({n})" : "")
+            </button>
+
+            @if (kayitBilgisi is not null)
+            {
+                <span class="rt-bilgi">@kayitBilgisi</span>
+            }
+
+            <button type="button" class="rt-dugme" title="@Metin.T("Tasarimci_GeriAl")"
+                    disabled="@(!yigin.GeriAlinabilir)" @onclick="() => AdimAt(geri: true)">
+                <Ikon Ad="geri" Etiket="@Metin.T("Tasarimci_GeriAl")" />
+            </button>
+            <button type="button" class="rt-dugme" title="@Metin.T("Tasarimci_Yinele")"
+                    disabled="@(!yigin.Yinelenebilir)" @onclick="() => AdimAt(geri: false)">
+                <Ikon Ad="yinele" Etiket="@Metin.T("Tasarimci_Yinele")" />
+            </button>
+
+            @* Adı "orijinale dön": kaydedilmemiş değişiklikleri atıp düzenin
+               DOSYADAKİ hâline döner — düzeltme dosyası varsa o da uygulanmış
+               olarak. Yani "dönüştürücünün ürettiği ham düzen" değil. *@
+            <button type="button" class="rt-dugme" disabled="@(!duzenlendi)" @onclick="Geri">
+                @Metin.T("Tasarimci_OrijinaleDon")
+            </button>
+
+            <button type="button" class="rt-dugme rt-dugme-birincil" disabled="@(!duzenlendi)"
+                    @onclick="Kaydet">
+                <Ikon Ad="kaydet" /> @Metin.T("Tasarimci_Kaydet")
+            </button>
+        }
+
+        @* Kapat en sağda: çubuğun geri kalanı bu düzen üzerinde çalışmaya
+           yarıyor, bu düğme ise çalışmayı bitiriyor. Sola konsaydı "geri al"
+           ile aynı bölgede durur ve yanlışlıkla basılırdı. *@
+        @if (Kapat.HasDelegate)
+        {
+            <button type="button" class="rt-dugme" title="@Metin.T("Tasarimci_KapatIpucu")"
+                    @onclick="Kapat">
+                <Ikon Ad="kapat" /> @Metin.T("Kapat")
+            </button>
+        }
+    </div>
+
+    @* Palet düzen açıkken görünür: düzen yokken ekleyecek bir yer de yok. *@
+    @if (secili is not null)
+    {
+        <AracPaneli SeciliBant="EkleBandi"
+                    NesneEkle="tur => KutuEkle(EkleBandi!, tur)"
+                    BantEkle="BantEkle"
+                    Kumeler="kumeler"
+                    AlanEkle="a => AlanKutusuEkle(EkleBandi!, a)"
+                    AlanSurukleBasladi="a => { suruklenenAlan = a; suruklenenTur = null; }"
+                    SurukleBasladi="tur => { suruklenenTur = tur; suruklenenAlan = null; }"
+                    SurukleBitti="SuruklemeBitti" />
+    }
+
+    <div class="rt-bolme">
+        <div class="rt-tezgah">
+            @if (Sayfa is null)
+            {
+                <div class="rt-bos">
+                    <Ikon Ad="kagit" Boyut="28" />
+                    <p class="rt-bos-baslik">@Metin.T("Tasarimci_BosBaslik")</p>
+                    <p class="rt-bos-alt">@Metin.T("Tasarimci_BosAlt")</p>
+                </div>
+            }
+            else if (basimOnizleme)
+            {
+                @* Sürüm sayacı: düzen yerinde değişiyor, önizleme başvuruya
+                   bakarak değişikliği göremez. Sayaç artınca yeniden dizilir. *@
+                <Onizleme Sayfa="Sayfa" Veri="Veri" Surum="surum" />
+            }
+            else
+            {
+                <Tuval Sayfa="Sayfa" Olcek="olcek" Izgara="izgara" Ornek="ornek"
+                       Surukleniyor="Surukleniyor" Birakildi="Birakildi"
+                       BantBoyu="BantBoyutlandi"
+                       Secililer="seciliKutular" Secildi="Secildi"
+                       SeciliBant="seciliBant" BantSecildi="BantSecildi"
+                       Degisti="degisenler.Contains"
+                       Tasindi="Tasindi" Tus="Tus" />
+            }
+        </div>
+
+        @if (sayfaAyari && Sayfa is not null)
+        {
+            <SayfaPaneli Sayfa="Sayfa" Uygula="SayfaDegisikligi" />
+        }
+        else if (betikler && secili is not null)
+        {
+            <BetikPaneli Duzen="secili" />
+        }
+        else if (secimler.Count > 1)
+        {
+            @* Birden çok kutu seçiliyken tek tek özellik düzenlemenin anlamı
+               yok; çoklu seçimin işi kutuları birbirine göre yerleştirmek. *@
+            <HizalamaPaneli Sayi="secimler.Count" Hizala="Hizala" Birak="SecimiTemizle" />
+        }
+        else if (secim is not null)
+        {
+            <OzellikPaneli Secim="secim" Uygula="PanelDegisikligi" Alanlar="alanlar"
+                           Sil="() => KutuSil(secim)" Kopyala="() => KutuKopyala(secim)" />
+        }
+        else if (seciliBant is not null)
+        {
+            @* Bant panelinin "kutu ekle" düğmesi yazı kutusu ekler; tür seçimi
+               araç paletinde. *@
+            <BantPaneli Bant="seciliBant" Uygula="BantDegisikligi"
+                        KutuEkle="b => KutuEkle(b)" Sil="BantSil" />
+        }
+
+        @if (onizleme && secili is not null && OnizlemeAdresi is { Length: > 0 })
+        {
+            @* Tarayıcı ile PDF motoru aynı satır kırmasını yapmaz; tuval nereye
+               konduğunu, bu çerçeve ne bastığını gösterir. Doğruluğun ölçüsü
+               soldaki değil, sağdaki. *@
+            <iframe class="rt-onizleme" title="@Metin.T("Tasarimci_PdfIpucu")"
+                    src="@string.Format(OnizlemeAdresi, secili.Anahtar)"></iframe>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>Düzenlerin okunduğu ve yazıldığı depo.</summary>
+    [Parameter, EditorRequired] public required IDuzenDeposu Depo { get; set; }
+
+    /// <summary>Düzenlenecek düzen; boşsa tasarımcı boş ekranla açılır.</summary>
+    [Parameter] public string? SeciliAnahtar { get; set; }
+
+    /// <summary>
+    /// "Kapat" düğmesine basıldığında çağrılır. Bağlanmazsa düğme görünmez —
+    /// tasarımcıyı tek ekran olarak gömen uygulamanın dönecek yeri yoktur.
+    /// </summary>
+    [Parameter] public EventCallback Kapat { get; set; }
+
+    /// <summary>
+    /// Düzenin PDF'ini veren adresin kalıbı — <c>"/cikti/duzen/{0}.pdf"</c>.
+    /// </summary>
+    /// <remarks>
+    /// Kütüphane PDF üretmez; hangi motorla basıldığı barındıran uygulamanın
+    /// işidir. Boş bırakılırsa önizleme düğmesi hiç görünmez.
+    /// </remarks>
+    [Parameter] public string? OnizlemeAdresi { get; set; }
+
+    private string? hata;
+    private int sayfaIndeksi;
+    private double olcek = 1;
+    private bool onizleme;
+
+    /// <summary>Düzenlenen düzen. Panelin bağlandığı nesneler bunun içindedir.</summary>
+    private CetvelDuzeni? secili;
+
+    /// <summary>
+    /// Dönüştürücünün ürettiği düzen — hiç değiştirilmez.
+    /// </summary>
+    /// <remarks>
+    /// Kaydedilecek düzeltme, <see cref="secili"/> ile bunun farkıdır. İkinci
+    /// bir kopya tutmanın sebebi bu: fark hesaplanacak bir "özgün hâl" olmadan
+    /// düzeltmeyi biriktirmek gerekirdi ve o zaman bir alanı eski değerine geri
+    /// almak onu dosyadan düşürmezdi.
+    /// </remarks>
+    private CetvelDuzeni? ham;
+
+    /// <summary>Ham düzendeki kutular — bant ve kutu adına göre.</summary>
+    private Dictionary<(string Bant, string Nesne), DuzenNesnesi> hamKutular = [];
+
+    /// <summary>Ham hâlinden farklı olan kutular; tuvalde işaretlenirler.</summary>
+    private readonly HashSet<DuzenNesnesi> degisenler = [];
+
+    /// <summary>Dosyadan okunan düzeltmenin açıklaması — kaydederken korunur.</summary>
+    /// <remarks>
+    /// Elle yazılmış düzeltmelerin açıklaması bazen düzenin kendisinden değerli:
+    /// ödeme yazısının açıklaması, hangi kutunun neden veriye bağlandığını
+    /// anlatan bir paragraf. Düzeltme her kayıtta baştan üretildiği için buraya
+    /// alınmasa kaybolurdu.
+    /// </remarks>
+    private string? aciklama;
+
+    /// <summary>
+    /// Seçili kutular, tıklanma sırasıyla.
+    /// </summary>
+    /// <remarks>
+    /// Küme değil liste: son tıklanan kutu "birincil" sayılıyor ve özellik
+    /// paneli onu gösteriyor. Kümede sıra olmadığı için hangisinin son
+    /// tıklandığı kaybolurdu.
+    /// </remarks>
+    private readonly List<KutuSecimi> secimler = [];
+
+    /// <summary>Özellik panelinin gösterdiği kutu — son seçilen.</summary>
+    private KutuSecimi? secim => secimler.Count > 0 ? secimler[^1] : null;
+
+    private readonly HashSet<DuzenNesnesi> seciliKutular = [];
+
+    /// <summary>Kanalda seçili bant; kutu seçiliyse null.</summary>
+    private DuzenBandi? seciliBant;
+
+    /// <summary>
+    /// Paletten eklenecek kutunun gireceği bant.
+    /// </summary>
+    /// <remarks>
+    /// Kanalda seçili bant yoksa <b>seçili kutunun bandı</b> kullanılıyor. Yeni
+    /// eklenen kutu kendisi seçili hâle geldiği için bant seçimi düşüyor ve
+    /// palet kapanıyordu: art arda iki nesne eklemek için her seferinde kanala
+    /// dönmek gerekiyordu.
+    /// </remarks>
+    private DuzenBandi? EkleBandi => seciliBant ?? secim?.Bant;
+
+    private double izgara;
+    private bool betikler;
+
+    /// <summary>Sayfa düzeni paneli açık mı?</summary>
+    private bool sayfaAyari;
+
+    /// <summary>Tuvalin yerine basım önizlemesi mi gösteriliyor?</summary>
+    private bool basimOnizleme;
+
+    /// <summary>
+    /// Tuval örnek değerlerle mi gösteriliyor?
+    /// </summary>
+    /// <remarks>
+    /// Kapalı başlıyor: tasarımcıyı ilk açan kişinin sorusu "bu kutu neye
+    /// bağlı", biçim denemesi sonra geliyor.
+    /// </remarks>
+    private bool ornek;
+
+    /// <summary>Düzende geçen alan adları — "veri alanı" kutusunun önerileri.</summary>
+    private List<string> alanlar = [];
+
+    /// <summary>Alan ağacındaki veri kümeleri.</summary>
+    private List<VeriKumesiTanimi> kumeler = [];
+
+    /// <summary>
+    /// Uygulamanın bildirdiği veri kümeleri — verilmezse ağaç yalnızca düzenden
+    /// çıkarılır.
+    /// </summary>
+    /// <remarks>
+    /// Düzenden çıkarılan liste <b>eksiksiz olamaz</b>: düzende hiç geçmeyen bir
+    /// alan orada görünmez. Ekranın servisini bilen uygulama gerçek listeyi
+    /// verebilir; ikisi birleştirilir, düzendeki alanlar hiçbir zaman
+    /// düşürülmez — basılıyorlarsa tasarımda da görünmeleri gerekir.
+    /// </remarks>
+    [Parameter] public IReadOnlyList<VeriKumesiTanimi>? VeriKumeleri { get; set; }
+
+    /// <summary>
+    /// Rapora beslenen veri: alan ağacı buradan dolar, önizleme bununla basar.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Kümelerin adı <b>düzendeki adlarla aynı olmalı</b>: bantlar
+    /// <c>VeriKumesi = "Fisler"</c> der, eşleşme ada göredir.
+    /// </para>
+    /// <para>
+    /// Verilmezse tasarımcı yine çalışır — alan ağacı düzenden çıkarılır,
+    /// önizleme örnek satırlarla dizilir. Tasarım anında veri olmaması normal.
+    /// </para>
+    /// </remarks>
+    [Parameter] public RaporVerisi? Veri { get; set; }
+
+    private readonly GeriAlYigini yigin = new();
+
+    // ------------------------------------------------------------ değişiklik
+
+    /// <summary>
+    /// Bir kutuyu değiştirir ve geri alınabilir kılar.
+    /// </summary>
+    /// <remarks>
+    /// Kutuya dokunan HER yol buradan geçmeli. Panelden, sürüklemeden ve ok
+    /// tuşlarından ayrı ayrı yazılsaydı biri geri alma yığınına düşmez ve o
+    /// değişiklik geri alınamazdı.
+    /// </remarks>
+    private void Uygula(DuzenNesnesi nesne, Action islem)
+    {
+        var once = nesne.Kopya();
+        islem();
+
+        yigin.Alan(nesne, once);
+        Degisti();
+    }
+
+    private void Tasindi(IReadOnlyList<KutuTasimasi> tasimalar)
+    {
+        foreach (var t in tasimalar)
+            Uygula(t.Nesne, () =>
+            {
+                t.Nesne.SolPt = t.SolPt;
+                t.Nesne.UstPt = t.UstPt;
+                t.Nesne.GenislikPt = t.GenislikPt;
+                t.Nesne.YukseklikPt = t.YukseklikPt;
+            });
+    }
+
+    // -------------------------------------------------------------------- seçim
+
+    private void Secildi(SecimIstegi istek)
+    {
+        if (istek.Bant is null || istek.Nesne is null)
+        {
+            // Boşluğa tıklandı. Ctrl basılıysa seçime dokunulmaz: kullanıcı
+            // birden çok kutu topluyor ve arada boşluğa denk gelmesi seçimi
+            // sıfırlamamalı.
+            if (!istek.Ekle) SecimiTemizle();
+            return;
+        }
+
+        var varolan = secimler.FindIndex(s => ReferenceEquals(s.Nesne, istek.Nesne));
+
+        if (!istek.Ekle)
+        {
+            SecimiTemizle();
+        }
+        else if (varolan >= 0)
+        {
+            // Ctrl ile seçili bir kutuya tekrar tıklamak onu seçimden çıkarır.
+            secimler.RemoveAt(varolan);
+            seciliKutular.Remove(istek.Nesne);
+            return;
+        }
+
+        secimler.Add(new KutuSecimi(istek.Bant, istek.Nesne));
+        seciliKutular.Add(istek.Nesne);
+    }
+
+    private void SecimiTemizle()
+    {
+        secimler.Clear();
+        seciliKutular.Clear();
+        seciliBant = null;
+    }
+
+    /// <remarks>
+    /// Bant seçmek kutu seçimini bırakır: sağdaki panel tek ve ikisini birden
+    /// gösteremez. Aynı bandın kanalına yeniden tıklamak seçimi bırakır.
+    /// </remarks>
+    private void BantSecildi(DuzenBandi bant)
+    {
+        var ayni = ReferenceEquals(seciliBant, bant);
+        SecimiTemizle();
+        seciliBant = ayni ? null : bant;
+    }
+
+    // ------------------------------------------------------------ kutu işlemleri
+
+    private Task BantDegisikligi(Action islem)
+    {
+        if (seciliBant is null) return Task.CompletedTask;
+
+        // Bant değişikliğinin geri alması kutununkinden farklı: bant kopyası
+        // tutmuyoruz, işlemi yapmadan önceki değerleri kapanışa alıp geri
+        // yazan bir çift üretiyoruz.
+        var bant = seciliBant;
+        var once = new BantDurumu(bant);
+
+        islem();
+
+        var sonra = new BantDurumu(bant);
+        yigin.Yapisal(() => once.Geri(bant), () => sonra.Geri(bant));
+
+        Degisti();
+        return Task.CompletedTask;
+    }
+
+    /// <remarks>
+    /// Sayfa değişikliği de geri alınabilir olmalı: A4'ten A5'e geçip
+    /// beğenmeyen biri Ctrl+Z ile dönebilmeli. Bant değişikliğiyle aynı
+    /// yöntem — önceki ve sonraki durumu kapanışa alıp yazan bir çift.
+    /// </remarks>
+    private Task SayfaDegisikligi(Action islem)
+    {
+        if (Sayfa is not { } sayfa) return Task.CompletedTask;
+
+        var once = new SayfaDurumu(sayfa);
+
+        islem();
+
+        var sonra = new SayfaDurumu(sayfa);
+        yigin.Yapisal(() => once.Geri(sayfa), () => sonra.Geri(sayfa));
+
+        Degisti();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Sayfanın kâğıt ayarlarının anlık kopyası.</summary>
+    private readonly record struct SayfaDurumu(
+        double GenislikPt, double YukseklikPt, bool Yatay,
+        double SolBoslukPt, double SagBoslukPt, double UstBoslukPt, double AltBoslukPt,
+        int SutunSayisi, double SutunAraligiPt)
+    {
+        public SayfaDurumu(DuzenSayfasi s) : this(
+            s.GenislikPt, s.YukseklikPt, s.Yatay,
+            s.SolBoslukPt, s.SagBoslukPt, s.UstBoslukPt, s.AltBoslukPt,
+            s.SutunSayisi, s.SutunAraligiPt) { }
+
+        public void Geri(DuzenSayfasi s)
+        {
+            s.GenislikPt = GenislikPt;
+            s.YukseklikPt = YukseklikPt;
+            s.Yatay = Yatay;
+            s.SolBoslukPt = SolBoslukPt;
+            s.SagBoslukPt = SagBoslukPt;
+            s.UstBoslukPt = UstBoslukPt;
+            s.AltBoslukPt = AltBoslukPt;
+            s.SutunSayisi = SutunSayisi;
+            s.SutunAraligiPt = SutunAraligiPt;
+        }
+    }
+
+    /// <summary>
+    /// Bandın yüksekliği tuvalde fareyle değiştirildi.
+    /// </summary>
+    /// <remarks>
+    /// Panelden yazmakla aynı yoldan geçiyor: aynı geri alma adımı, aynı
+    /// düzeltme çıkarımı. Ayrı yazılsaydı fareyle yapılan değişiklik geri
+    /// alınamazdı.
+    /// </remarks>
+    private Task BantBoyutlandi(BantBoyutlamasi olcu)
+    {
+        var bant = olcu.Bant;
+        var once = new BantDurumu(bant);
+
+        bant.YukseklikPt = Math.Round(olcu.YukseklikPt, 3);
+
+        var sonra = new BantDurumu(bant);
+        yigin.Yapisal(() => once.Geri(bant), () => sonra.Geri(bant));
+
+        Degisti();
+        return Task.CompletedTask;
+    }
+
+    /// <summary>Bandın düzenlenebilir alanlarının anlık kopyası.</summary>
+    private readonly record struct BantDurumu(
+        double YukseklikPt, bool Uzayabilir, bool SonrasindaYeniSayfa,
+        string? VeriKumesi, string? GrupKosulu, string? YanBant)
+    {
+        public BantDurumu(DuzenBandi b) : this(
+            b.YukseklikPt, b.Uzayabilir, b.SonrasindaYeniSayfa,
+            b.VeriKumesi, b.GrupKosulu, b.YanBant) { }
+
+        public void Geri(DuzenBandi b)
+        {
+            b.YukseklikPt = YukseklikPt;
+            b.Uzayabilir = Uzayabilir;
+            b.SonrasindaYeniSayfa = SonrasindaYeniSayfa;
+            b.VeriKumesi = VeriKumesi;
+            b.GrupKosulu = GrupKosulu;
+            b.YanBant = YanBant;
+        }
+    }
+
+    /// <summary>
+    /// Düzenin sürümü — her değişiklikte artar.
+    /// </summary>
+    /// <remarks>
+    /// Düzen yerinde değiştiriliyor: nesne aynı kalıyor, içeriği değişiyor.
+    /// Başvuruya bakan her önbellek (önizleme dizimi gibi) değişikliği
+    /// göremez; sayaç o yüzden var.
+    /// </remarks>
+    private int surum;
+
+    private void Degisti()
+    {
+        duzenlendi = true;
+        kayitBilgisi = null;
+        surum++;
+        FarkiHesapla();
+    }
+
+    /// <summary>Paletten sürüklenen nesne türü.</summary>
+    private NesneTuru? suruklenenTur;
+
+    /// <summary>Alan ağacından sürüklenen veri alanı.</summary>
+    /// <remarks>
+    /// Türle aynı anda dolu olmuyor: sürükleyen taraf ikisinden birini
+    /// kuruyor, diğerini boşaltıyor. Tuval hangisi olduğunu bilmiyor, yalnızca
+    /// "bir şey sürükleniyor" diye biliyor.
+    /// </remarks>
+    private AlanSurukleme? suruklenenAlan;
+
+    private bool Surukleniyor => suruklenenTur is not null || suruklenenAlan is not null;
+
+    private void SuruklemeBitti()
+    {
+        suruklenenTur = null;
+        suruklenenAlan = null;
+    }
+
+    /// <summary>
+    /// Sürüklenen şey bırakıldı: bırakıldığı bandın, bırakıldığı noktasına
+    /// konur.
+    /// </summary>
+    /// <remarks>
+    /// Kutunun sol üst köşesi imlecin bırakıldığı noktaya oturuyor — imleci
+    /// merkez almak "tam oraya bıraktım ama başka yere gitti" duygusu verirdi.
+    /// </remarks>
+    private void Birakildi(NesneBirakma birakma)
+    {
+        var alan = suruklenenAlan;
+        var tur = suruklenenTur;
+
+        SuruklemeBitti();
+
+        if (alan is not null) AlanKutusuEkle(birakma.Bant, alan, birakma.SolPt, birakma.UstPt);
+        else if (tur is { } t) KutuEkle(birakma.Bant, t, birakma.SolPt, birakma.UstPt);
+    }
+
+    /// <summary>
+    /// Bir veri alanına bağlı yazı kutusu ekler.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Kutu <b>hem metniyle hem bağıyla</b> kuruluyor: metin
+    /// <c>[MuhFis."Aciklama"]</c>, <c>VeriAlani</c> ise <c>Aciklama</c>.
+    /// FastReport da ikisini birden yazıyor ve dönüştürülmüş düzenler de böyle;
+    /// yalnız biri yazılsaydı elle düzenlenmiş düzenlerle taşınmış olanlar iki
+    /// ayrı biçimde okunurdu.
+    /// </para>
+    /// <para>
+    /// Biçim ve hizalama <b>ad</b>dan tahmin ediliyor (bkz.
+    /// <see cref="AlanSezgisi"/>): tutar alanı sağa yaslı ve iki ondalıklı,
+    /// tarih alanı <c>dd.mm.yyyy</c> gelir. Tahmin yanlışsa iki tıklamayla
+    /// düzeltilir; hiç tahmin edilmeseydi o iki tıklama her alan için
+    /// gerekirdi.
+    /// </para>
+    /// </remarks>
+    private void AlanKutusuEkle(DuzenBandi bant, AlanSurukleme alan, double solPt = 0, double ustPt = 0)
+    {
+        var bicim = AlanSezgisi.Bicim(alan.Alan);
+
+        KutuEkle(bant, NesneTuru.Yazi, solPt, ustPt, nesne =>
+        {
+            nesne.Metin = alan.Kume is { Length: > 0 } kume
+                ? $"[{kume}.\"{alan.Alan}\"]"
+                : $"[{alan.Alan}]";
+
+            nesne.VeriAlani = alan.Alan;
+
+            nesne.Bicim = bicim;
+            nesne.BicimDeseni = AlanSezgisi.Desen(bicim);
+
+            // Sayılar sağa yaslanır: cetvelde bir sütun ancak öyle okunur,
+            // basamaklar alt alta gelir.
+            if (bicim is BicimTuru.Sayi)
+            {
+                nesne.Yatay = YatayHiza.Sag;
+                nesne.GenislikPt = 70;
+            }
+            else if (bicim is BicimTuru.Tarih)
+            {
+                nesne.GenislikPt = 55;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Banda yeni bir kutu ekler.
+    /// </summary>
+    /// <remarks>
+    /// Her tür kendi ölçüsüyle ve dolu gelir: boş ve boyutsuz eklenseydi kutu
+    /// tuvalde görünmez, kullanıcı düğmenin çalışmadığını sanardı. Çizgi
+    /// dönüştürücünün kuralıyla üretiliyor — çizginin çerçevesi yoktur, kendisi
+    /// çizgidir (bkz. FrxDuzenCikarici).
+    /// <para>
+    /// <c>duzenle</c> tür varsayılanları kurulduktan <b>sonra</b>, konum
+    /// hesaplanmadan <b>önce</b> çalışır: alana bağlı kutu genişliğini de
+    /// değiştiriyor ve kâğıt sınırı o genişliğe göre hesaplanmalı.
+    /// </para>
+    /// </remarks>
+    private void KutuEkle(DuzenBandi bant, NesneTuru tur = NesneTuru.Yazi,
+                          double solPt = 0, double ustPt = 0,
+                          Action<DuzenNesnesi>? duzenle = null)
+    {
+        var nesne = new DuzenNesnesi
+        {
+            Ad = YeniKutuAdi(),
+            Tur = tur,
+            PuntoPt = 9.75,
+        };
+
+        switch (tur)
+        {
+            case NesneTuru.Cizgi:
+                nesne.GenislikPt = 160;
+                nesne.YukseklikPt = 1;
+                nesne.Cerceve = CerceveKenari.Ust;
+                break;
+
+            case NesneTuru.Sekil:
+                nesne.GenislikPt = 80;
+                nesne.YukseklikPt = 40;
+                nesne.Cerceve = CerceveKenari.Tumu;
+                break;
+
+            case NesneTuru.Resim:
+                nesne.GenislikPt = 80;
+                nesne.YukseklikPt = 40;
+                break;
+
+            case NesneTuru.Barkod:
+                nesne.GenislikPt = 120;
+                nesne.YukseklikPt = 40;
+                // Örnek değer: boş barkod çizilemez ve yeni kutu tuvalde boş
+                // bir dikdörtgen olarak görünürdü.
+                nesne.Metin = "1234567890";
+                nesne.BarkodYazisi = true;
+                break;
+
+            default:
+                nesne.GenislikPt = 80;
+                nesne.YukseklikPt = 14;
+                // Yer tutucu metin kullanıcının dilinde: kutu eklendiği anda
+                // görülüyor ve zaten hemen değiştiriliyor.
+                nesne.Metin = Metin.T("YeniKutuMetni");
+                nesne.KelimeKaydir = true;
+                break;
+        }
+
+        duzenle?.Invoke(nesne);
+
+        nesne.SolPt = Yerlestir(solPt, nesne.GenislikPt, AlanEni);
+        nesne.UstPt = Yerlestir(ustPt, nesne.YukseklikPt, BantSirasi.Yukseklik(bant));
+
+        bant.Nesneler.Add(nesne);
+
+        yigin.Yapisal(
+            () => bant.Nesneler.Remove(nesne),
+            () => bant.Nesneler.Add(nesne));
+
+        SecimiTemizle();
+        secimler.Add(new KutuSecimi(bant, nesne));
+        seciliKutular.Add(nesne);
+
+        Degisti();
+    }
+
+    /// <summary>
+    /// Bırakılan kutunun bir eksenini yerleştirir: ızgaraya yaslar ve kutuyu
+    /// alanın dışına taşırmaz.
+    /// </summary>
+    /// <remarks>
+    /// Sınır <b>kutunun tamamı</b> için: sol kenarı içeride ama sağ kenarı
+    /// dışarıda kalan bir kutu kâğıdın kenarından taşar ve PDF'te kesilir.
+    /// Alan kutudan darsa (dar bir bandın içine büyük bir barkod) 0'a
+    /// oturuyor — orada taşmadan yerleşmesi mümkün değil, kullanıcı boyutu
+    /// kendisi küçültecek.
+    /// </remarks>
+    private double Yerlestir(double deger, double boyut, double alan)
+    {
+        var v = izgara > 0 ? Math.Round(deger / izgara) * izgara : deger;
+
+        return Math.Max(0, Math.Min(v, alan - boyut));
+    }
+
+    /// <summary>Bantların içine kutu konabilen yazı alanının eni.</summary>
+    private double AlanEni
+        => Sayfa is { } s ? Math.Max(0, s.GenislikPt - s.SolBoslukPt - s.SagBoslukPt) : 0;
+
+    private void KutuKopyala(KutuSecimi s)
+    {
+        var kopya = s.Nesne.Kopya();
+        kopya.Ad = YeniKutuAdi();
+
+        // Üst üste binmesin: kopya biraz sağa aşağı konur, yoksa kullanıcı
+        // yeni kutuyu göremez ve iki kez kopyaladığını sanır.
+        kopya.SolPt += 6;
+        kopya.UstPt += 6;
+
+        s.Bant.Nesneler.Add(kopya);
+
+        yigin.Yapisal(
+            () => s.Bant.Nesneler.Remove(kopya),
+            () => s.Bant.Nesneler.Add(kopya));
+
+        SecimiTemizle();
+        secimler.Add(new KutuSecimi(s.Bant, kopya));
+        seciliKutular.Add(kopya);
+
+        Degisti();
+    }
+
+    private void KutuSil(KutuSecimi s)
+    {
+        var yer = s.Bant.Nesneler.IndexOf(s.Nesne);
+        if (yer < 0) return;
+
+        s.Bant.Nesneler.RemoveAt(yer);
+
+        // Yerine geri konur, sonuna değil: bant içindeki sıra çizim sırasıdır
+        // ve üst üste binen kutularda hangisinin üstte kalacağını belirler.
+        yigin.Yapisal(
+            () => s.Bant.Nesneler.Insert(Math.Min(yer, s.Bant.Nesneler.Count), s.Nesne),
+            () => s.Bant.Nesneler.Remove(s.Nesne));
+
+        SecimiTemizle();
+        Degisti();
+    }
+
+    // ------------------------------------------------------------ bant işlemleri
+
+    /// <summary>
+    /// Sayfaya yeni bir bant ekler.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Yeni bandın <b>dikey konumu (UstPt) basım sırasını belirler</b> — gövde
+    /// bantları kâğıda o sıraya göre çıkar. Bir bant seçiliyse yeni bant onun
+    /// hemen ALTINA giriyor: konumu, seçili bant ile tasarımda ondan sonra
+    /// gelen bandın tam ortası. Aralarına sıkıştırmak yerine sona eklenseydi
+    /// bant listenin dibinde belirir ve kullanıcı onu istediği yere taşımanın
+    /// yolunu bulamazdı.
+    /// </para>
+    /// <para>
+    /// Seçili bant yoksa en alta eklenir.
+    /// </para>
+    /// </remarks>
+    private void BantEkle(BantTuru tur)
+    {
+        if (Sayfa is not { } sayfa) return;
+
+        var bant = new DuzenBandi
+        {
+            Ad = YeniAd("Bant", secili!.Sayfalar.SelectMany(s => s.Bantlar).Select(b => b.Ad)),
+            Tur = tur,
+            UstPt = YeniBantKonumu(sayfa),
+            YukseklikPt = 20,
+        };
+
+        sayfa.Bantlar.Add(bant);
+
+        yigin.Yapisal(
+            () => sayfa.Bantlar.Remove(bant),
+            () => sayfa.Bantlar.Add(bant));
+
+        SecimiTemizle();
+        seciliBant = bant;
+        Degisti();
+    }
+
+    /// <remarks>
+    /// Ölçü <see cref="EkleBandi"/>'na göre alınır, yalnızca kanalda seçili
+    /// banda göre değil: paletteki ipucu "şu bandın altına eklenir" diyorsa
+    /// bant gerçekten oraya girmeli.
+    /// </remarks>
+    private double YeniBantKonumu(DuzenSayfasi sayfa)
+    {
+        var sirali = sayfa.Bantlar.OrderBy(b => b.UstPt).ToList();
+        var olcu = EkleBandi;
+
+        if (olcu is null || sirali.Count == 0)
+            return sirali.Count == 0 ? 0 : sirali[^1].UstPt + 40;
+
+        var yer = sirali.IndexOf(olcu);
+        if (yer < 0) return sirali[^1].UstPt + 40;
+
+        return yer == sirali.Count - 1
+            ? olcu.UstPt + 40
+            : (olcu.UstPt + sirali[yer + 1].UstPt) / 2;
+    }
+
+    private void BantSil(DuzenBandi bant)
+    {
+        if (Sayfa is not { } sayfa) return;
+
+        var yer = sayfa.Bantlar.IndexOf(bant);
+        if (yer < 0) return;
+
+        sayfa.Bantlar.RemoveAt(yer);
+
+        yigin.Yapisal(
+            () => sayfa.Bantlar.Insert(Math.Min(yer, sayfa.Bantlar.Count), bant),
+            () => sayfa.Bantlar.Remove(bant));
+
+        SecimiTemizle();
+        Degisti();
+    }
+
+    /// <summary>Düzende kullanılmayan bir ad üretir.</summary>
+    /// <remarks>
+    /// Ad benzersiz olmalı: düzeltme dosyası bantları ve kutuları adıyla
+    /// buluyor, iki aynı adlıdan biri sessizce diğerinin düzeltmesini yerdi.
+    /// </remarks>
+    private static string YeniAd(string onek, IEnumerable<string> kullanilanlar)
+    {
+        var kullanilan = kullanilanlar.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        for (var i = 1; ; i++)
+            if (kullanilan.Add($"{onek}{i}"))
+                return $"{onek}{i}";
+    }
+
+    private string YeniKutuAdi()
+        => YeniAd("Kutu", secili is null
+            ? []
+            : secili.Sayfalar.SelectMany(s => s.Bantlar).SelectMany(b => b.Nesneler).Select(n => n.Ad));
+
+    // ---------------------------------------------------------------- hizalama
+
+    private void Hizala(HizalamaTuru tur)
+    {
+        var sonuclar = Hizalama.Hesapla(tur, [.. secimler.Select(s => s.Nesne)]);
+
+        foreach (var s in sonuclar)
+            Uygula(s.Nesne, () =>
+            {
+                s.Nesne.SolPt = s.SolPt;
+                s.Nesne.UstPt = s.UstPt;
+                s.Nesne.GenislikPt = s.GenislikPt;
+                s.Nesne.YukseklikPt = s.YukseklikPt;
+            });
+    }
+
+    private void AdimAt(bool geri)
+    {
+        if (!(geri ? yigin.GeriAl() : yigin.Yinele())) return;
+
+        // Geri alınan adım bir kutuyu silmiş ya da eklemiş olabilir; seçim
+        // artık düzende olmayan bir nesneyi gösteriyor olabilir.
+        SecimiGecerleStir();
+        Degisti();
+    }
+
+    /// <summary>Düzenden düşmüş kutuları seçimden çıkarır.</summary>
+    private void SecimiGecerleStir()
+    {
+        if (secili is null) { SecimiTemizle(); return; }
+
+        var duran = secili.Sayfalar.SelectMany(s => s.Bantlar)
+            .SelectMany(b => b.Nesneler)
+            .ToHashSet();
+
+        secimler.RemoveAll(s => !duran.Contains(s.Nesne));
+        seciliKutular.RemoveWhere(n => !duran.Contains(n));
+    }
+
+    /// <summary>
+    /// Klavyeyle ince ayar ve geri alma.
+    /// </summary>
+    /// <remarks>
+    /// Ok tuşu bir ızgara adımı, Shift ile onu; ızgara kapalıysa 1 ve 10 punto.
+    /// Fareyle 0,25 puntoluk bir düzeltme yapmak neredeyse imkânsız, klavyeyle
+    /// kesin.
+    /// </remarks>
+    private void Tus(TusVurusu e)
+    {
+        if (e.Ctrl && e.Tus is "z" or "Z") { AdimAt(geri: true); return; }
+        if (e.Ctrl && e.Tus is "y" or "Y") { AdimAt(geri: false); return; }
+
+        if (secim is null) return;
+
+        var adim = (izgara > 0 ? izgara : 1) * (e.Shift ? 10 : 1);
+
+        var (dx, dy) = e.Tus switch
+        {
+            "ArrowLeft" => (-adim, 0d),
+            "ArrowRight" => (adim, 0d),
+            "ArrowUp" => (0d, -adim),
+            "ArrowDown" => (0d, adim),
+            _ => (0d, 0d),
+        };
+
+        if (dx == 0 && dy == 0) return;
+
+        var n = secim.Nesne;
+        Uygula(n, () => { n.SolPt += dx; n.UstPt += dy; });
+    }
+
+    private void IzgaraDegisti(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(),
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var v))
+            izgara = v;
+    }
+
+    /// <summary>
+    /// Düzen açıldığından beri bir alana dokunuldu mu?
+    /// </summary>
+    /// <remarks>
+    /// "Fark var mı" ile aynı şey değil ve öyle olmamalı: bütün değişiklikleri
+    /// geri alan biri de kaydetmek ister — o kayıt düzeltme dosyasını siler.
+    /// Farka bakılsaydı o düğme kapalı kalır, dosya diskte kalırdı.
+    /// </remarks>
+    private bool duzenlendi;
+
+    /// <summary>Son kaydın sonucu — araç çubuğunda gösterilir.</summary>
+    private string? kayitBilgisi;
+
+    private static readonly double[] Olcekler = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+    /// <summary>Çizilecek sayfa; düzen yoksa ya da sayfası yoksa <c>null</c>.</summary>
+    private DuzenSayfasi? Sayfa
+        => secili is not null && sayfaIndeksi < secili.Sayfalar.Count
+            ? secili.Sayfalar[sayfaIndeksi]
+            : null;
+
+    /// <summary>Yüklenmiş düzenin anahtarı — parametre değişimini yakalamak için.</summary>
+    private string? yuklenen;
+
+    /// <remarks>
+    /// Düzen <c>OnParametersSet</c>'te yüklenir, <c>Sec</c> içinde değil: adres
+    /// çubuğundan gelen anahtar da (sayfa yenilendiğinde) aynı yoldan geçsin.
+    /// </remarks>
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SeciliAnahtar == yuklenen) return;
+
+        yuklenen = SeciliAnahtar;
+        await Yukle();
+    }
+
+    /// <remarks>
+    /// Düzen <b>iki kez</b> okunur: biri düzenlenecek çalışma kopyası, diğeri
+    /// karşılaştırma için dokunulmamış hâli. Depo her çağrıda dosyayı yeniden
+    /// ayrıştırdığı için bu iki ayrı nesne demektir; derin kopya çıkarmaya
+    /// gerek kalmıyor.
+    /// </remarks>
+    private async Task Yukle()
+    {
+        hata = null;
+        kayitBilgisi = null;
+        secili = null;
+        ham = null;
+        aciklama = null;
+        SecimiTemizle();
+        duzenlendi = false;
+        degisenler.Clear();
+        hamKutular.Clear();
+
+        // Alan ağacı düzen başınadır: temizlenmezse önceki düzenin kümeleri
+        // yeni düzenin panelinde durur ve olmayan bir alan sürüklenebilirdi.
+        alanlar = [];
+        kumeler = [];
+
+        // Yığın düzen başınadır: temizlenmezse geri alma, artık ekranda olmayan
+        // bir belgenin kutusuna yazmaya çalışırdı.
+        yigin.Temizle();
+
+        // Yeni düzenin sayfa sayısı farklı olabilir; önceki seçim geçersiz.
+        sayfaIndeksi = 0;
+
+        if (string.IsNullOrEmpty(SeciliAnahtar)) return;
+
+        secili = await Depo.HamGetirAsync(SeciliAnahtar);
+        ham = await Depo.HamGetirAsync(SeciliAnahtar);
+
+        if (secili is null || ham is null)
+        {
+            hata = Metin.T("Tasarimci_Bulunamadi", SeciliAnahtar);
+            secili = null;
+            return;
+        }
+
+        hamKutular = ham.Sayfalar
+            .SelectMany(s => s.Bantlar)
+            .SelectMany(b => b.Nesneler.Select(n => (Anahtar: (b.Ad, n.Ad), Nesne: n)))
+            // Aynı ada iki kutu düşerse ilki kazanır. Şablonlarda kutu adları
+            // benzersiz ama düzeltme dosyası da adla eşleştiği için bu varsayım
+            // patlarsa çakışma orada da vardır.
+            .DistinctBy(x => x.Anahtar)
+            .ToDictionary(x => x.Anahtar, x => x.Nesne);
+
+        var duzeltme = await Depo.DuzeltmeGetirAsync(SeciliAnahtar);
+
+        if (duzeltme is not null)
+        {
+            aciklama = duzeltme.Aciklama;
+            duzeltme.Uygula(secili);
+            FarkiHesapla();
+        }
+
+        alanlar = AlanKatalogu.Cikar(secili);
+
+        // Alan ağacı üç kaynaktan birleşiyor: düzenin kendisi, uygulamanın
+        // bildirdiği katalog ve gerçekten bağlanmış veri. Hiçbiri diğerini
+        // silmiyor — düzende geçen bir alan basılıyor demektir, listeden
+        // düşerse kullanıcı onu bir daha bulamaz.
+        kumeler = AlanKatalogu.Birlestir(
+            AlanKatalogu.Birlestir(AlanKatalogu.Kumeler(secili), VeriKumeleri),
+            Veri?.Katalog());
+    }
+
+    /// <summary>Çalışma kopyasını ham düzenle karşılaştırır.</summary>
+    private void FarkiHesapla()
+    {
+        degisenler.Clear();
+        if (secili is null) return;
+
+        foreach (var bant in secili.Sayfalar.SelectMany(s => s.Bantlar))
+        {
+            foreach (var nesne in bant.Nesneler)
+            {
+                // Ham düzende karşılığı olmayan kutu sonradan eklenmiştir ve
+                // tanımı gereği farklıdır.
+                if (!hamKutular.TryGetValue((bant.Ad, nesne.Ad), out var oz)
+                    || NesneDuzeltmesi.Cikar(bant.Ad, oz, nesne) is not null)
+                    degisenler.Add(nesne);
+            }
+        }
+    }
+
+    private Task PanelDegisikligi(Action islem)
+    {
+        if (secim is not null) Uygula(secim.Nesne, islem);
+        return Task.CompletedTask;
+    }
+
+    private async Task Kaydet()
+    {
+        if (secili is null || ham is null || SeciliAnahtar is null) return;
+
+        try
+        {
+            var duzeltme = DuzenDuzeltmesi.Cikar(ham, secili, aciklama);
+
+            await Depo.DuzeltmeKaydetAsync(SeciliAnahtar, duzeltme.Bos ? null : duzeltme);
+
+            duzenlendi = false;
+            kayitBilgisi = duzeltme.Bos
+                ? Metin.T("Tasarimci_DuzeltmeKalkti")
+                : Metin.T("Tasarimci_Kaydedildi", duzeltme.Sayi);
+        }
+        catch (Exception ex)
+        {
+            hata = Metin.T("Tasarimci_Kaydedilemedi", ex.Message);
+        }
+    }
+
+    /// <summary>Kaydedilmemiş değişiklikleri atıp dosyadaki hâle döner.</summary>
+    private Task Geri() => Yukle();
+
+    private void SayfaDegisti(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var i)) sayfaIndeksi = i;
+    }
+
+    private void OlcekDegisti(ChangeEventArgs e)
+    {
+        if (double.TryParse(e.Value?.ToString(),
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var o))
+            olcek = o;
+    }
+
+}

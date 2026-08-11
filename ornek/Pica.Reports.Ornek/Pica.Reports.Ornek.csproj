@@ -1,0 +1,37 @@
+<!--
+  Pica.Reports örnek uygulaması.
+
+  Kütüphanenin nasıl gömüldüğünü gösteren en küçük Blazor uygulaması: bir
+  IDuzenDeposu, iki sayfa (liste ve tasarımcı), on örnek düzen. Başka hiçbir
+  şey yok — kütüphanenin kendisi de başka hiçbir şey istemiyor.
+
+  PDF ÖNİZLEMESİ YOK. Kütüphane PDF üretmez; hangi motorla basılacağı
+  barındıran uygulamanın işidir (bkz. README → "PDF önizlemesi"). Örneğe bir
+  PDF motoru eklemek, kütüphanenin bağımlılığı sanılırdı.
+-->
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Pica.Reports.Ornek</RootNamespace>
+    <!-- Örnek düzenlerdeki sayı ve tarih desenleri Türkçe biçime göre yazıldı;
+         değişmez kültürde "1.234,56" yerine "1,234.56" görünürdü. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Pica.Reports/Pica.Reports.csproj" />
+  </ItemGroup>
+
+  <!-- Örnek düzenler uygulamanın yanında durur; depo onları ContentRootPath
+       altında arıyor. Web SDK .json dosyalarını zaten içeriğe alıyor, burada
+       yalnızca çıktı dizinine kopyalanmaları söyleniyor (Include değil Update:
+       ikinci kez eklemek "yinelenen öğe" hatası verir). -->
+  <ItemGroup>
+    <Content Update="Duzenler/**/*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
