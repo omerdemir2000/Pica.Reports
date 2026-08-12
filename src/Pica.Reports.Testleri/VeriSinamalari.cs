@@ -1,3 +1,4 @@
+using System.Globalization;
 using Pica.Reports.Veri;
 
 namespace Pica.Reports.Testleri;
@@ -201,13 +202,13 @@ public class DegerCozucuSinamalari
         cozucu.SatirIsle(Satir(("Borc", 50m)));
 
         var sayfaToplami = Kutu("[SUM(<Yevmiye.\"Borc\">, Veri1, 2)]");
-        Assert.Equal("150,00", cozucu.Yaz(sayfaToplami));
+        Assert.Equal(Bicimli(150m), cozucu.Yaz(sayfaToplami));
 
         cozucu.SayfayiKapat();
 
         // Nakli yekûn: kapanan sayfanın toplamı devreder, sayfa toplamı sıfırlanır.
-        Assert.Equal("150,00", cozucu.Yaz(Kutu("[Nakil_Borc]")));
-        Assert.Equal("0,00", cozucu.Yaz(sayfaToplami));
+        Assert.Equal(Bicimli(150m), cozucu.Yaz(Kutu("[Nakil_Borc]")));
+        Assert.Equal(Bicimli(0m), cozucu.Yaz(sayfaToplami));
     }
 
     [Fact]
@@ -221,8 +222,17 @@ public class DegerCozucuSinamalari
 
         var cozucu = new DegerCozucu(veri, ornek: false);
 
-        Assert.Equal("25,00", cozucu.Yaz(Kutu("[SUM(<Fisler.\"Tutar\">)]")));
+        Assert.Equal(Bicimli(25m), cozucu.Yaz(Kutu("[SUM(<Fisler.\"Tutar\">)]")));
     }
+
+    /// <summary>Beklenen çıktı, o anki kültürün ondalık ayracıyla.</summary>
+    /// <remarks>
+    /// Ayraç <b>elle yazılamaz</b>: kütüphane sayıyı kültürden geçiriyor (kendi
+    /// dil ayarı yok, barındıran uygulamanınkini kullanıyor) ve "150,00" yazan
+    /// bir sınama yalnızca Türkçe makinede geçerdi. CI ubuntu üzerinde koşuyor,
+    /// orada ayraç nokta. Aynı hesap <c>OrnekVeriSinamalari</c> içinde de var.
+    /// </remarks>
+    private static string Bicimli(decimal d) => d.ToString("#,##0.00", CultureInfo.CurrentCulture);
 
     [Fact]
     public void Sayfa_numarasi_ve_toplam_yazilir()
