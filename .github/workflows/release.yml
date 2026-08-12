@@ -2,10 +2,16 @@
 #
 #   git tag v0.9.0 && git push origin v0.9.0
 #
-# Şart: depoda NUGET_API_KEY adlı bir gizli değer (Settings → Secrets and
-# variables → Actions). Anahtar nuget.org → API Keys'ten alınır ve YALNIZCA
-# Pica.Reports paketine izin verecek şekilde kısıtlanmalıdır — geniş yetkili
-# bir anahtar, sızarsa bütün paketleri etkiler.
+# Kimlik doğrulama TRUSTED PUBLISHING ile: depoda saklanan uzun ömürlü bir
+# anahtar YOK. GitHub koşuya kısa ömürlü, imzalı bir OIDC belirteci veriyor;
+# nuget.org onu kendi kayıtlı ilkesiyle karşılaştırıp bir saatlik geçici anahtar
+# üretiyor. Sızacak, dolacak ya da döndürülecek bir sır kalmıyor.
+#
+# Şart: nuget.org → Trusted Publishing'de bu depoya bir ilke tanımlı olmalı —
+# Repository Owner "omerdemir2000", Repository "Pica.Reports", Workflow File
+# "release.yml", Environment boş. Dördü de birebir eşleşmezse belirteç
+# reddedilir. Bu dosyanın ADI ilkeye yazılı: yeniden adlandırırsanız ilkeyi de
+# güncelleyin.
 #
 # Sürüm numarası csproj'dan okunur; etiket yalnızca tetikleyicidir. İkisini
 # birbirine karıştırmamak için etiketi sürümle aynı yazın.
@@ -18,6 +24,13 @@ on:
 jobs:
   yayimla:
     runs-on: ubuntu-latest
+
+    # OIDC belirtecini üretme izni. Olmadan NuGet/login kimlik doğrulayamaz ve
+    # adım "id-token" hatasıyla düşer. contents okumaya indiriliyor: varsayılan
+    # izin kümesi bu iş için fazla geniş.
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -35,16 +48,21 @@ jobs:
       - name: Paketle
         run: dotnet pack src/Pica.Reports --configuration Release --no-build --output artifacts
 
+      # Geçici anahtar BİR SAAT geçerli ve gönderimden hemen önce alınıyor:
+      # derleme ile sınama uzun sürerse baştan alınmış bir anahtar yolda ölürdü.
+      # Belirteç tek kullanımlık — bir belirteç, bir anahtar.
+      - name: NuGet oturumu (OIDC → geçici anahtar)
+        uses: NuGet/login@v1
+        id: oturum
+        with:
+          # nuget.org PROFİL adı, e-posta değil. Gizli değer değil: paket
+          # sayfasında sahibi olarak zaten herkese görünüyor.
+          user: omerdemir2000
+
       - name: NuGet'e gönder
-        env:
-          ANAHTAR: ${{ secrets.NUGET_API_KEY }}
         run: |
-          if [ -z "$ANAHTAR" ]; then
-            echo "NUGET_API_KEY tanımlı değil; gönderilmedi." >&2
-            exit 1
-          fi
           dotnet nuget push artifacts/*.nupkg \
-            --api-key "$ANAHTAR" \
+            --api-key "${{ steps.oturum.outputs.NUGET_API_KEY }}" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
 

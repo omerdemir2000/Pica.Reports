@@ -61,15 +61,32 @@ LinkedIn/blog duyurusu) sıralamayı en çok değiştiren şey.
 
 ## 3. NuGet'e gönderme
 
-**Bir kez:** <https://www.nuget.org> → hesap → **API Keys** → *Create*:
+**Bir kez:** <https://www.nuget.org> → hesap → **Trusted Publishing** → yeni ilke.
+Depoda saklanan uzun ömürlü bir anahtar **yok**: GitHub koşuya imzalı bir OIDC
+belirteci veriyor, nuget.org onu ilkeyle karşılaştırıp bir saatlik geçici anahtar
+üretiyor. Sızacak, dolacak ya da döndürülecek bir sır kalmıyor.
 
-- Key Name: `pica-reports-release`
-- Select Scopes: **Push** (yalnızca)
-- Glob Pattern: `Pica.Reports*` — anahtarı bu pakete kısıtlar. Geniş yetkili
-  anahtar sızarsa bütün paketleriniz etkilenir.
+| Alan | Değer |
+| --- | --- |
+| Package Owner | `omerdemir2000` |
+| CI/CD Provider | GitHub Actions |
+| Repository Owner | `omerdemir2000` |
+| Repository | `Pica.Reports` |
+| Workflow File | `release.yml` — yalnız dosya adı, `.github/workflows/` öneki **yok** |
+| Environment | **boş** — iş akışı GitHub environment kullanmıyor |
 
-Anahtarı GitHub'a koyun: depo → **Settings → Secrets and variables → Actions →
-New repository secret** → ad `NUGET_API_KEY`.
+Dördü de birebir eşleşmezse belirteç reddedilir. `release.yml`'ın adı ilkeye
+yazılı: dosyayı yeniden adlandırırsanız ilkeyi de güncelleyin.
+
+> **İlke ilk 7 gün "geçici" olabilir.** nuget.org, depoyu kimliğine kilitlemek
+> için GitHub'ın depo ve sahip kimliklerini ilk başarılı yayında öğreniyor
+> (silinip aynı adla yeniden açılan bir depo, ilkeyi devralamasın diye). O süre
+> içinde yayın yapılmazsa ilke pasifleşir; pencere istendiği zaman yeniden
+> başlatılabiliyor. Genelde özel depolarda görülür.
+
+Eski yöntem (nuget.org → **API Keys** → `NUGET_API_KEY` gizli değeri) hâlâ
+çalışıyor ama artık kullanılmıyor: anahtarın en fazla 365 günlük ömrü var ve
+dolduğunda yayın düşer.
 
 **Her sürümde:** `src/Pica.Reports/Pica.Reports.csproj` içindeki `<Version>`'ı
 artırın, `CHANGELOG.md`'ye yazın, sonra:
