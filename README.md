@@ -41,7 +41,7 @@ one** — so the next conversion doesn't throw your work away.
 
 ## Try it first
 
-A working sample app ships in the repo, with ten example layouts:
+A working sample app ships in the repo, with eleven example layouts:
 
 ```
 dotnet run --project ornek/Pica.Reports.Ornek
@@ -57,6 +57,7 @@ dotnet run --project ornek/Pica.Reports.Ornek
 | **Objects** | Text, line, shape, image, barcode (Code 128 / EAN-13) |
 | **Data tree** | Datasets and fields in the palette; drag a field onto the paper to bind it |
 | **Print preview** | Real pagination — data bands repeat, pages break, footers sit at the bottom, page totals reset |
+| **Subreports** | A band can embed another page's bands into the flow; embedded content breaks across pages too |
 | **Page setup** | Paper size, portrait/landscape, margins, columns |
 | **Sample data** | See `1,234.56` instead of `[amount]` without running a query |
 | **Patch model** | Hand edits are stored as a diff; the generated layout is never touched |
@@ -72,6 +73,11 @@ SVG icons, and runs under both Blazor Server and WebAssembly.
 ```xml
 <PackageReference Include="Pica.Reports" Version="0.9.0" />
 ```
+
+> **Not on nuget.org yet.** The first release tag pushes it there (see
+> `.github/workflows/release.yml`); until then, reference the project directly
+> or build the package yourself with `dotnet pack src/Pica.Reports`. The NuGet
+> badge above goes green with that first release.
 
 Add the stylesheet to the page:
 
@@ -174,6 +180,34 @@ design time the point is the layout, not the pagination.
 engine don't break lines the same way. The layout is right, the exact pixels of
 the glyphs are not. If you have your own PDF output, pass the URL pattern
 (`OnizlemeAdresi`) and a separate **PDF** button appears on the toolbar.
+
+### Subreports
+
+In FastReport a subreport object placed on a band points at **another page**;
+that page's body bands enter the flow where the object sits, and then the main
+flow carries on. Account statements, reconciliation letters and shift reports are
+all built that way.
+
+Embedded bands share the same sheet, so they **take part in page breaking** — a
+statement's transaction list is long. The target page's own page-header and
+page-footer bands are not printed: those belong to the edge of the sheet, and the
+sheet belongs to the host page. The placeholder box isn't printed either, but the
+height of the band it sits on is kept (FastReport also runs the subreport *after*
+printing the band).
+
+The target page is found by `DuzenSayfasi.Ad` and the embedding box points at it
+with `DuzenNesnesi.AltRaporSayfasi`. That's why the layout engine takes the whole
+layout rather than a single page: `SayfaDizici.Diz(layout, pageIndex, data)`.
+
+A page that is a subreport target **does not appear in the preview's sheet
+picker** — it isn't a sheet of its own, it's part of another page and is printed
+with it. It stays listed in the designer; embedded or not, it has to be editable.
+
+Subreports may nest. A cycle such as `A → B → A` does not unfold forever: a page
+already on the chain is skipped. The same subreport on two different bands is not
+a cycle — it flows twice.
+
+The sample app's `alt-raporlu-ekstre` layout demonstrates this.
 
 ### Printing
 

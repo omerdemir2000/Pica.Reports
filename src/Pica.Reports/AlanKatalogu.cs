@@ -23,9 +23,17 @@ public static class AlanKatalogu
     /// <summary>
     /// Basımda değeri veriden gelmeyen, çizicinin kendi ürettiği başvurular.
     /// </summary>
-    /// <remarks>Alan listesine girmemeliler: bir alana bağlanacak şeyler değil.</remarks>
+    /// <remarks>
+    /// Alan listesine girmemeliler: bir alana bağlanacak şeyler değil.
+    /// <c>#</c>'siz yazımları da burada — şablonlarda <c>[Line]</c> ve
+    /// <c>[Line#]</c> aynı şeydir, çözücü de ikisini aynı sayıyor.
+    /// </remarks>
     private static readonly HashSet<string> Degiskenler =
-        new(StringComparer.OrdinalIgnoreCase) { "Page#", "TotalPages#", "Line#", "Date", "Time" };
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Page#", "TotalPages#", "Line#", "Date", "Time",
+            "Page", "TotalPages", "Line",
+        };
 
     /// <summary>Düzende geçen alan adları, alfabetik.</summary>
     public static List<string> Cikar(CetvelDuzeni duzen)
@@ -34,6 +42,11 @@ public static class AlanKatalogu
 
         foreach (var nesne in duzen.Sayfalar.SelectMany(s => s.Bantlar).SelectMany(b => b.Nesneler))
         {
+            // Alt rapor kutusu bir alana bağlanmaz; metni de kâğıda çıkmayan bir
+            // yer tutucudur ("[alt rapor → Page2]"). Taranırsa alan ağacına
+            // gerçek bir alanmış gibi girer.
+            if (nesne.AltRaporSayfasi is { Length: > 0 }) continue;
+
             if (nesne.VeriAlani is { Length: > 0 } bagli) alanlar.Add(bagli);
 
             if (nesne.Metin is not { Length: > 0 } metin) continue;
@@ -124,6 +137,9 @@ public static class AlanKatalogu
 
             foreach (var nesne in bant.Nesneler)
             {
+                // Alt rapor kutusunun metni yer tutucudur, alan başvurusu değil.
+                if (nesne.AltRaporSayfasi is { Length: > 0 }) continue;
+
                 if (nesne.VeriAlani is { Length: > 0 } bagli)
                     Kume(bant.VeriKumesi).Add(bagli);
 

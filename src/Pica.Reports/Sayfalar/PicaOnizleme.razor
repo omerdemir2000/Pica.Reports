@@ -30,12 +30,12 @@
 
             <span class="rt-cubuk-ara"></span>
 
-            @if (duzen is { Sayfalar.Count: > 1 })
+            @if (cetveller.Count > 1)
             {
                 <label class="rt-etiket" for="pica-cetvel">@Metin.T("Tasarimci_Cetvel")</label>
                 <select id="pica-cetvel" class="rt-secim" value="@indeks"
                         @onchange="e => indeks = int.TryParse(e.Value?.ToString(), out var i) ? i : 0">
-                    @for (var i = 0; i < duzen.Sayfalar.Count; i++)
+                    @foreach (var i in cetveller)
                     {
                         <option value="@i">@Metin.T("Tasarimci_CetvelNo", i + 1)</option>
                     }
@@ -57,7 +57,8 @@
 
         <div class="rt-bolme" style="grid-column: 1">
             <div class="rt-tezgah">
-                <Onizleme Sayfa="Sayfa" Veri="Rapor.VeriAl(Anahtar ?? string.Empty)"
+                <Onizleme Duzen="duzen" SayfaIndeksi="indeks"
+                          Veri="Rapor.VeriAl(Anahtar ?? string.Empty)"
                           HemenYazdir="hemenYazdir" />
             </div>
         </div>
@@ -85,8 +86,19 @@
     private int indeks;
     private string? yuklenen;
 
-    private DuzenSayfasi? Sayfa
-        => duzen is not null && indeks < duzen.Sayfalar.Count ? duzen.Sayfalar[indeks] : null;
+    /// <summary>Seçicide görünen cetveller — sayfa sıraları.</summary>
+    /// <remarks>
+    /// Alt rapor hedefi olan sayfa listeye girmiyor: o ayrı bir cetvel değil,
+    /// başka bir sayfanın gövdesine gömülen parçasıdır ve zaten onunla birlikte
+    /// basılıyor. Ayrıca listelenseydi kullanıcı aynı içeriği iki kere görür,
+    /// hangisinin kâğıda çıkacağını anlamazdı. Tasarımcıda ise duruyorlar —
+    /// gömülü sayfanın da düzenlenmesi gerekir.
+    /// <para>
+    /// Numara sayfanın DÜZENDEKİ sırası, listedeki değil: aynı cetvel
+    /// tasarımcıda da o numarayla görünsün.
+    /// </para>
+    /// </remarks>
+    private List<int> cetveller = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -96,6 +108,7 @@
         duzen = null;
         hata = null;
         indeks = 0;
+        cetveller = [];
 
         if (string.IsNullOrEmpty(Anahtar)) return;
 
@@ -110,5 +123,12 @@
         // Düzeltme uygulanır: kullanıcının göreceği çıktı, elle yapılmış
         // düzeltmelerle birlikte basılan hâldir.
         if (await Depo.DuzeltmeGetirAsync(Anahtar) is { } duzeltme) duzeltme.Uygula(duzen);
+
+        cetveller = [.. Enumerable.Range(0, duzen.Sayfalar.Count)
+            .Where(i => !duzen.AltRaporMu(duzen.Sayfalar[i]))];
+
+        // Açılışta ilk CETVEL seçiliyor, ilk sayfa değil: şablonun ilk sayfası
+        // bir alt rapor hedefiyse tek başına basılması anlamsız olurdu.
+        indeks = cetveller.Count > 0 ? cetveller[0] : 0;
     }
 }

@@ -119,6 +119,20 @@ html, body {
     display: flex;
     gap: 8px;
     margin: 18px 0 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ornek-etiket { font-size: 13px; color: #4a5a5c; }
+
+.ornek-secim {
+    padding: 6px 8px;
+    font: inherit;
+    font-size: 13px;
+    color: inherit;
+    background: #fff;
+    border: 1px solid #c3cfd0;
+    border-radius: 3px;
 }
 
 .ornek-dugme {
@@ -153,6 +167,8 @@ html, body {
 
 @media (prefers-color-scheme: dark) {
     .ornek-yazi code { background: #1c2628; }
+    .ornek-etiket { color: #9aabad; }
+    .ornek-secim { background: #1c2628; border-color: #354446; }
     .ornek-tablo th, .ornek-tablo td { border-bottom-color: #2b3739; }
 
     html, body { color: #e2ebec; background: #23292b; }

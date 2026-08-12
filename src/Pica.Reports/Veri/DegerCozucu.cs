@@ -93,13 +93,16 @@ public sealed class DegerCozucu(RaporVerisi? veri = null, bool ornek = true)
     {
         var ic = ifade.Trim().Trim('[', ']').Trim();
 
-        switch (ic)
+        // Karşılaştırma harf duyarsız ve '#' isteğe bağlı: taşınan şablonlarda
+        // aynı değişken [Line#], [Line] ve [line] diye üç ayrı yazımla geçiyor.
+        // FastReport üçünü de aynı sayar; ayırmak kâğıda "[line]" bastırırdı.
+        switch (ic.TrimEnd('#').ToLowerInvariant())
         {
-            case "Page#": return SayfaNo;
-            case "TotalPages#": return ToplamSayfa;
-            case "Line#": return SatirSirasi;
-            case "Date": return Zaman().ToString("dd.MM.yyyy");
-            case "Time": return Zaman().ToString("HH:mm");
+            case "page": return SayfaNo;
+            case "totalpages": return ToplamSayfa;
+            case "line": return SatirSirasi;
+            case "date": return Zaman().ToString("dd.MM.yyyy");
+            case "time": return Zaman().ToString("HH:mm");
         }
 
         if (Toplam(ic) is { } toplam) return toplam;
@@ -136,6 +139,15 @@ public sealed class DegerCozucu(RaporVerisi? veri = null, bool ornek = true)
             // Kümesi yazılmamış başvuru: tek küme varsa oradan okunur.
             if (veri.Kume(null) is { Satirlar.Count: > 0 } tek && tek.Satirlar[0].Var(alan))
                 return tek.Satirlar[0][alan];
+
+            // Birden çok küme varsa alan adı bütün kümelerde aranır. Taşınan
+            // şablonların başlıklarında [sirket_uzun_adi] gibi kümesiz
+            // başvurular var ve o alan ana kümede değil, şablonun içinde duran
+            // ikinci sorgudadır (firma parametreleri). Alan adları düzen içinde
+            // benzersiz olduğu için arama yanlış kümeye düşmez.
+            foreach (var baska in veri.Kumeler)
+                if (baska.Satirlar.Count > 0 && baska.Satirlar[0].Var(alan))
+                    return baska.Satirlar[0][alan];
         }
 
         return ornek ? OrnekVeri.Deger(alan, bicim, Math.Max(1, SatirSirasi)) : "[" + alan + "]";

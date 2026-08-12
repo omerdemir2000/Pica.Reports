@@ -99,8 +99,21 @@
 </div>
 
 @code {
-    /// <summary>Basılacak cetvel sayfası.</summary>
-    [Parameter, EditorRequired] public required DuzenSayfasi? Sayfa { get; set; }
+    /// <summary>Basılacak düzen.</summary>
+    /// <remarks>
+    /// Tek sayfa değil düzenin tamamı alınıyor: alt rapor kutusu hedefini sayfa
+    /// adıyla gösteriyor ve o sayfa düzenin başka bir yerinde duruyor. Sayfa
+    /// verilseydi gömülecek içerik bulunamaz, kâğıtta boşluk kalırdı.
+    /// </remarks>
+    [Parameter, EditorRequired] public required CetvelDuzeni? Duzen { get; set; }
+
+    /// <summary>Basılacak cetvelin sırası — bir şablonda birden çok cetvel olabilir.</summary>
+    [Parameter] public int SayfaIndeksi { get; set; }
+
+    private DuzenSayfasi? Sayfa
+        => Duzen is not null && SayfaIndeksi >= 0 && SayfaIndeksi < Duzen.Sayfalar.Count
+            ? Duzen.Sayfalar[SayfaIndeksi]
+            : null;
 
     /// <summary>
     /// Basılacak veri; verilmezse kutular örnek değerlerle dolar.
@@ -128,7 +141,8 @@
     private double olcek = 0.75;
     private List<BasilanSayfa> sayfalar = [];
 
-    private DuzenSayfasi? dizilen;
+    private CetvelDuzeni? dizilen;
+    private int dizilenIndeks = -1;
     private RaporVerisi? dizilenVeri;
     private int dizilenSurum = -1;
 
@@ -139,16 +153,18 @@
     /// </remarks>
     protected override void OnParametersSet()
     {
-        if (ReferenceEquals(dizilen, Sayfa)
+        if (ReferenceEquals(dizilen, Duzen)
+            && dizilenIndeks == SayfaIndeksi
             && ReferenceEquals(dizilenVeri, Veri)
             && dizilenSurum == Surum)
             return;
 
-        dizilen = Sayfa;
+        dizilen = Duzen;
+        dizilenIndeks = SayfaIndeksi;
         dizilenVeri = Veri;
         dizilenSurum = Surum;
 
-        sayfalar = Sayfa is null ? [] : SayfaDizici.Diz(Sayfa, Veri);
+        sayfalar = Duzen is null ? [] : SayfaDizici.Diz(Duzen, SayfaIndeksi, Veri);
     }
 
     /// <summary>Kâğıdın büyütülmüş hâlinin kapladığı yer.</summary>

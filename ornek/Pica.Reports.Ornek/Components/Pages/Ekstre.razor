@@ -1,0 +1,193 @@
+@page "/ekstre"
+
+@using Pica.Reports.Servisler
+@using Pica.Reports.Veri
+
+@inject IRaporAraci Rapor
+
+@*
+    Alt raporlu düzenin veriyle açılışı.
+
+    `alt-raporlu-ekstre` iki sayfalı: "Ana" kâğıdın antetini ve kapanışını
+    basar, "Hareketler" ise döküm tablosunu — ve o sayfa Ana'nın bandındaki
+    alt rapor kutusunun yerine akışa girer. Buradan bakınca fark yok:
+    veri KÜME ADIYLA bağlanıyor, hangi sayfanın bastığı düzenin işi.
+
+    Hareket sayısı seçilebiliyor çünkü gömülen içerik de sayfa kırılımına
+    katılıyor: uzun döküm kâğıdı kırar, ikinci sayfada Ana sayfanın başlığı
+    ve sayfa altı yeniden basılır.
+*@
+
+<PageTitle>Alt raporlu ekstre · Pica.Reports örneği</PageTitle>
+
+<div class="ornek-yazi">
+    <h1>Alt raporlu ekstre</h1>
+
+    <p>
+        <code>alt-raporlu-ekstre</code> düzeni iki sayfadan oluşuyor:
+        <b>Ana</b> antet ile kapanış bakiyesini basar, <b>Hareketler</b> döküm
+        tablosunu. İkincisi ayrı bir cetvel değil — Ana sayfadaki bir bandın
+        içinde duran <b>alt rapor kutusunun</b> yerine akışa giriyor.
+    </p>
+
+    <p>
+        Veri iki kümeyle bağlanıyor: <b>Cari</b> (tek satır, anteti besler) ve
+        <b>Hareket</b> (döküm satırları, gömülen sayfanın veri bandını besler).
+        Kapanış bakiyesi ile kurum adı <b>değişken</b> olarak geçiyor.
+    </p>
+
+    <div class="ornek-dugmeler">
+        <label class="ornek-etiket" for="ekstre-adet">Hareket sayısı</label>
+        <select id="ekstre-adet" class="ornek-secim" @bind="adet">
+            <option value="12">12 — tek kâğıda sığar</option>
+            <option value="60">60 — kâğıt kırılır</option>
+        </select>
+
+        <button class="ornek-dugme" @onclick="Onizle">Önizle</button>
+        <button class="ornek-dugme" @onclick="Yazdir">Yazdır</button>
+        <button class="ornek-dugme" @onclick="Tasarla">Tasarımcıda aç</button>
+    </div>
+
+    <p class="ornek-not">
+        Önizlemenin cetvel seçicisinde <b>tek</b> cetvel görünür: "Hareketler"
+        ayrı bir cetvel değil, Ana sayfanın parçası. Tasarımcıda ise iki sayfa
+        da listelenir — gömülü olan da düzenlenebilmeli.
+    </p>
+
+    <h2>Bağlanan veri</h2>
+
+    <p class="ornek-not">
+        Cari: <b>@Cari["cari_kodu"] · @Cari["cari_ad_unvan"]</b> ·
+        devir @Tutar(Cari["devir_bakiye"]) ·
+        kapanış @Tutar(KapanisBakiyesi(Hareketler(adet)))
+    </p>
+
+    <table class="ornek-tablo">
+        <thead>
+            <tr>
+                <th>Tarih</th><th>Belge no</th><th>Açıklama</th>
+                <th>Borç</th><th>Alacak</th><th>Bakiye</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var h in Hareketler(adet).Take(8))
+            {
+                <tr>
+                    <td>@(((DateTime)h["tarih"]!).ToString("dd.MM.yyyy"))</td>
+                    <td>@h["belge_no"]</td>
+                    <td>@h["aciklama"]</td>
+                    <td class="ornek-sag">@Tutar(h["borc"])</td>
+                    <td class="ornek-sag">@Tutar(h["alacak"])</td>
+                    <td class="ornek-sag">@Tutar(h["bakiye"])</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p class="ornek-not">
+        İlk 8 satır gösteriliyor; rapora @adet satırın tamamı gidiyor.
+    </p>
+</div>
+
+@code {
+    private const string Anahtar = "alt-raporlu-ekstre";
+
+    private int adet = 12;
+
+    /// <summary>Anteti besleyen tek satırlık küme.</summary>
+    /// <remarks>
+    /// Tek satır da bir kümedir: düzen <c>[Cari."cari_ad_unvan"]</c> yazıyor ve
+    /// çözücü küme adı verilmiş başvuruda kümenin ilk satırına bakıyor. Değişken
+    /// olarak da geçilebilirdi; küme seçildi çünkü gerçek uygulamada bu bilgi
+    /// zaten ikinci bir sorgudan geliyor.
+    /// </remarks>
+    private static readonly Dictionary<string, object?> Cari = new()
+    {
+        ["cari_kodu"] = "120.01.0007",
+        ["cari_ad_unvan"] = "Menekşe Gıda Sanayi ve Ticaret A.Ş.",
+        ["donem"] = "01.01.2027 – 31.03.2027",
+        ["devir_bakiye"] = 18_450.75m,
+    };
+
+    private static readonly (string Aciklama, bool Borclu, decimal Tutar)[] Kalemler =
+    [
+        ("Satış faturası", true, 12_480.00m),
+        ("Nakliye bedeli", true, 1_950.50m),
+        ("Havale tahsilatı", false, 9_000.00m),
+        ("Satış faturası", true, 23_115.90m),
+        ("İade faturası", false, 3_240.00m),
+        ("Çek tahsilatı", false, 15_000.00m),
+        ("Satış faturası", true, 7_860.25m),
+        ("Vade farkı", true, 640.00m),
+    ];
+
+    /// <summary>
+    /// Dapper'ın döndüreceği satırların aynısı: her satır bir sözlük.
+    /// </summary>
+    /// <remarks>
+    /// Bakiye satır satır yürütülüyor — gerçek ekstrede de öyle: kâğıttaki
+    /// bakiye sütunu bir toplam değil, o satıra kadarki durumdur ve sorgunun
+    /// kendisinden gelir.
+    /// </remarks>
+    private static Dictionary<string, object?>[] Hareketler(int adet)
+    {
+        var bakiye = (decimal)Cari["devir_bakiye"]!;
+        var basla = new DateTime(2027, 1, 2);
+
+        List<Dictionary<string, object?>> satirlar = [];
+
+        for (var i = 0; i < adet; i++)
+        {
+            var (aciklama, borclu, tutar) = Kalemler[i % Kalemler.Length];
+
+            // Aynı kalem yinelense de tutar aynı kalmasın: sütun genişliği tek
+            // bir değere göre ayarlanmasın, basamak sayısı değişsin.
+            tutar = Math.Round(tutar * (1 + i % 7 * 0.13m), 2);
+            bakiye += borclu ? tutar : -tutar;
+
+            satirlar.Add(new Dictionary<string, object?>
+            {
+                ["tarih"] = basla.AddDays(i * 3),
+                ["belge_no"] = $"{(borclu ? "FTR" : "THS")}-{2027}{i + 1:000}",
+                ["aciklama"] = aciklama,
+                // Kullanılmayan taraf BOŞ, sıfır değil: ekstrede "0,00" ile
+                // "hareket yok" ayrı şeylerdir ve sıfırla dolu bir sütun
+                // okunmaz. Çözücü null'ı boş dize basıyor, SUM ise yok sayıyor.
+                ["borc"] = borclu ? tutar : (decimal?)null,
+                ["alacak"] = borclu ? null : (decimal?)tutar,
+                ["bakiye"] = bakiye,
+            });
+        }
+
+        return [.. satirlar];
+    }
+
+    private static decimal KapanisBakiyesi(Dictionary<string, object?>[] hareketler)
+        => hareketler.Length == 0
+            ? (decimal)Cari["devir_bakiye"]!
+            : (decimal)hareketler[^1]["bakiye"]!;
+
+    /// <summary>Boş hücre boş kalır — kâğıttaki davranışın aynısı.</summary>
+    private static string Tutar(object? d) => d is decimal t ? t.ToString("#,##0.00") : "";
+
+    /// <remarks>
+    /// Küme adları düzendekilerle birebir aynı: bant <c>VeriKumesi = "Hareket"</c>
+    /// diyor, antet kutuları <c>[Cari."…"]</c> yazıyor. Eşleşme ada göre.
+    /// </remarks>
+    private RaporVerisi Veri()
+    {
+        var hareketler = Hareketler(adet);
+
+        return new RaporVerisi()
+            .Ekle("Cari", new[] { Cari })
+            .Ekle("Hareket", hareketler)
+            .Degisken("kurum_adi", "Papirus Yazılım Ltd. Şti.")
+            .Degisken("kapanis_bakiye", KapanisBakiyesi(hareketler));
+    }
+
+    private Task Onizle() => Rapor.Onizle(Anahtar, Veri());
+
+    private Task Yazdir() => Rapor.Yazdir(Anahtar, Veri());
+
+    private Task Tasarla() => Rapor.TasarimAc(Anahtar, Veri());
+}

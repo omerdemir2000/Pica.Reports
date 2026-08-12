@@ -25,7 +25,7 @@ satır içi SVG ikonlarını taşır.
 
 ## Önce çalıştırıp görün
 
-Depoda çalışan bir örnek uygulama var — on örnek düzenle birlikte:
+Depoda çalışan bir örnek uygulama var — on bir örnek düzenle birlikte:
 
 ```
 dotnet run --project ornek/Pica.Reports.Ornek
@@ -38,6 +38,10 @@ dotnet run --project ornek/Pica.Reports.Ornek
 ```xml
 <PackageReference Include="Pica.Reports" Version="0.9.0" />
 ```
+
+> **Paket henüz nuget.org'da değil.** İlk sürüm etiketi onu oraya gönderiyor
+> (bkz. `.github/workflows/release.yml`); o zamana kadar projeye doğrudan
+> başvurun ya da `dotnet pack src/Pica.Reports` ile paketi kendiniz üretin.
 
 Biçem dosyasını sayfaya ekleyin:
 
@@ -123,6 +127,33 @@ sayfada sıfırlanır.
 satır kırmasını yapmaz. Yerleşim doğrudur, harflerin tam pikseli değil. Kendi
 PDF çıktınız varsa adres kalıbını verin (`OnizlemeAdresi`), araç çubuğunda
 ayrıca bir **PDF** düğmesi çıkar.
+
+### Alt rapor
+
+FastReport'ta bir bandın içine konan alt rapor nesnesi **başka bir sayfayı**
+gösterir; o sayfanın gövde bantları nesnenin durduğu noktada akışa girer, sonra
+ana akış kaldığı yerden sürer. Cari hesap ekstresi, mutabakat yazısı ve vardiya
+raporu böyle kurulmuştur.
+
+Gömülen bantlar aynı kâğıdı paylaşır, dolayısıyla **sayfa kırılımına da
+katılırlar** — ekstre dökümü uzundur. Hedef sayfanın kendi sayfa başlığı ve
+sayfa sonu bantları basılmaz: o bantlar kâğıdın kenarına aittir ve kâğıt ana
+sayfanındır. Yer tutucu kutu da basılmaz, ama durduğu bandın yüksekliği kâğıtta
+yerini korur (FastReport da alt raporu bandı bastıktan sonra çalıştırır).
+
+Düzende hedef sayfa `DuzenSayfasi.Ad` ile bulunur, gömen kutu onu
+`DuzenNesnesi.AltRaporSayfasi` ile gösterir. Dizici bu yüzden tek sayfayı
+değil düzenin tamamını alır: `SayfaDizici.Diz(duzen, sayfaIndeksi, veri)`.
+
+Alt rapor hedefi olan sayfa önizlemenin **cetvel seçicisinde görünmez** — o ayrı
+bir cetvel değil, başka bir sayfanın parçasıdır ve zaten onunla basılıyor.
+Tasarımcıda görünmeye devam eder; gömülü de olsa düzenlenmesi gerekir.
+
+İç içe alt rapor olabilir. `A → B → A` gibi bir döngü kâğıtta sonsuza kadar
+açılmaz: zincirde zaten duran sayfa atlanır. Aynı alt raporun iki ayrı bantta
+olması döngü değildir, iki kez akar.
+
+Örnek uygulamada `alt-raporlu-ekstre` düzeni bunu gösteriyor.
 
 ### Yazdırma
 

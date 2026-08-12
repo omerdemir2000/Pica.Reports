@@ -48,6 +48,13 @@ public class SayfaDiziciSinamalari
         ],
     };
 
+    /// <summary>Tek cetvellik düzen — dizici sayfayı değil, düzeni alıyor.</summary>
+    private static CetvelDuzeni Duzen(DuzenSayfasi sayfa)
+        => new() { Anahtar = "dizici", Ad = "Dizici", Kaynak = "sınama", Sayfalar = [sayfa] };
+
+    private static List<BasilanSayfa> Diz(DuzenSayfasi sayfa, RaporVerisi? veri = null)
+        => SayfaDizici.Diz(Duzen(sayfa), 0, veri);
+
     private static RaporVerisi Veri(int satir)
         => new RaporVerisi().Ekle("Fisler",
             Enumerable.Range(1, satir).Select(i => new Dictionary<string, object?>
@@ -59,7 +66,7 @@ public class SayfaDiziciSinamalari
     [Fact]
     public void Veri_bandi_satir_sayisi_kadar_yinelenir()
     {
-        var sayfalar = SayfaDizici.Diz(Sayfa(), Veri(3));
+        var sayfalar = Diz(Sayfa(), Veri(3));
 
         var satirlar = sayfalar[0].Kutular.Where(k => k.Nesne.Ad == "Satir").ToList();
 
@@ -73,7 +80,7 @@ public class SayfaDiziciSinamalari
     {
         // 200 pt boy, 10+10 boşluk, 20 başlık, 15 alt → satırlara 145 pt kalır,
         // satır 15 pt: sayfa başına 9 satır. 20 satır 3 sayfa eder.
-        var sayfalar = SayfaDizici.Diz(Sayfa(), Veri(20));
+        var sayfalar = Diz(Sayfa(), Veri(20));
 
         Assert.True(sayfalar.Count > 1, "sayfa kırılmalıydı");
         Assert.All(sayfalar, s => Assert.Contains(s.Kutular, k => k.Nesne.Ad == "Baslik"));
@@ -88,7 +95,7 @@ public class SayfaDiziciSinamalari
     public void Sayfa_alti_kagidin_altina_yaslanir()
     {
         var sayfa = Sayfa();
-        var sayfalar = SayfaDizici.Diz(sayfa, Veri(2));
+        var sayfalar = Diz(sayfa, Veri(2));
 
         var alt = sayfalar[0].Kutular.Single(k => k.Nesne.Ad == "Alt");
 
@@ -100,7 +107,7 @@ public class SayfaDiziciSinamalari
     [Fact]
     public void Sayfa_numarasi_sayfadan_sayfaya_artar()
     {
-        var sayfalar = SayfaDizici.Diz(Sayfa(), Veri(20));
+        var sayfalar = Diz(Sayfa(), Veri(20));
 
         Assert.Equal("Sayfa 1", sayfalar[0].Kutular.Single(k => k.Nesne.Ad == "Alt").Metin);
         Assert.Equal("Sayfa 2", sayfalar[1].Kutular.Single(k => k.Nesne.Ad == "Alt").Metin);
@@ -110,7 +117,7 @@ public class SayfaDiziciSinamalari
     public void Veri_verilmezse_ornek_satirlarla_dizilir()
     {
         // Tasarım anında veri yok; boş önizleme göstermektense örnek satır.
-        var sayfalar = SayfaDizici.Diz(Sayfa());
+        var sayfalar = Diz(Sayfa());
 
         Assert.Contains(sayfalar[0].Kutular, k => k.Nesne.Ad == "Satir");
     }
@@ -122,7 +129,7 @@ public class SayfaDiziciSinamalari
         // edilmesi güç bir hata olurdu.
         var veri = new RaporVerisi().Ekle("Ozet", new[] { new Dictionary<string, object?>() });
 
-        var sayfalar = SayfaDizici.Diz(Sayfa(), veri);
+        var sayfalar = Diz(Sayfa(), veri);
 
         Assert.DoesNotContain(sayfalar[0].Kutular, k => k.Nesne.Ad == "Satir");
     }
@@ -131,7 +138,7 @@ public class SayfaDiziciSinamalari
     public void Kutu_konumu_sayfanin_koseSine_gore_verilir()
     {
         var sayfa = Sayfa();
-        var sayfalar = SayfaDizici.Diz(sayfa, Veri(1));
+        var sayfalar = Diz(sayfa, Veri(1));
 
         var baslik = sayfalar[0].Kutular.First(k => k.Nesne.Ad == "Baslik");
 
@@ -146,7 +153,7 @@ public class SayfaDiziciSinamalari
         var sayfa = Sayfa();
         sayfa.Bantlar[2].Nesneler[0].Metin = "[Page#] / [TotalPages#]";
 
-        var sayfalar = SayfaDizici.Diz(sayfa, Veri(20));
+        var sayfalar = Diz(sayfa, Veri(20));
 
         var son = sayfalar[^1].Kutular.Single(k => k.Nesne.Ad == "Alt").Metin;
         Assert.Equal($"{sayfalar.Count} / {sayfalar.Count}", son);

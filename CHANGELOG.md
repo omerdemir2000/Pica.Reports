@@ -4,6 +4,32 @@ Bu dosya sürümler arasındaki değişiklikleri anlatır. Biçim
 [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esaslı, sürümleme
 [SemVer](https://semver.org/lang/tr/) — **0.x sürümlerinde API değişebilir**.
 
+## [Yayımlanmadı]
+
+### Eklenen
+
+- **Alt rapor**: bir bandın içindeki kutu başka bir sayfayı gösterebiliyor
+  (`DuzenNesnesi.AltRaporSayfasi` → `DuzenSayfasi.Ad`) ve o sayfanın gövde
+  bantları kutunun durduğu noktada akışa giriyor. Gömülen bantlar sayfa
+  kırılımına katılır; hedefin kendi sayfa başlığı/sayfa sonu bantları ile yer
+  tutucu kutu basılmaz. İç içe gömme çalışır, `A → B → A` döngüsü kesilir.
+  Taşınan 2.109 düzenin 109'unda alt rapor var — cari hesap ekstresi, mutabakat
+  yazısı, gün sonu ve vardiya raporu bunlarla basılıyor.
+- Örnek uygulamaya `alt-raporlu-ekstre` düzeni ve onu **gerçek veriyle** açan
+  `/ekstre` sayfası: iki küme (`Cari`, `Hareket`) ve iki değişken bağlanıyor,
+  hareket sayısı seçilerek gömülen dökümün kâğıdı kırması görülebiliyor.
+
+### Değişen
+
+- `SayfaDizici.Diz` artık tek sayfayı değil **düzenin tamamını** alıyor:
+  `Diz(duzen, sayfaIndeksi, veri, ornek)`. Alt rapor hedefi düzenin başka bir
+  yerinde duruyor, tek sayfayla bulunamazdı.
+- `Onizleme` bileşeninin `Sayfa` parametresi yerine `Duzen` ve `SayfaIndeksi`
+  geldi — aynı sebeple.
+- Önizlemenin cetvel seçicisi alt rapor hedefi olan sayfaları listelemiyor; o
+  sayfalar ayrı cetvel değil, başka bir sayfanın parçası. Tasarımcıda
+  listelenmeye devam ediyorlar.
+
 ## [0.9.0] — 2026-08-11
 
 İlk genel sürüm. Kütüphane PBM2027 uygulamasının içinde geliştirildi ve bu

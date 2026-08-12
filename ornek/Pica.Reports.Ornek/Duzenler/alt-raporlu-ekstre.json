@@ -1,0 +1,351 @@
+{
+  "Anahtar": "alt-raporlu-ekstre",
+  "Ad": "Alt Raporlu Ekstre",
+  "Kaynak": "Alt rapor: 'Hareketler' sayfasının bantları 'Ana' sayfanın akışına gömülür. Veri /ekstre sayfasından bağlanıyor.",
+  "Sayfalar": [
+    {
+      "Ad": "Ana",
+      "GenislikPt": 595.28,
+      "YukseklikPt": 841.89,
+      "SolBoslukPt": 28.35,
+      "SagBoslukPt": 28.35,
+      "UstBoslukPt": 28.35,
+      "AltBoslukPt": 28.35,
+      "Bantlar": [
+        {
+          "//": "Anet, cari bilgisi ve sütun başlıkları BURADA: sayfa başlığı bandı her kâğıtta yinelenir. Döküm gömülü akışta uzayıp kâğıdı kırdığında ikinci sayfa da başlıksız kalmaz.",
+          "Ad": "SayfaBasligi1",
+          "Tur": "SayfaBasligi",
+          "UstPt": 0,
+          "YukseklikPt": 106,
+          "Nesneler": [
+            {
+              "Ad": "Kurum",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 0, "GenislikPt": 330, "YukseklikPt": 12,
+              "Metin": "[kurum_adi]",
+              "PuntoPt": 8, "Dikey": "Orta"
+            },
+            {
+              "Ad": "DokumTarihi",
+              "Tur": "Yazi",
+              "SolPt": 338.58, "UstPt": 0, "GenislikPt": 200, "YukseklikPt": 12,
+              "Metin": "Döküm: [Date] [Time]",
+              "PuntoPt": 8, "Yatay": "Sag", "Dikey": "Orta"
+            },
+            {
+              "Ad": "Baslik",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 16, "GenislikPt": 538.58, "YukseklikPt": 20,
+              "Metin": "CARİ HESAP EKSTRESİ",
+              "PuntoPt": 14, "Kalin": true, "Yatay": "Orta", "Dikey": "Orta"
+            },
+            {
+              "Ad": "BaslikCizgi",
+              "Tur": "Cizgi",
+              "SolPt": 0, "UstPt": 42, "GenislikPt": 538.58, "YukseklikPt": 1,
+              "Cerceve": "Ust", "CerceveKalinligiPt": 1
+            },
+            {
+              "Ad": "KodEtiket",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 50, "GenislikPt": 70, "YukseklikPt": 12,
+              "Metin": "Cari kodu:",
+              "PuntoPt": 9, "Kalin": true, "Dikey": "Orta"
+            },
+            {
+              "Ad": "CariKodu",
+              "Tur": "Yazi",
+              "SolPt": 70, "UstPt": 50, "GenislikPt": 90, "YukseklikPt": 12,
+              "Metin": "[Cari.\"cari_kodu\"]",
+              "PuntoPt": 9, "Dikey": "Orta"
+            },
+            {
+              "Ad": "CariAd",
+              "Tur": "Yazi",
+              "SolPt": 160, "UstPt": 50, "GenislikPt": 378.58, "YukseklikPt": 12,
+              "Metin": "[Cari.\"cari_ad_unvan\"]",
+              "PuntoPt": 9, "Kalin": true, "Dikey": "Orta"
+            },
+            {
+              "Ad": "DonemEtiket",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 66, "GenislikPt": 70, "YukseklikPt": 12,
+              "Metin": "Dönem:",
+              "PuntoPt": 9, "Kalin": true, "Dikey": "Orta"
+            },
+            {
+              "Ad": "Donem",
+              "Tur": "Yazi",
+              "SolPt": 70, "UstPt": 66, "GenislikPt": 240, "YukseklikPt": 12,
+              "Metin": "[Cari.\"donem\"]",
+              "PuntoPt": 9, "Dikey": "Orta"
+            },
+            {
+              "Ad": "DevirEtiket",
+              "Tur": "Yazi",
+              "SolPt": 310, "UstPt": 66, "GenislikPt": 150, "YukseklikPt": 12,
+              "Metin": "Devir bakiyesi:",
+              "PuntoPt": 9, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta"
+            },
+            {
+              "Ad": "DevirBakiye",
+              "Tur": "Yazi",
+              "SolPt": 462.58, "UstPt": 66, "GenislikPt": 76, "YukseklikPt": 12,
+              "Metin": "[Cari.\"devir_bakiye\"]",
+              "PuntoPt": 9, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            },
+            {
+              "Ad": "BasTarih",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 88, "GenislikPt": 58, "YukseklikPt": 14,
+              "Metin": "Tarih",
+              "PuntoPt": 8, "Kalin": true, "Dikey": "Orta",
+              "Cerceve": "Alt", "CerceveKalinligiPt": 0.75
+            },
+            {
+              "Ad": "BasBelge",
+              "Tur": "Yazi",
+              "SolPt": 58, "UstPt": 88, "GenislikPt": 66, "YukseklikPt": 14,
+              "Metin": "Belge No",
+              "PuntoPt": 8, "Kalin": true, "Dikey": "Orta",
+              "Cerceve": "Alt", "CerceveKalinligiPt": 0.75
+            },
+            {
+              "Ad": "BasAciklama",
+              "Tur": "Yazi",
+              "SolPt": 124, "UstPt": 88, "GenislikPt": 190.58, "YukseklikPt": 14,
+              "Metin": "Açıklama",
+              "PuntoPt": 8, "Kalin": true, "Dikey": "Orta",
+              "Cerceve": "Alt", "CerceveKalinligiPt": 0.75
+            },
+            {
+              "Ad": "BasBorc",
+              "Tur": "Yazi",
+              "SolPt": 314.58, "UstPt": 88, "GenislikPt": 74, "YukseklikPt": 14,
+              "Metin": "Borç",
+              "PuntoPt": 8, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta",
+              "Cerceve": "Alt", "CerceveKalinligiPt": 0.75
+            },
+            {
+              "Ad": "BasAlacak",
+              "Tur": "Yazi",
+              "SolPt": 388.58, "UstPt": 88, "GenislikPt": 74, "YukseklikPt": 14,
+              "Metin": "Alacak",
+              "PuntoPt": 8, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta",
+              "Cerceve": "Alt", "CerceveKalinligiPt": 0.75
+            },
+            {
+              "Ad": "BasBakiye",
+              "Tur": "Yazi",
+              "SolPt": 462.58, "UstPt": 88, "GenislikPt": 76, "YukseklikPt": 14,
+              "Metin": "Bakiye",
+              "PuntoPt": 8, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta",
+              "Cerceve": "Alt", "CerceveKalinligiPt": 0.75
+            }
+          ]
+        },
+        {
+          "//": "Alt raporun yeri. Kutu kâğıda basılmaz; bandın yüksekliği kalır ve sütun başlığı ile ilk satır arasındaki boşluğu verir.",
+          "Ad": "HareketDokumu",
+          "Tur": "Baslik",
+          "UstPt": 120,
+          "YukseklikPt": 10,
+          "Nesneler": [
+            {
+              "Ad": "AltRapor1",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 0, "GenislikPt": 538.58, "YukseklikPt": 10,
+              "Metin": "[alt rapor → Hareketler]",
+              "AltRaporSayfasi": "Hareketler",
+              "PuntoPt": 7, "Egik": true, "Yatay": "Orta", "Dikey": "Orta",
+              "Renk": "#8A8A8A", "Cerceve": "Tumu", "CerceveKalinligiPt": 0.5, "CerceveRengi": "#C8C8C8"
+            }
+          ]
+        },
+        {
+          "Ad": "RaporSonu1",
+          "Tur": "RaporSonu",
+          "UstPt": 160,
+          "YukseklikPt": 38,
+          "Nesneler": [
+            {
+              "Ad": "KapanisCizgi",
+              "Tur": "Cizgi",
+              "SolPt": 314.58, "UstPt": 8, "GenislikPt": 224, "YukseklikPt": 1,
+              "Cerceve": "Ust", "CerceveKalinligiPt": 1
+            },
+            {
+              "Ad": "KapanisEtiket",
+              "Tur": "Yazi",
+              "SolPt": 124, "UstPt": 14, "GenislikPt": 190.58, "YukseklikPt": 14,
+              "Metin": "KAPANIŞ BAKİYESİ",
+              "PuntoPt": 9, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta"
+            },
+            {
+              "Ad": "KapanisBakiye",
+              "Tur": "Yazi",
+              "SolPt": 388.58, "UstPt": 14, "GenislikPt": 150, "YukseklikPt": 14,
+              "Metin": "[kapanis_bakiye]",
+              "PuntoPt": 9, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            }
+          ]
+        },
+        {
+          "Ad": "SayfaSonu1",
+          "Tur": "SayfaSonu",
+          "UstPt": 220,
+          "YukseklikPt": 22,
+          "Nesneler": [
+            {
+              "Ad": "AltCizgi",
+              "Tur": "Cizgi",
+              "SolPt": 0, "UstPt": 0, "GenislikPt": 538.58, "YukseklikPt": 1,
+              "Cerceve": "Ust", "CerceveKalinligiPt": 0.5, "CerceveRengi": "#C8C8C8"
+            },
+            {
+              "Ad": "SayfaNo",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 6, "GenislikPt": 538.58, "YukseklikPt": 12,
+              "Metin": "Sayfa [Page#] / [TotalPages#]",
+              "PuntoPt": 8, "Yatay": "Orta", "Dikey": "Orta"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Ad": "Hareketler",
+      "GenislikPt": 595.28,
+      "YukseklikPt": 841.89,
+      "SolBoslukPt": 28.35,
+      "SagBoslukPt": 28.35,
+      "UstBoslukPt": 28.35,
+      "AltBoslukPt": 28.35,
+      "Bantlar": [
+        {
+          "Ad": "HareketSayfaBasligi",
+          "Tur": "SayfaBasligi",
+          "UstPt": 0,
+          "YukseklikPt": 16,
+          "Nesneler": [
+            {
+              "Ad": "GomuludeBasilmaz",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 0, "GenislikPt": 538.58, "YukseklikPt": 12,
+              "Metin": "(sayfa başlığı bandı: kâğıdın kenarına ait, gömülü akışta basılmaz)",
+              "PuntoPt": 8, "Egik": true, "Renk": "#A00000", "Dikey": "Orta"
+            }
+          ]
+        },
+        {
+          "//": "Sütun başlıkları burada DEĞİL, Ana sayfanın sayfa başlığında: gövde bandı olsalardı bir kez basılırlar ve kâğıt kırıldığında ikinci sayfa başlıksız kalırdı.",
+          "Ad": "HareketVeri",
+          "Tur": "Veri",
+          "UstPt": 60,
+          "YukseklikPt": 14,
+          "VeriKumesi": "Hareket",
+          "Nesneler": [
+            {
+              "Ad": "Tarih",
+              "Tur": "Yazi",
+              "SolPt": 0, "UstPt": 0, "GenislikPt": 58, "YukseklikPt": 12,
+              "Metin": "[Hareket.\"tarih\"]",
+              "VeriAlani": "tarih",
+              "PuntoPt": 8, "Dikey": "Orta",
+              "Bicim": "Tarih", "BicimDeseni": "dd.mm.yyyy"
+            },
+            {
+              "Ad": "BelgeNo",
+              "Tur": "Yazi",
+              "SolPt": 58, "UstPt": 0, "GenislikPt": 66, "YukseklikPt": 12,
+              "Metin": "[Hareket.\"belge_no\"]",
+              "VeriAlani": "belge_no",
+              "PuntoPt": 8, "Dikey": "Orta"
+            },
+            {
+              "Ad": "Aciklama",
+              "Tur": "Yazi",
+              "SolPt": 124, "UstPt": 0, "GenislikPt": 190.58, "YukseklikPt": 12,
+              "Metin": "[Hareket.\"aciklama\"]",
+              "VeriAlani": "aciklama",
+              "PuntoPt": 8, "Dikey": "Orta"
+            },
+            {
+              "Ad": "Borc",
+              "Tur": "Yazi",
+              "SolPt": 314.58, "UstPt": 0, "GenislikPt": 74, "YukseklikPt": 12,
+              "Metin": "[Hareket.\"borc\"]",
+              "VeriAlani": "borc",
+              "PuntoPt": 8, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            },
+            {
+              "Ad": "Alacak",
+              "Tur": "Yazi",
+              "SolPt": 388.58, "UstPt": 0, "GenislikPt": 74, "YukseklikPt": 12,
+              "Metin": "[Hareket.\"alacak\"]",
+              "VeriAlani": "alacak",
+              "PuntoPt": 8, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            },
+            {
+              "Ad": "Bakiye",
+              "Tur": "Yazi",
+              "SolPt": 462.58, "UstPt": 0, "GenislikPt": 76, "YukseklikPt": 12,
+              "Metin": "[Hareket.\"bakiye\"]",
+              "VeriAlani": "bakiye",
+              "PuntoPt": 8, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            }
+          ]
+        },
+        {
+          "Ad": "HareketAlt",
+          "Tur": "Alt",
+          "UstPt": 90,
+          "YukseklikPt": 24,
+          "Nesneler": [
+            {
+              "Ad": "AraCizgi",
+              "Tur": "Cizgi",
+              "SolPt": 314.58, "UstPt": 2, "GenislikPt": 224, "YukseklikPt": 1,
+              "Cerceve": "Ust", "CerceveKalinligiPt": 0.75
+            },
+            {
+              "Ad": "AraEtiket",
+              "Tur": "Yazi",
+              "SolPt": 124, "UstPt": 6, "GenislikPt": 190.58, "YukseklikPt": 12,
+              "Metin": "Dönem hareket toplamı",
+              "PuntoPt": 8, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta"
+            },
+            {
+              "Ad": "AraBorc",
+              "Tur": "Yazi",
+              "SolPt": 314.58, "UstPt": 6, "GenislikPt": 74, "YukseklikPt": 12,
+              "Metin": "[SUM(<Hareket.\"borc\">)]",
+              "PuntoPt": 8, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            },
+            {
+              "Ad": "AraAlacak",
+              "Tur": "Yazi",
+              "SolPt": 388.58, "UstPt": 6, "GenislikPt": 74, "YukseklikPt": 12,
+              "Metin": "[SUM(<Hareket.\"alacak\">)]",
+              "PuntoPt": 8, "Kalin": true, "Yatay": "Sag", "Dikey": "Orta",
+              "Bicim": "Sayi", "BicimDeseni": "%2.2n"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "VeriKumeleri": [
+    { "Ad": "Cari", "NesneAdi": "sqlCari", "Sql": "select cari_kodu, cari_ad_unvan, donem, devir_bakiye from cari where cari_kodu = :kod" },
+    { "Ad": "Hareket", "NesneAdi": "sqlHareket", "Sql": "select tarih, belge_no, aciklama, borc, alacak, bakiye from cari_hareket where cari_kodu = :kod order by tarih, belge_no" }
+  ],
+  "Betikler": [],
+  "Uyarilar": []
+}

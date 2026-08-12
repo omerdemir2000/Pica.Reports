@@ -157,7 +157,7 @@ public sealed class VeriKumesi(string ad, IReadOnlyList<string> alanlar, IReadOn
         // Dapper'ın satırı IDictionary<string, object>; kendi kurduğunuz
         // sözlükler genelde IDictionary<string, object?>. İkisi de gelir.
         if (satir is IDictionary<string, object?> sozluk)
-            return new VeriSatiri(new Dictionary<string, object?>(sozluk, StringComparer.OrdinalIgnoreCase));
+            return new VeriSatiri(Topla(sozluk));
 
         if (satir is IDictionary ham)
         {
@@ -175,6 +175,38 @@ public sealed class VeriKumesi(string ad, IReadOnlyList<string> alanlar, IReadOn
             nesne[ozellik.Name] = ozellik.GetValue(satir);
 
         return new VeriSatiri(nesne);
+    }
+
+    /// <summary>
+    /// Satırı ada göre eşleşen bir sözlüğe alır; <b>aynı adlı ikinci sütun
+    /// <c>_1</c>, üçüncüsü <c>_2</c> olur</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Rapor sorguları iki tabloyu birden seçebiliyor
+    /// (<c>select b.*, d.* from başlık b join detay d …</c>) ve iki tabloda da
+    /// <c>cari_ad_unvan</c> gibi ortak bir sütun varsa satır aynı adı iki kez
+    /// taşır. Sözlüğü doğrudan kurmak orada patlardı.
+    /// </para>
+    /// <para>
+    /// Sıra numarası eklemek <b>ADO'nun davranışıdır</b> ve taşınan şablonlar
+    /// ona göre yazılmış: çek/senet bordrosunun düzeni ciro edilen carinin adını
+    /// <c>[sql."cari_ad_unvan_1"]</c> diye basıyor. İkinciyi atmak o kutuyu
+    /// sessizce boşaltırdı.
+    /// </para>
+    /// </remarks>
+    private static Dictionary<string, object?> Topla(IEnumerable<KeyValuePair<string, object?>> satir)
+    {
+        Dictionary<string, object?> sonuc = new(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (ad, deger) in satir)
+        {
+            if (sonuc.TryAdd(ad, deger)) continue;
+
+            for (var sira = 1; !sonuc.TryAdd($"{ad}_{sira}", deger); sira++) { }
+        }
+
+        return sonuc;
     }
 
     /// <remarks>

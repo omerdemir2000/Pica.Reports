@@ -33,6 +33,22 @@ public sealed class CetvelDuzeni
     public List<DuzenSayfasi> Sayfalar { get; set; } = [];
 
     /// <summary>
+    /// Şablonun içinde tanımlı veri kümeleri ve tasarım anındaki sorguları.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Bir rapor şablonunda birden çok sorgu olabilir ve <b>hepsi dışarıdan
+    /// beslenmez</b>: barındıran program genelde yalnız birini ezer (VB6'da
+    /// <c>FindObject("SQL")</c>), ötekiler şablonda yazdıkları sorguyla çalışır —
+    /// kâğıdın başlığındaki firma bilgisi, form ayarları, iade toplamı böyle
+    /// gelir. Sorgular <b>taşınmaz</b> (çalıştırmak barındıran uygulamanın işi)
+    /// ama kaybolmamalı: hangi kutunun hangi alandan geldiği ancak onlarla
+    /// okunur.
+    /// </para>
+    /// </remarks>
+    public List<DuzenVeriKumesi> VeriKumeleri { get; set; } = [];
+
+    /// <summary>
     /// Şablonun içindeki PascalScript. <b>Taşınmaz, çalıştırılmaz</b>; dönüşümde
     /// gözden kaçmasın diye saklanır. Boş olmayan her betik elle karşılığı
     /// yazılması gereken bir davranıştır (nakli yekûn, koşullu gizleme...).
@@ -64,11 +80,61 @@ public sealed class CetvelDuzeni
             Ad = Ad,
             Kaynak = Kaynak,
             Sayfalar = [Sayfalar[indeks]],
+            VeriKumeleri = VeriKumeleri,
             Betikler = Betikler,
             Uyarilar = Uyarilar,
         };
     }
+
+    /// <summary>Adı verilen sayfa; ad boşsa ya da eşleşme yoksa <c>null</c>.</summary>
+    /// <remarks>
+    /// Alt rapor hedefini <b>adıyla</b> gösteriyor (<c>Page="Page2"</c>), sırasıyla
+    /// değil: şablonda sayfa eklendiğinde sıra kayar, ad kaymaz.
+    /// </remarks>
+    public DuzenSayfasi? SayfaBul(string? ad)
+        => string.IsNullOrEmpty(ad)
+            ? null
+            : Sayfalar.FirstOrDefault(s => string.Equals(s.Ad, ad, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// Sayfa başka bir sayfanın alt raporu mu — yani kendi başına bir cetvel
+    /// değil, onun bir parçası mı?
+    /// </summary>
+    /// <remarks>
+    /// Önizlemenin cetvel seçicisi bunu soruyor: alt rapor hedefi ayrı bir
+    /// cetvel diye listelenirse kullanıcı aynı içeriği iki yerde görür ve
+    /// hangisinin basılacağını anlamaz. <b>Tasarımcıda listelenmeye devam
+    /// eder</b>; gömülü de olsa düzenlenebilmesi gereken bir sayfadır.
+    /// </remarks>
+    public bool AltRaporMu(DuzenSayfasi sayfa)
+        => sayfa.Ad is { Length: > 0 } ad
+        && Sayfalar.Any(s => !ReferenceEquals(s, sayfa)
+                             && s.Bantlar.SelectMany(b => b.Nesneler)
+                                 .Any(n => string.Equals(n.AltRaporSayfasi, ad,
+                                                         StringComparison.OrdinalIgnoreCase)));
 }
+
+/// <summary>Şablonun içinde tanımlı bir veri kümesi.</summary>
+/// <param name="Ad">
+/// Kümenin <b>görünen</b> adı. Bantlar ve kutular bunu yazar
+/// (<c>[Barkod."cari_kodu"]</c>); veriyi bu adla vermek gerekir.
+/// </param>
+/// <param name="NesneAdi">
+/// Kümenin şablondaki nesne adı.
+/// </param>
+/// <remarks>
+/// <para>
+/// <b>İkisi neden ayrı?</b> FastReport'ta bir sorgunun nesne adı
+/// (<c>Name</c>) ile görünen adı (<c>UserName</c>) farklı olabilir ve sık sık
+/// farklıdır: taşınan 2.110 şablonun 750'sinde ayrışıyor
+/// (<c>sql</c> → <c>Barkod</c>, <c>sqlSatislar</c> → <c>Satislar</c>).
+/// İfadeler görünen adı, barındıran programın ezdiği sorgu ise nesne adını
+/// kullanır — ikisi birden saklanmazsa "ekranın sorgusu hangi kümeye gidecek"
+/// sorusu cevapsız kalır.
+/// </para>
+/// </remarks>
+/// <param name="Sql">Tasarım anındaki sorgu metni; boş olabilir.</param>
+public sealed record DuzenVeriKumesi(string Ad, string? NesneAdi, string Sql);
 
 /// <param name="Nerede">Nesne ya da rapor adı.</param>
 /// <param name="Olay">Olay adı — <c>OnBeforePrint</c>.</param>
@@ -77,6 +143,15 @@ public sealed record TasinmayanBetik(string Nerede, string Olay, string Kod);
 
 public sealed class DuzenSayfasi
 {
+    /// <summary>Sayfanın şablondaki adı — <c>Page1</c>.</summary>
+    /// <remarks>
+    /// Sıra numarası yetmiyor: alt rapor hedefini adıyla gösteriyor
+    /// (<see cref="DuzenNesnesi.AltRaporSayfasi"/>) ve şablonun ortasına bir
+    /// sayfa eklendiğinde sıra kayar, ad kaymaz. Eski düzen dosyalarında bu
+    /// alan yok — o yüzden boş geçilebilir.
+    /// </remarks>
+    public string? Ad { get; set; }
+
     public double GenislikPt { get; set; }
     public double YukseklikPt { get; set; }
 
@@ -293,6 +368,28 @@ public sealed class DuzenNesnesi
 
     public ResimUyumu ResimUyumu { get; set; }
 
+    // --------------------------------------------------------- alt rapor
+
+    /// <summary>
+    /// Bu kutunun yerine akışa girecek sayfanın adı — FastReport
+    /// <c>TfrxSubreport.Page</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Alt rapor ayrı bir belge değil, <b>başka bir sayfanın bantlarının bu
+    /// noktada akışa girmesi</b>dir: cari hesap ekstresinin şablonunda kâğıdın
+    /// üst yarısı ana sayfada, hareket dökümü ikinci sayfada durur ve ikincisi
+    /// birincinin bandına gömülür.
+    /// </para>
+    /// <para>
+    /// Dolu olan kutu <b>basılmaz</b>; yalnızca gömmenin nerede olacağını
+    /// söyler. Dönüştürücü yer tutucu bir yazı kutusu bırakıyor — kutunun boyu
+    /// bandın ne kadar yer tutacağını belirlediği için o kutu duruyor, metni
+    /// kâğıda çıkmıyor.
+    /// </para>
+    /// </remarks>
+    public string? AltRaporSayfasi { get; set; }
+
     // ------------------------------------------------------------- barkod
 
     public BarkodTuru BarkodTuru { get; set; }
@@ -378,6 +475,8 @@ public sealed class DuzenNesnesi
 
         ResimVerisi = k.ResimVerisi;
         ResimUyumu = k.ResimUyumu;
+
+        AltRaporSayfasi = k.AltRaporSayfasi;
 
         BarkodTuru = k.BarkodTuru;
         BarkodYazisi = k.BarkodYazisi;
