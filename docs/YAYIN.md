@@ -4,35 +4,25 @@ Bu dosya **Papirus Yazılım** içindir: depoyu GitHub'a açmak, NuGet'e paket
 göndermek ve arama sonuçlarında görünmek için yapılacaklar. Bir kez yapılır,
 sonra sürüm etiketi atmak yeter.
 
-## 1. GitHub deposu
+## 1. GitHub deposu — YAPILDI
 
-Depo yerel olarak hazır ve ilk commit atılmış durumda. Uzak depo açmak sizin
-hesabınıza bağlı:
+<https://github.com/omerdemir2000/Pica.Reports> · **Public** · varsayılan dal
+`master`.
 
-**Tarayıcıdan:** <https://github.com/new> → depo adı `pica-reports`, görünürlük
-**Public**, "Add a README" ve ".gitignore" seçeneklerini **işaretlemeyin**
-(dosyalar burada zaten var).
+Depo adı `pica-reports` değil **`Pica.Reports`** oldu (NuGet paket adıyla
+birebir), dal da `main`e çevrilmedi. İkisini birden değiştirmek isterseniz
+GitHub → Settings → *Repository name* / *Default branch*; ad değişince eski
+adres yeni adrese yönlenir ama `git remote set-url` yapmak yine de gerekir.
 
-Sonra:
+> **Dal adı ile iş akışı bağlı.** `.github/workflows/ci.yml` `master` ve `main`
+> dallarını birden dinliyor; dalı yeniden adlandırırsanız CI yine çalışır.
 
-```bash
-cd D:\C#\Projeler_Demir\PicaReports
-git remote add origin https://github.com/<hesap>/pica-reports.git
-git branch -M main
-git push -u origin main
-```
+## 2. Deponun görünen yüzü (About) — YAPILDI
 
-**GitHub CLI kuruluysa** tek satır:
+Description, website ve topics API'den yazıldı. Değiştirmek için depo
+sayfasında sağ üstteki ⚙ **About** düğmesi.
 
-```bash
-gh repo create <hesap>/pica-reports --public --source=. --remote=origin --push
-```
-
-## 2. Deponun görünen yüzü (About)
-
-Depo sayfasında sağ üstteki ⚙ **About** düğmesinden:
-
-**Description** — arama sonuçlarında görünen satır. İki dili birden taşısın:
+**Description** — arama sonuçlarında görünen satır, iki dili birden taşıyor:
 
 ```
 Blazor rapor tasarım aracı — banded report designer for Blazor. Papirus Yazılım Ltd. Şti.
@@ -48,8 +38,8 @@ https://www.papirusbilisim.com
 
 ```
 blazor  report-designer  reporting  dotnet  csharp  aspnetcore
-razor-class-library  fastreport  barcode  pdf  rapor  rapor-tasarim
-blazor-components  turkish
+razor-components  fastreport  report-generator  banded-report
+blazor-server  blazor-webassembly  pdf-alternative  turkish
 ```
 
 "Releases" ve "Packages" kutularını açık bırakın; NuGet paketi bağlanınca depo
@@ -119,4 +109,7 @@ olacağı kararı verildikten sonra.
 - [ ] Marka sicilleri: TÜRKPATENT, EUIPO ve USPTO'da 9. ve 42. sınıfta "PICA".
       *Pica* tipografide jenerik bir terim ve yazılım alanında canlı çakışan
       bir marka bulunamadı, ama siciller denetlenmedi.
-- [ ] Depo **Public** ve LICENSE görünüyor.
+- [x] Depo **Public** ve LICENSE görünüyor.
+- [ ] README'deki NuGet rozeti ilk sürüm etiketine kadar kırmızı: paket henüz
+      nuget.org'da yok. `git tag v0.9.0 && git push origin v0.9.0` ile yayımlanır
+      ve rozet kendiliğinden yeşile döner.
