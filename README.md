@@ -10,6 +10,7 @@ English · [Türkçe](README.tr.md) — **Blazor rapor tasarım aracı**
 
 A product of **[Papirus Yazılım Ltd. Şti.](https://www.papirusbilisim.com)**
 
+[![ci](https://github.com/omerdemir2000/Pica.Reports/actions/workflows/ci.yml/badge.svg)](https://github.com/omerdemir2000/Pica.Reports/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/Pica.Reports.svg)](https://www.nuget.org/packages/Pica.Reports)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4)
