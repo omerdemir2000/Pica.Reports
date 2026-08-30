@@ -6,8 +6,40 @@ Bu dosya sürümler arasındaki değişiklikleri anlatır. Biçim
 
 ## [Yayımlanmadı]
 
+## [0.10.1] — 2026-08-30
+
+> 0.10.0 yayımlanmadı; alt rapor desteği bu sürümle birlikte çıkıyor.
+
 ### Eklenen
 
+- **Zengin metin nesnesi** (`NesneTuru.ZenginMetin`): kutunun değeri **im
+  olarak** basılır — kalın, eğik, altı çizili, paragraf, liste ve tablo
+  korunur. Delphi'nin `TfrxRichView` karşılığı.
+  - **Kütüphane RTF okumaz.** Delphi tarafı zengin metni RTF olarak saklıyor
+    ama RTF'i çözmek barındıran uygulamanın işi; kendi ayrıştırıcısını taşımak
+    bir kod sayfası tablosunu ve bakımını da taşımak demekti. Buraya gelen
+    değer im'dir.
+  - İçerik veritabanından geldiği için `ZenginMetin.Temizle` **izin
+    listesinden** geçiriyor: biçimleme etiketleri kalır, `script`/`style`/
+    `iframe` gövdesiyle atılır, `class` dışındaki bütün öznitelikler düşer
+    (`style`, `href`, `on…` hiç geçmez). Süzülmeseydi bir rapor metnindeki
+    `<script>` raporu açan herkeste çalışırdı.
+  - İzin listesinde olmayan bir etiket düşer ama **metni kalır**; kapatılmamış
+    etiketler sonda kapatılır.
+  - Tuvalde biçimli metin basılmaz, başvurusu görünür: tuval yerleşim
+    yüzeyidir ve zengin metnin içeriği neredeyse her zaman veriden gelir.
+- **Onay kutusu nesnesi** (`NesneTuru.OnayKutusu`): matbu formların
+  işaretlenen kareleri. Delphi'nin `TfrxCheckBoxView` karşılığı.
+  - Üç im: onay, çarpı, dolu kare (`OnayBicimi`). Kare **her zaman** çizilir —
+    boş bir kare "işaretlenmemiş" bilgisidir ve kâğıtta görünmelidir.
+  - **Veriye bağlanabilir**: `Metin` bir başvuru taşıyorsa çözülen değer
+    `OnayKutusu.Isaretli` ile yorumlanır — `1`, `true`, `evet`, `E`, `X` ve
+    sıfırdan farklı her sayı işaretli sayılır. Karşılaştırma kültürden
+    bağımsızdır (Türkçe `I/ı` tuzağı).
+  - Çizim barkodda olduğu gibi **SVG**: tuval de çizici de aynı dizeyi basar.
+    `viewBox` kare, dolayısıyla dikdörtgen bir alanda kutu ezilmez, ortalanır.
+- Örnek uygulamaya `onam-formu` düzeni: biçimli paragraf, işaretli/işaretsiz
+  kutular ve veriye bağlı onay bir arada.
 - **Alt rapor**: bir bandın içindeki kutu başka bir sayfayı gösterebiliyor
   (`DuzenNesnesi.AltRaporSayfasi` → `DuzenSayfasi.Ad`) ve o sayfanın gövde
   bantları kutunun durduğu noktada akışa giriyor. Gömülen bantlar sayfa

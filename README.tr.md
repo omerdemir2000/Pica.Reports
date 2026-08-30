@@ -25,7 +25,7 @@ satır içi SVG ikonlarını taşır.
 
 ## Önce çalıştırıp görün
 
-Depoda çalışan bir örnek uygulama var — on bir örnek düzenle birlikte:
+Depoda çalışan bir örnek uygulama var — hazır örnek düzenlerle birlikte:
 
 ```
 dotnet run --project ornek/Pica.Reports.Ornek
@@ -36,12 +36,11 @@ dotnet run --project ornek/Pica.Reports.Ornek
 ## Kurulum
 
 ```xml
-<PackageReference Include="Pica.Reports" Version="0.9.0" />
+<PackageReference Include="Pica.Reports" Version="0.10.1" />
 ```
 
-> **Paket henüz nuget.org'da değil.** İlk sürüm etiketi onu oraya gönderiyor
-> (bkz. `.github/workflows/release.yml`); o zamana kadar projeye doğrudan
-> başvurun ya da `dotnet pack src/Pica.Reports` ile paketi kendiniz üretin.
+Paket [nuget.org](https://www.nuget.org/packages/Pica.Reports)'da; sürümler
+etiket atıldığında oradan yayımlanıyor (bkz. `.github/workflows/release.yml`).
 
 Biçem dosyasını sayfaya ekleyin:
 
@@ -249,6 +248,8 @@ ekran olarak da gömülebilir.
 | Şekil | Çerçeve ve zemin |
 | Resim | Düzenin **içinde** saklanan resim (veri URI'si) |
 | Barkod | Code 128 ya da EAN-13 |
+| Zengin metin | Değeri **im olarak** basar: kalın, eğik, liste, tablo |
+| Onay kutusu | Matbu formların işaretlenen karesi; veriye de bağlanır |
 
 Nesneler soldaki araç paletinden eklenir. İki yol var:
 
@@ -266,6 +267,56 @@ Barkod çubukları kütüphanede üretilir ve **SVG** olarak verilir; tuval onu
 doğrudan gösterir, çizici de aynı dizeyi PDF motoruna verir. Kodlanamayan bir
 değer (Code 128'e Türkçe harf, EAN-13'e yanlış sağlama) **boş kutu** basar —
 uydurma bir barkod, okutulduğunda başka bir şey söyleyen bir etiket demektir.
+
+### Zengin metin
+
+Kutunun değeri **im olarak** basılır; yazı kutusundan farkı budur. Ölçüsü,
+çerçevesi, taban yazı tipi ve veri bağı aynı çalışır.
+
+**Kütüphane RTF okumaz.** Delphi/FastReport zengin metni RTF olarak saklıyor
+(`TfrxRichView`), ama RTF'i çözmek barındıran uygulamanın işi: kendi
+ayrıştırıcısını taşımak bir kod sayfası tablosunu ve onun bakımını da taşımak
+olurdu. Buraya gelen değer im'dir; RTF → im çevrimini uygulama yapar.
+
+İçerik veritabanından geldiği için **izin listesinden** geçer
+(`ZenginMetin.Temizle`):
+
+- Kalan: `p br div span b strong i em u s sub sup ul ol li table thead tbody
+  tfoot tr td th h1…h6`
+- Gövdesiyle atılan: `script style iframe object embed svg math`
+- Öznitelikler **bütünüyle düşer**, yalnız `class` kalır — `style`, `href`,
+  `src` ve `on…` hiç geçmez.
+
+Süzülmeseydi bir rapor metnindeki `<script>`, raporu açan herkeste çalışırdı.
+İzin listesinde olmayan bir etiket düşer ama **metni kalır**: bilinmeyen bir
+sarmalayıcı yüzünden kâğıtta içerik kaybolmaz. Kapatılmamış etiketler sonda
+kapatılır.
+
+Tuvalde biçimli metin **basılmaz**, başvurusu görünür: tuval yerleşim
+yüzeyidir, baskı önizlemesi değil — ve zengin metnin içeriği neredeyse her
+zaman veriden gelir, tasarım anında zaten boştur.
+
+### Onay kutusu
+
+Matbu formların işaretlenen kareleri. Üç im var — onay, çarpı, dolu kare — ve
+**kare her zaman çizilir**: boş bir kare "işaretlenmemiş" bilgisidir, kâğıtta
+görünmesi gerekir.
+
+Kutu **veriye bağlanabilir**. Bağlı değer boşsa tasarımdaki hâli basılır (matbu
+form); bir başvuru yazılırsa çözülen değer yorumlanır:
+
+```razor
+Bağlı değer:  [Hasta."Onayli"]
+```
+
+`1`, `true`, `t`, `yes`, `y`, `evet`, `e`, `var`, `X`, `on`, `checked` ve
+sıfırdan farklı her sayı **işaretli** sayılır; boş değer işaretsizdir — veri
+gelmediği için kutuyu işaretlemek, formda olmayan bir onayı varmış gibi
+göstermek olurdu. Karşılaştırma kültürden bağımsızdır (Türkçe `I/ı` tuzağı).
+
+Çizim barkodda olduğu gibi **SVG**: tuval de çizici de aynı dizeyi basar.
+`viewBox` kare olduğu için kutu dikdörtgen bir alana konsa da ezilmez,
+ortalanır — ezilmiş bir onay kutusu kâğıtta baskı hatası gibi görünür.
 
 ## Alan ağacı
 
@@ -400,7 +451,7 @@ onu koyu temada gri gösterirse yerleşim kararları yanlış zeminde verilir.
 dotnet test
 ```
 
-173 sınama kütüphanenin kendi sözleşmesini denetler ve her yerde çalışır.
+250 sınama kütüphanenin kendi sözleşmesini denetler ve her yerde çalışır.
 
 Bunlara ek olarak **gerçek düzen dosyaları** üzerinde çalışan bir küme daha var:
 düzeltme çıkarımının kayıpsız olduğunu ve dokunulmamış bir düzenin sahte

@@ -87,6 +87,29 @@
                             {
                                 <div class="rt-barkod">@((MarkupString)svg)</div>
                             }
+                            else if (kutu.Nesne.Tur is NesneTuru.ZenginMetin)
+                            {
+                                @* Değer İM olarak basılır — zengin metin kutusunun
+                                   varlık sebebi bu. İçerik veritabanından geldiği için
+                                   önce izin listesinden geçer: süzülmezse bir rapor
+                                   metnindeki <script> raporu açan herkeste çalışırdı
+                                   (bkz. ZenginMetin.Temizle). *@
+                                <div class="rt-kutu-yazi rt-zengin" style="@Bicem.Yazi(kutu.Nesne)">
+                                    @((MarkupString)ZenginMetin.Temizle(kutu.Metin))
+                                </div>
+                            }
+                            else if (kutu.Nesne.Tur is NesneTuru.OnayKutusu)
+                            {
+                                @* Kutu veriye bağlıysa çözülen değer yorumlanır; bağ
+                                   yoksa tasarımdaki hâli basılır (matbu form). *@
+                                <div class="rt-onay">
+                                    @((MarkupString)OnayKutusu.Svg(
+                                        kutu.Nesne.Metin is { Length: > 0 }
+                                            ? OnayKutusu.Isaretli(kutu.Metin)
+                                            : kutu.Nesne.Isaretli,
+                                        kutu.Nesne.OnayBicimi, kutu.Nesne.Renk))
+                                </div>
+                            }
                         </div>
                     }
 

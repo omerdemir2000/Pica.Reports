@@ -38,9 +38,10 @@
        yüklenemediğinde yalnızca olay dinleyicileri kurulmamış olur. -->
   <PropertyGroup>
     <PackageId>Pica.Reports</PackageId>
-    <!-- 0.9.0: yayına hazır ama 1.0 değil. 1.0 "API donmuştur" sözüdür ve API
-         henüz Türkçe/İngilizce kararını beklediği için o söz verilemez. -->
-    <Version>0.9.0</Version>
+    <!-- 1.0 değil: 1.0 "API donmuştur" sözüdür ve API henüz Türkçe/İngilizce
+         kararını beklediği için o söz verilemez.
+         0.10.1: zengin metin ve onay kutusu nesneleri. -->
+    <Version>0.10.1</Version>
     <Product>Pica.Reports</Product>
     <Authors>Papirus Yazılım Ltd. Şti.</Authors>
     <Company>Papirus Yazılım Ltd. Şti.</Company>

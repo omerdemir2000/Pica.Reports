@@ -1,0 +1,208 @@
+{
+  "Anahtar": "onam-formu",
+  "Ad": "Onam Formu",
+  "Kaynak": "Zengin metin ve onay kutusu: biçimli paragraf, işaretli ve işaretsiz kutular, veriye bağlı onay.",
+  "Sayfalar": [
+    {
+      "Ad": "Page1",
+      "GenislikPt": 595.28,
+      "YukseklikPt": 841.89,
+      "SolBoslukPt": 42,
+      "SagBoslukPt": 42,
+      "UstBoslukPt": 42,
+      "AltBoslukPt": 42,
+      "Yatay": false,
+      "SutunSayisi": 0,
+      "SutunAraligiPt": 0,
+      "Bantlar": [
+        {
+          "Ad": "RaporBasligi1",
+          "Tur": "RaporBasligi",
+          "YukseklikPt": 36,
+          "UstPt": 0,
+          "VeriKumesi": null,
+          "GrupKosulu": null,
+          "Uzayabilir": false,
+          "SonrasindaYeniSayfa": false,
+          "YanBant": null,
+          "Nesneler": [
+            {
+              "Ad": "Baslik",
+              "Tur": "Yazi",
+              "SolPt": 0,
+              "UstPt": 0,
+              "GenislikPt": 511,
+              "YukseklikPt": 22,
+              "Metin": "BİLGİLENDİRİLMİŞ ONAM FORMU",
+              "YaziTipi": "Arial",
+              "PuntoPt": 14,
+              "Kalin": true,
+              "Yatay": "Orta",
+              "Dikey": "Orta",
+              "Cerceve": "Alt",
+              "CerceveKalinligiPt": 1
+            }
+          ]
+        },
+        {
+          "Ad": "Veri1",
+          "Tur": "Veri",
+          "YukseklikPt": 260,
+          "UstPt": 48,
+          "VeriKumesi": "Hasta",
+          "GrupKosulu": null,
+          "Uzayabilir": true,
+          "SonrasindaYeniSayfa": false,
+          "YanBant": null,
+          "Nesneler": [
+            {
+              "Ad": "HastaAdi",
+              "Tur": "Yazi",
+              "SolPt": 0,
+              "UstPt": 6,
+              "GenislikPt": 511,
+              "YukseklikPt": 14,
+              "Metin": "Hasta: [Hasta.\"AdSoyad\"]   ·   Protokol: [Hasta.\"ProtokolNo\"]",
+              "PuntoPt": 10,
+              "Yatay": "Sol",
+              "Dikey": "Orta"
+            },
+
+            {
+              "Ad": "Aciklama",
+              "Tur": "ZenginMetin",
+              "SolPt": 0,
+              "UstPt": 28,
+              "GenislikPt": 511,
+              "YukseklikPt": 96,
+              "Metin": "<p>Aşağıda tanımlanan girişimin <b>gerekçesi</b>, <b>beklenen yararları</b> ve olası <u>riskleri</u> tarafıma anlatıldı.</p><ul><li>İşlem öncesi hazırlık anlatıldı.</li><li>Alternatif tedaviler açıklandı.</li></ul>",
+              "PuntoPt": 10,
+              "Yatay": "Sol",
+              "Dikey": "Ust",
+              "Cerceve": "Tumu",
+              "CerceveKalinligiPt": 0.5,
+              "KelimeKaydir": true,
+              "Uzayabilir": true
+            },
+
+            {
+              "Ad": "Sonuc",
+              "Tur": "ZenginMetin",
+              "SolPt": 0,
+              "UstPt": 132,
+              "GenislikPt": 511,
+              "YukseklikPt": 40,
+              "Metin": "[Hasta.\"Aciklama\"]",
+              "VeriAlani": "Aciklama",
+              "PuntoPt": 10,
+              "Dikey": "Ust",
+              "KelimeKaydir": true,
+              "Uzayabilir": true
+            },
+
+            {
+              "Ad": "OnayKutu1",
+              "Tur": "OnayKutusu",
+              "SolPt": 0,
+              "UstPt": 184,
+              "GenislikPt": 12,
+              "YukseklikPt": 12,
+              "Isaretli": true,
+              "OnayBicimi": "Onay"
+            },
+            {
+              "Ad": "OnayYazi1",
+              "Tur": "Yazi",
+              "SolPt": 18,
+              "UstPt": 182,
+              "GenislikPt": 480,
+              "YukseklikPt": 16,
+              "Metin": "Bilgilendirmeyi okudum ve anladım.",
+              "PuntoPt": 10,
+              "Dikey": "Orta"
+            },
+
+            {
+              "Ad": "OnayKutu2",
+              "Tur": "OnayKutusu",
+              "SolPt": 0,
+              "UstPt": 206,
+              "GenislikPt": 12,
+              "YukseklikPt": 12,
+              "Isaretli": false,
+              "OnayBicimi": "Carpi"
+            },
+            {
+              "Ad": "OnayYazi2",
+              "Tur": "Yazi",
+              "SolPt": 18,
+              "UstPt": 204,
+              "GenislikPt": 480,
+              "YukseklikPt": 16,
+              "Metin": "Ek bilgi istiyorum (işaretsiz — matbu formda elle işaretlenir).",
+              "PuntoPt": 10,
+              "Dikey": "Orta"
+            },
+
+            {
+              "Ad": "OnayKutu3",
+              "Tur": "OnayKutusu",
+              "SolPt": 0,
+              "UstPt": 228,
+              "GenislikPt": 12,
+              "YukseklikPt": 12,
+              "Metin": "[Hasta.\"Onayli\"]",
+              "VeriAlani": "Onayli",
+              "OnayBicimi": "Onay"
+            },
+            {
+              "Ad": "OnayYazi3",
+              "Tur": "Yazi",
+              "SolPt": 18,
+              "UstPt": 226,
+              "GenislikPt": 480,
+              "YukseklikPt": 16,
+              "Metin": "Veriye bağlı onay — kutu [Hasta.\"Onayli\"] alanına uyar.",
+              "PuntoPt": 10,
+              "Dikey": "Orta"
+            }
+          ]
+        },
+        {
+          "Ad": "SayfaSonu1",
+          "Tur": "SayfaSonu",
+          "YukseklikPt": 18,
+          "UstPt": 320,
+          "VeriKumesi": null,
+          "GrupKosulu": null,
+          "Uzayabilir": false,
+          "SonrasindaYeniSayfa": false,
+          "YanBant": null,
+          "Nesneler": [
+            {
+              "Ad": "SayfaNo",
+              "Tur": "Yazi",
+              "SolPt": 0,
+              "UstPt": 0,
+              "GenislikPt": 511,
+              "YukseklikPt": 12,
+              "Metin": "Sayfa [Page#] / [TotalPages#]",
+              "PuntoPt": 8,
+              "Yatay": "Sag",
+              "Dikey": "Orta"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "VeriKumeleri": [
+    {
+      "Ad": "Hasta",
+      "NesneAdi": "qryHasta",
+      "Sql": "select AdSoyad, ProtokolNo, Aciklama, Onayli from hasta"
+    }
+  ],
+  "Betikler": [],
+  "Uyarilar": []
+}

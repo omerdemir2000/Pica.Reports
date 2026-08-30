@@ -258,7 +258,14 @@ public static class SayfaDizici
                         nesne,
                         sayfa.SolBoslukPt + nesne.SolPt,
                         y + nesne.UstPt,
-                        nesne.Tur is NesneTuru.Yazi or NesneTuru.Barkod ? cozucu.Yaz(nesne) : ""));
+                        // Değeri çözülen türler: yazı ve zengin metin basılacak
+                        // içeriği, barkod kodlanacak diziyi, onay kutusu ise
+                        // işaretli olup olmadığını buradan alır. Çizgi, şekil ve
+                        // resmin çözülecek bir metni yok.
+                        nesne.Tur is NesneTuru.Yazi or NesneTuru.Barkod
+                                  or NesneTuru.ZenginMetin or NesneTuru.OnayKutusu
+                            ? cozucu.Yaz(nesne)
+                            : ""));
                 }
 
             y += yukseklik;

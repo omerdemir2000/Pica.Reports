@@ -85,7 +85,13 @@
   <data name="Nesne_Sekil"><value>Shape</value></data>
   <data name="Nesne_Resim"><value>Image</value></data>
   <data name="Nesne_Barkod"><value>Barcode</value></data>
+  <data name="Nesne_ZenginMetin"><value>Rich text</value></data>
+  <data name="Nesne_OnayKutusu"><value>Check box</value></data>
   <data name="Nesne_Bilinmeyen"><value>Unknown</value></data>
+
+  <data name="Onay_Onay"><value>Check mark</value></data>
+  <data name="Onay_Carpi"><value>Cross</value></data>
+  <data name="Onay_Dolu"><value>Filled square</value></data>
 
   <!-- ============================================================ biçim -->
   <data name="Bicim_Yok"><value>None</value></data>
@@ -178,6 +184,8 @@
   <data name="Palet_IpucuSekil"><value>Box with a border or fill</value></data>
   <data name="Palet_IpucuResim"><value>Image embedded in the layout</value></data>
   <data name="Palet_IpucuBarkod"><value>Code 128 or EAN-13 barcode</value></data>
+  <data name="Palet_IpucuZenginMetin"><value>Formatted text — bold, italic, lists, tables</value></data>
+  <data name="Palet_IpucuOnayKutusu"><value>Check box for printed forms</value></data>
   <data name="Palet_BantSecin"><value>Where to add it is not clear. Drag the object onto the paper, or select a band first.</value></data>
   <data name="Palet_AlanBantSecin"><value>Where to add it is not clear. Drag the field onto the paper, or select a band first.</value></data>
 
@@ -247,6 +255,18 @@
   <data name="Ozellik_BarkodEanHata"><value>EAN-13 needs exactly 12 or 13 digits (with 13, the check digit must match).</value></data>
   <data name="Ozellik_BarkodCodeHata"><value>Code 128 carries ASCII only.</value></data>
   <data name="Ozellik_BarkodEnIpucu"><value>The barcode is as wide as its box. In a very narrow box the bars merge and readers cannot read it.</value></data>
+
+  <data name="Ozellik_ZenginMetin"><value>Rich text</value></data>
+  <data name="Ozellik_ZenginMetinIpucu"><value>The value is printed as &lt;b&gt;markup&lt;/b&gt;: bold, italic, underline, paragraphs, lists and tables are kept. Field references such as &lt;code&gt;[Sales."Note"]&lt;/code&gt; are resolved first; the result then goes through the allow list.</value></data>
+  <data name="Ozellik_ZenginSuzuldu"><value>Some markup will not be printed: only formatting tags are allowed, and attributes other than “class” are dropped.</value></data>
+
+  <data name="Ozellik_OnayKutusu"><value>Check box</value></data>
+  <data name="Ozellik_OnayBicimi"><value>Mark</value></data>
+  <data name="Ozellik_Isaretli"><value>Checked</value></data>
+  <data name="Ozellik_OnayDeger"><value>Bound value</value></data>
+  <data name="Ozellik_OnayDegerIpucu"><value>Leave empty for a printed form: the box is printed as designed. If you enter a reference such as &lt;code&gt;[Patient."Consent"]&lt;/code&gt;, the box follows the data — &lt;code&gt;1&lt;/code&gt;, &lt;code&gt;true&lt;/code&gt;, &lt;code&gt;yes&lt;/code&gt;, &lt;code&gt;X&lt;/code&gt; and any non-zero number count as checked.</value></data>
+
+  <data name="Yeni_ZenginMetin"><value>Formatted &lt;b&gt;text&lt;/b&gt;</value></data>
   <data name="Ozellik_Cerceve"><value>Border and fill</value></data>
   <data name="Ozellik_KenarIpucu"><value>{0} edge</value></data>
   <data name="Ozellik_DortKenar"><value>Four edges</value></data>

@@ -712,6 +712,25 @@
                 nesne.BarkodYazisi = true;
                 break;
 
+            case NesneTuru.ZenginMetin:
+                // Yazı kutusundan geniş ve yüksek: biçimli metin genelde bir
+                // paragraf taşır, tek satırlık bir kutu ilk bakışta yanlış tür
+                // seçildiği izlenimi verirdi.
+                nesne.GenislikPt = 200;
+                nesne.YukseklikPt = 48;
+                nesne.KelimeKaydir = true;
+                nesne.Uzayabilir = true;
+                nesne.Metin = Metin.T("Yeni_ZenginMetin");
+                break;
+
+            case NesneTuru.OnayKutusu:
+                // Kare: çizim viewBox'ı kare ve kutu dikdörtgen alanda
+                // ortalanıyor; başlangıçta da kare olsun ki tutamakla
+                // büyütülünce beklenen yerde kalsın.
+                nesne.GenislikPt = 12;
+                nesne.YukseklikPt = 12;
+                break;
+
             default:
                 nesne.GenislikPt = 80;
                 nesne.YukseklikPt = 14;

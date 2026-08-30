@@ -42,7 +42,7 @@ one** — so the next conversion doesn't throw your work away.
 
 ## Try it first
 
-A working sample app ships in the repo, with eleven example layouts:
+A working sample app ships in the repo, with ready-made example layouts:
 
 ```
 dotnet run --project ornek/Pica.Reports.Ornek
@@ -55,7 +55,7 @@ dotnet run --project ornek/Pica.Reports.Ornek
 | | |
 | --- | --- |
 | **Design surface** | Drag, resize, multi-select, snap to grid, align, undo/redo |
-| **Objects** | Text, line, shape, image, barcode (Code 128 / EAN-13) |
+| **Objects** | Text, rich text, line, shape, image, barcode (Code 128 / EAN-13), check box |
 | **Data tree** | Datasets and fields in the palette; drag a field onto the paper to bind it |
 | **Print preview** | Real pagination — data bands repeat, pages break, footers sit at the bottom, page totals reset |
 | **Subreports** | A band can embed another page's bands into the flow; embedded content breaks across pages too |
@@ -72,13 +72,12 @@ SVG icons, and runs under both Blazor Server and WebAssembly.
 ## Install
 
 ```xml
-<PackageReference Include="Pica.Reports" Version="0.9.0" />
+<PackageReference Include="Pica.Reports" Version="0.10.1" />
 ```
 
-> **Not on nuget.org yet.** The first release tag pushes it there (see
-> `.github/workflows/release.yml`); until then, reference the project directly
-> or build the package yourself with `dotnet pack src/Pica.Reports`. The NuGet
-> badge above goes green with that first release.
+The package is on [nuget.org](https://www.nuget.org/packages/Pica.Reports);
+releases are published from there when a tag is pushed (see
+`.github/workflows/release.yml`).
 
 Add the stylesheet to the page:
 
@@ -297,6 +296,8 @@ embedded as a single full-screen view.
 | Shape | Frame and fill |
 | Image | An image stored **inside** the layout (as a data URI) |
 | Barcode | Code 128 or EAN-13 |
+| Rich text | Prints its value as **markup**: bold, italic, lists, tables |
+| Check box | The ticked square of a printed form; can also be data-bound |
 
 Objects come from the tool palette on the left, in two ways:
 
@@ -316,6 +317,56 @@ displays it directly, and your renderer passes the same string to the PDF
 engine. A value that can't be encoded (Turkish letters in Code 128, a bad EAN-13
 checksum) prints an **empty box** — an invented barcode is a label that says
 something else when it's scanned.
+
+### Rich text
+
+The box prints its value as **markup** — that is the whole difference from a
+text box. Size, frame, base font and data binding work the same way.
+
+**The library does not read RTF.** Delphi/FastReport stores rich text as RTF
+(`TfrxRichView`), but decoding RTF is the host application's job: carrying its
+own parser would mean carrying a code page table and its maintenance too. What
+arrives here is markup; the application does the RTF → markup step.
+
+Because the content comes from a database, it goes through an **allow list**
+(`ZenginMetin.Temizle`):
+
+- Kept: `p br div span b strong i em u s sub sup ul ol li table thead tbody
+  tfoot tr td th h1…h6`
+- Dropped with their body: `script style iframe object embed svg math`
+- Attributes are dropped **entirely**, except `class` — `style`, `href`, `src`
+  and `on…` never get through.
+
+Without the filter, a `<script>` inside a report note would run for everyone who
+opens the report. A tag that is not on the list is dropped but **its text
+stays**: content must not disappear because of an unknown wrapper. Unclosed tags
+are closed at the end.
+
+The canvas does **not** print formatted text; it shows the reference instead.
+The canvas is a layout surface, not a print preview — and rich text content
+almost always comes from data, so at design time it is empty anyway.
+
+### Check box
+
+The ticked squares of printed forms. Three marks — check, cross, filled square —
+and the **square is always drawn**: an empty square means "not ticked" and has
+to be visible on paper.
+
+The box can be **data-bound**. With an empty bound value it prints as designed
+(a printed form); with a reference, the resolved value is interpreted:
+
+```razor
+Bound value:  [Patient."Consent"]
+```
+
+`1`, `true`, `t`, `yes`, `y`, `evet`, `e`, `var`, `X`, `on`, `checked` and any
+non-zero number count as **checked**; an empty value is unchecked — ticking a
+box because no data arrived would show a consent that was never given. The
+comparison is culture-independent (the Turkish `I/ı` trap).
+
+Drawing is **SVG**, as with barcodes: canvas and renderer print the same string.
+The `viewBox` is square, so the box is never squashed in a rectangular area — it
+stays square and is centred. A squashed check box looks like a printing fault.
 
 ## Field tree
 
@@ -499,7 +550,7 @@ Here's the map. It's shorter than you'd expect:
 dotnet test
 ```
 
-173 tests check the library's own contract, and they run everywhere.
+250 tests check the library's own contract, and they run everywhere.
 
 On top of those there's another set that runs against **real layout files**,
 verifying that patch extraction is lossless and that an untouched layout

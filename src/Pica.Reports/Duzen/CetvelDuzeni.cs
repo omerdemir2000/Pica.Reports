@@ -264,6 +264,45 @@ public enum NesneTuru
     Sekil,    // TfrxShapeView
     Resim,    // TfrxPictureView
     Barkod,   // TfrxBarCodeView
+
+    /// <summary>Biçimli metin — <c>TfrxRichView</c>.</summary>
+    /// <remarks>
+    /// Değeri <b>im olarak</b> basılır: kalın, eğik, altı çizili, paragraf,
+    /// liste ve tablo korunur. Yazı kutusundan farkı bu; ölçüsü, çerçevesi ve
+    /// veri bağı aynı çalışır.
+    /// <para>
+    /// <b>Kütüphane RTF okumaz.</b> Delphi tarafı zengin metni RTF olarak
+    /// saklıyor ama RTF'i im'e çevirmek barındıran uygulamanın işi — orada
+    /// zaten bir çevirici var ve kütüphane bağımsız kalmalı. Buraya gelen
+    /// değer im'dir ve <see cref="ZenginMetin.Temizle"/> süzgecinden geçer.
+    /// </para>
+    /// </remarks>
+    ZenginMetin,
+
+    /// <summary>Onay kutusu — <c>TfrxCheckBoxView</c>.</summary>
+    /// <remarks>
+    /// Matbu formların işaretlenen kareleri. Tasarım anındaki hâli
+    /// <see cref="DuzenNesnesi.Isaretli"/>; veriye bağlanırsa değer
+    /// <see cref="OnayKutusu.Isaretli"/> ile yorumlanır.
+    /// </remarks>
+    OnayKutusu,
+}
+
+/// <summary>Onay kutusunun işaretli hâlinde çizilen im.</summary>
+/// <remarks>
+/// FastReport <c>CheckStyle</c> karşılığı. Kare, işaret konmadan da her zaman
+/// çizilir; boş bir kare "işaretlenmemiş" demektir ve kâğıtta görünmesi gerekir.
+/// </remarks>
+public enum OnayBicimi
+{
+    /// <summary>Onay imi — <c>csCheck</c>.</summary>
+    Onay = 0,
+
+    /// <summary>Çarpı — <c>csCross</c>.</summary>
+    Carpi,
+
+    /// <summary>Dolu kare — imi olmayan, boyanan kutu.</summary>
+    Dolu,
 }
 
 /// <summary>
@@ -397,6 +436,21 @@ public sealed class DuzenNesnesi
     /// <summary>Çubukların altına okunabilir metin basılsın mı?</summary>
     public bool BarkodYazisi { get; set; } = true;
 
+    // --------------------------------------------------------- onay kutusu
+
+    /// <summary>
+    /// Onay kutusunun tasarım anındaki hâli.
+    /// </summary>
+    /// <remarks>
+    /// Kutu <b>veriye de bağlanabilir</b>: <see cref="Metin"/> bir başvuru
+    /// taşıyorsa çözülen değer <see cref="OnayKutusu.Isaretli"/> ile yorumlanır
+    /// ve bu alan yalnızca tasarımdaki görünümü belirler. Matbu formlarda
+    /// (elle işaretlenen kareler) bağ yoktur ve kâğıda bu değer basılır.
+    /// </remarks>
+    public bool Isaretli { get; set; }
+
+    public OnayBicimi OnayBicimi { get; set; }
+
     // ------------------------------------------------------------- görünüm
 
     public string YaziTipi { get; set; } = "Arial";
@@ -480,6 +534,9 @@ public sealed class DuzenNesnesi
 
         BarkodTuru = k.BarkodTuru;
         BarkodYazisi = k.BarkodYazisi;
+
+        Isaretli = k.Isaretli;
+        OnayBicimi = k.OnayBicimi;
 
         YaziTipi = k.YaziTipi;
         PuntoPt = k.PuntoPt;

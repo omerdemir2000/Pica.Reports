@@ -82,7 +82,13 @@
   <data name="Nesne_Sekil"><value>Şekil</value></data>
   <data name="Nesne_Resim"><value>Resim</value></data>
   <data name="Nesne_Barkod"><value>Barkod</value></data>
+  <data name="Nesne_ZenginMetin"><value>Zengin metin</value></data>
+  <data name="Nesne_OnayKutusu"><value>Onay kutusu</value></data>
   <data name="Nesne_Bilinmeyen"><value>Bilinmeyen</value></data>
+
+  <data name="Onay_Onay"><value>Onay imi</value></data>
+  <data name="Onay_Carpi"><value>Çarpı</value></data>
+  <data name="Onay_Dolu"><value>Dolu kare</value></data>
 
   <!-- ============================================================ biçim -->
   <data name="Bicim_Yok"><value>Yok</value></data>
@@ -175,6 +181,8 @@
   <data name="Palet_IpucuSekil"><value>Çerçeveli/zeminli kutu</value></data>
   <data name="Palet_IpucuResim"><value>Düzene gömülü resim</value></data>
   <data name="Palet_IpucuBarkod"><value>Code 128 ya da EAN-13 barkod</value></data>
+  <data name="Palet_IpucuZenginMetin"><value>Biçimli metin — kalın, eğik, liste, tablo</value></data>
+  <data name="Palet_IpucuOnayKutusu"><value>Matbu formlar için onay kutusu</value></data>
   <data name="Palet_BantSecin"><value>Ekleneceği bant belli değil. Nesneyi kâğıda sürükleyin ya da önce bir bant seçin.</value></data>
   <data name="Palet_AlanBantSecin"><value>Ekleneceği bant belli değil. Alanı kâğıda sürükleyin ya da önce bir bant seçin.</value></data>
 
@@ -244,6 +252,18 @@
   <data name="Ozellik_BarkodEanHata"><value>EAN-13 tam 12 ya da 13 rakam ister (13 haneli verirseniz sağlama hanesi de tutmalı).</value></data>
   <data name="Ozellik_BarkodCodeHata"><value>Code 128 yalnızca ASCII taşır: Türkçe harfler girmez.</value></data>
   <data name="Ozellik_BarkodEnIpucu"><value>Barkodun eni kutunun enidir. Çok dar bir kutuda çubuklar birbirine girer ve okuyucu barkodu okuyamaz.</value></data>
+
+  <data name="Ozellik_ZenginMetin"><value>Zengin metin</value></data>
+  <data name="Ozellik_ZenginMetinIpucu"><value>Değer &lt;b&gt;im olarak&lt;/b&gt; basılır: kalın, eğik, altı çizili, paragraf, liste ve tablo korunur. &lt;code&gt;[Satis."Not"]&lt;/code&gt; gibi alan başvuruları önce çözülür, sonuç sonra izin listesinden geçer.</value></data>
+  <data name="Ozellik_ZenginSuzuldu"><value>İmin bir kısmı basılmayacak: yalnızca biçimleme etiketlerine izin veriliyor ve “class” dışındaki öznitelikler atılıyor.</value></data>
+
+  <data name="Ozellik_OnayKutusu"><value>Onay kutusu</value></data>
+  <data name="Ozellik_OnayBicimi"><value>İm</value></data>
+  <data name="Ozellik_Isaretli"><value>İşaretli</value></data>
+  <data name="Ozellik_OnayDeger"><value>Bağlı değer</value></data>
+  <data name="Ozellik_OnayDegerIpucu"><value>Matbu form için boş bırakın: kutu tasarımdaki hâliyle basılır. &lt;code&gt;[Hasta."Onay"]&lt;/code&gt; gibi bir başvuru yazarsanız kutu veriye uyar — &lt;code&gt;1&lt;/code&gt;, &lt;code&gt;true&lt;/code&gt;, &lt;code&gt;evet&lt;/code&gt;, &lt;code&gt;E&lt;/code&gt;, &lt;code&gt;X&lt;/code&gt; ve sıfırdan farklı her sayı işaretli sayılır.</value></data>
+
+  <data name="Yeni_ZenginMetin"><value>Biçimli &lt;b&gt;metin&lt;/b&gt;</value></data>
   <data name="Ozellik_Cerceve"><value>Çerçeve ve zemin</value></data>
   <data name="Ozellik_KenarIpucu"><value>{0} kenar</value></data>
   <data name="Ozellik_DortKenar"><value>Dört kenar</value></data>

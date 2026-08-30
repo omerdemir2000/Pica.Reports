@@ -57,7 +57,17 @@ public static class Etiketler
         NesneTuru.Sekil => nameof(NesneTuru.Sekil),
         NesneTuru.Resim => nameof(NesneTuru.Resim),
         NesneTuru.Barkod => nameof(NesneTuru.Barkod),
+        NesneTuru.ZenginMetin => nameof(NesneTuru.ZenginMetin),
+        NesneTuru.OnayKutusu => nameof(NesneTuru.OnayKutusu),
         _ => "Bilinmeyen",
+    }));
+
+    /// <summary>Onay kutusu iminin adı.</summary>
+    public static string Onay(OnayBicimi bicim) => Metin.Al("Onay_" + (bicim switch
+    {
+        OnayBicimi.Carpi => nameof(OnayBicimi.Carpi),
+        OnayBicimi.Dolu => nameof(OnayBicimi.Dolu),
+        _ => nameof(OnayBicimi.Onay),
     }));
 
     /// <summary>Biçim türünün okunur adı — cümle içinde geçen küçük hâli.</summary>

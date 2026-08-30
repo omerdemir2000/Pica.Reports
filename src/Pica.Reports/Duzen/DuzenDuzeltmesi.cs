@@ -444,6 +444,11 @@ public sealed class NesneDuzeltmesi
     public BarkodTuru? BarkodTuru { get; set; }
     public bool? BarkodYazisi { get; set; }
 
+    /// <summary>Onay kutusunun tasarım anındaki hâli.</summary>
+    public bool? Isaretli { get; set; }
+
+    public OnayBicimi? OnayBicimi { get; set; }
+
     // ------------------------------------------------------------- görünüm
 
     public string? YaziTipi { get; set; }
@@ -487,6 +492,8 @@ public sealed class NesneDuzeltmesi
         if (ResimUyumu is { } s) n.ResimUyumu = s;
         if (BarkodTuru is { } t) n.BarkodTuru = t;
         if (BarkodYazisi is { } u) n.BarkodYazisi = u;
+        if (Isaretli is { } v) n.Isaretli = v;
+        if (OnayBicimi is { } y) n.OnayBicimi = y;
 
         if (YaziTipi is not null) n.YaziTipi = YaziTipi;
         if (PuntoPt is { } e) n.PuntoPt = e;
@@ -537,6 +544,8 @@ public sealed class NesneDuzeltmesi
         Deger(ham.ResimUyumu, yeni.ResimUyumu, v => d.ResimUyumu = v);
         Deger(ham.BarkodTuru, yeni.BarkodTuru, v => d.BarkodTuru = v);
         Deger(ham.BarkodYazisi, yeni.BarkodYazisi, v => d.BarkodYazisi = v);
+        Deger(ham.Isaretli, yeni.Isaretli, v => d.Isaretli = v);
+        Deger(ham.OnayBicimi, yeni.OnayBicimi, v => d.OnayBicimi = v);
 
         Yazi(ham.YaziTipi, yeni.YaziTipi, v => d.YaziTipi = v);
         Olcu(ham.PuntoPt, yeni.PuntoPt, v => d.PuntoPt = v);

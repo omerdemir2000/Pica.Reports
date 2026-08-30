@@ -171,6 +171,49 @@
                                                 <span class="rt-resim">@Metin.T("Tuval_Kodlanamadi", Etiketler.Barkod(nesne.BarkodTuru))</span>
                                             }
                                         }
+                                        else if (nesne.Tur is NesneTuru.ZenginMetin)
+                                        {
+                                            @* Tuvalde biçimli metin BASILMAZ, başvurusu görünür.
+                                               Tuval yerleşim yüzeyidir: kutunun nereye konduğunu
+                                               gösterir, ne bastığını değil — ve zengin metnin
+                                               içeriği neredeyse her zaman veriden gelir, tasarım
+                                               anında zaten boştur. Örnek kipte içerik varsa düz
+                                               karşılığı gösterilir; im olarak basmak tuvali başka
+                                               bir belgenin biçemine açardı. *@
+                                            <div class="rt-kutu-yazi rt-zengin" style="@YaziBicemi(nesne)">
+                                                @if (ZenginMetin.DuzMetin(nesne.Metin) is { Length: > 0 } duz
+                                                     && !KutuMetni.Parcala(nesne).Any(p => p.Ifade))
+                                                {
+                                                    @duz
+                                                }
+                                                else
+                                                {
+                                                    foreach (var parca in KutuMetni.Parcala(nesne))
+                                                    {
+                                                        if (parca.Ifade)
+                                                        {
+                                                            <span class="rt-ifade">@parca.Metin</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @parca.Metin
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        }
+                                        else if (nesne.Tur is NesneTuru.OnayKutusu)
+                                        {
+                                            @* Örnek kipte kutu bağlı olduğu değere göre çizilir;
+                                               bağı yoksa tasarımdaki hâli görünür. *@
+                                            <div class="rt-onay">
+                                                @((MarkupString)OnayKutusu.Svg(
+                                                    Ornek && nesne.Metin is { Length: > 0 }
+                                                        ? OnayKutusu.Isaretli(OrnekVeri.Yaz(nesne))
+                                                        : nesne.Isaretli,
+                                                    nesne.OnayBicimi, nesne.Renk))
+                                            </div>
+                                        }
 
                                         @* Tutamaklar kutunun İÇİNDE duruyor ki seçili kutu
                                            kaydırılırken onlar da onunla gitsin — JS kutunun

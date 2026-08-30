@@ -33,6 +33,11 @@
             </div>
         </fieldset>
 
+        @* Yazı kümesi zengin metinde de gerekli: taban yazı tipi, hizalama ve
+           renkler orada da geçerlidir — biçimleme yalnızca içeriğin İÇİNDEKİ
+           vurguyu belirler, kutunun kendi yazı ayarını değil. İçerik ve biçim
+           kümeleri ise düz yazıya özgü; zengin metnin kendi içerik kümesi var
+           ve sayı/tarih deseni bir paragrafa uygulanmaz. *@
         @if (Secim.Nesne.Tur is NesneTuru.Yazi)
         {
             <fieldset class="rt-kume">
@@ -59,7 +64,10 @@
                 </datalist>
                 <p class="rt-ipucu">@Metin.T("Ozellik_VeriAlaniIpucu")</p>
             </fieldset>
+        }
 
+        @if (Secim.Nesne.Tur is NesneTuru.Yazi or NesneTuru.ZenginMetin)
+        {
             <fieldset class="rt-kume">
                 <legend>@Metin.T("Ozellik_Yazi")</legend>
 
@@ -123,7 +131,10 @@
                     </label>
                 </div>
             </fieldset>
+        }
 
+        @if (Secim.Nesne.Tur is NesneTuru.Yazi)
+        {
             <fieldset class="rt-kume">
                 <legend>@Metin.T("Ozellik_Bicim") <span class="rt-kume-not">@Metin.T("Ozellik_BicimNot")</span></legend>
                 <div class="rt-ikili">
@@ -224,6 +235,65 @@
                 }
 
                 <p class="rt-ipucu">@Metin.T("Ozellik_BarkodEnIpucu")</p>
+            </fieldset>
+        }
+
+        @if (Secim.Nesne.Tur is NesneTuru.ZenginMetin)
+        {
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_ZenginMetin")</legend>
+
+                <label class="rt-tam">@Metin.T("Ozellik_Metin")
+                    <textarea class="rt-girdi rt-metin" rows="5"
+                              value="@Secim.Nesne.Metin"
+                              @onchange="e => Yaz(e, v => Secim.Nesne.Metin = v)"></textarea>
+                </label>
+                <p class="rt-ipucu">@((MarkupString)Metin.T("Ozellik_ZenginMetinIpucu"))</p>
+
+                <label class="rt-tam">@Metin.T("Ozellik_VeriAlani")
+                    <input class="rt-girdi" list="rt-alanlar" value="@Secim.Nesne.VeriAlani"
+                           @onchange="e => Yaz(e, v => Secim.Nesne.VeriAlani = v)" />
+                </label>
+                <p class="rt-ipucu">@Metin.T("Ozellik_VeriAlaniIpucu")</p>
+
+                @* Süzgeçten geçen çıktının kendisi gösteriliyor: kullanıcı hangi
+                   etiketin kaldığını ancak burada görür. Uyarı yalnız gerçekten
+                   bir şey düştüyse çıkar — her yazı kutusuna kırmızı bir satır
+                   koymak uyarıyı değersizleştirirdi. *@
+                @if (Secim.Nesne.Metin is { Length: > 0 } zengin && zengin.Contains('<')
+                     && ZenginMetin.Temizle(zengin) is var temiz && temiz != zengin)
+                {
+                    <p class="rt-ipucu">@Metin.T("Ozellik_ZenginSuzuldu")</p>
+                }
+            </fieldset>
+        }
+
+        @if (Secim.Nesne.Tur is NesneTuru.OnayKutusu)
+        {
+            <fieldset class="rt-kume">
+                <legend>@Metin.T("Ozellik_OnayKutusu")</legend>
+
+                <div class="rt-ikili">
+                    <label>@Metin.T("Ozellik_OnayBicimi")
+                        <select class="rt-girdi" value="@Secim.Nesne.OnayBicimi"
+                                @onchange="e => Sec<OnayBicimi>(e, v => Secim.Nesne.OnayBicimi = v)">
+                            @foreach (var b in Enum.GetValues<OnayBicimi>())
+                            {
+                                <option value="@b">@Etiketler.Onay(b)</option>
+                            }
+                        </select>
+                    </label>
+                    <label class="rt-onay">
+                        <input type="checkbox" checked="@Secim.Nesne.Isaretli"
+                               @onchange="e => Onay(e, v => Secim.Nesne.Isaretli = v)" /> @Metin.T("Ozellik_Isaretli")
+                    </label>
+                </div>
+
+                <label class="rt-tam">@Metin.T("Ozellik_OnayDeger")
+                    <input class="rt-girdi" value="@Secim.Nesne.Metin"
+                           @onchange="e => Yaz(e, v => Secim.Nesne.Metin = v)" />
+                </label>
+                <p class="rt-ipucu">@((MarkupString)Metin.T("Ozellik_OnayDegerIpucu"))</p>
             </fieldset>
         }
 
