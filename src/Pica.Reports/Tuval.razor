@@ -508,5 +508,13 @@
     // yoksa tasarımda görünen kutu ile önizlemedeki ayrışırdı.
     private static string KutuBicemi(DuzenNesnesi n) => Bicem.Kutu(n, n.SolPt, n.UstPt);
 
-    private static string YaziBicemi(DuzenNesnesi n) => Bicem.Yazi(n);
+    /// <remarks>
+    /// Örnek veri kipinde kutunun basacağı metin de veriliyor: sığdırma
+    /// (<see cref="DuzenNesnesi.Sigdir"/>) ancak metin bilinince hesaplanır ve
+    /// "sayı bu kutuya sığıyor mu" sorusu zaten orada soruluyor. Başvuru
+    /// kipinde kutuda <c>[alan]</c> yazıyor; onun genişliğine göre punto
+    /// düşürmek yanıltıcı olurdu.
+    /// </remarks>
+    private string YaziBicemi(DuzenNesnesi n)
+        => Bicem.Yazi(n, Ornek ? OrnekVeri.Yaz(n) : null);
 }

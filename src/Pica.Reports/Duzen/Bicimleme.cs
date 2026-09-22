@@ -31,8 +31,12 @@ public static class Bicimleme
 
         return nesne.Bicim switch
         {
-            BicimTuru.Sayi when SayiyaCevir(deger) is { } s
-                => s.ToString(SayiDeseni(nesne.BicimDeseni), kultur),
+            // Desen tanınmıyorsa (SayiDeseni null döner) uydurma bir biçim
+            // seçilmez, varsayılan yazıma düşülür: tanınmayan deseni sessizce
+            // iki ondalığa çevirmek, kâğıtta "30" yerine "30,00" basıp hatayı
+            // görünmez kılıyordu.
+            BicimTuru.Sayi when SayiyaCevir(deger) is { } s && SayiDeseni(nesne.BicimDeseni) is { } d
+                => s.ToString(d, kultur),
 
             BicimTuru.Tarih or BicimTuru.Saat when TariheCevir(deger) is { } t
                 => t.ToString(TarihDeseni(nesne.BicimDeseni), kultur),
@@ -70,36 +74,62 @@ public static class Bicimleme
     }
 
     /// <summary>
-    /// Delphi <c>Format</c> desenini .NET desenine çevirir.
+    /// Delphi <c>Format</c> desenini .NET desenine çevirir; desen
+    /// tanınmıyorsa <c>null</c>.
     /// </summary>
     /// <remarks>
-    /// Şablonlarda geçen tek biçim <c>%[genişlik].[ondalık]n</c>'dir
-    /// (<c>%2.2n</c> = binlik ayraçlı, iki ondalıklı). <c>n</c> binlik ayraç
-    /// ister, <c>f</c> istemez, <c>m</c> para birimidir. Genişlik alanı
-    /// Delphi'de en az karakter sayısıdır; .NET'te karşılığı olmadığı ve
-    /// kutular zaten hizalandığı için yok sayılır.
+    /// <para>
+    /// Desen <c>%[genişlik].[ondalık]tür</c> biçimindedir. Taşınan 137 düzende
+    /// geçen üç desen var: <c>%2.2n</c> (264 kutu), <c>%g</c> (60 kutu),
+    /// <c>%2.2f</c> (7 kutu). <c>n</c> binlik ayraç ister, <c>f</c> istemez,
+    /// <c>m</c> para birimi, <c>d</c> tam sayıdır. Genişlik alanı Delphi'de en
+    /// az karakter sayısıdır; .NET'te karşılığı olmadığı ve kutular zaten
+    /// hizalandığı için yok sayılır.
+    /// </para>
+    /// <para>
+    /// <b><c>%g</c> "genel"dir: anlamsız ondalık sıfırlar atılır</b> ve binlik
+    /// ayraç konmaz. Puantaj katsayıları ve gün sayıları bu desenle yazılıyor —
+    /// tam gün <c>30</c>, yarım gün <c>29,5</c> basmalı. Desteklenmediği sürece
+    /// bu kutular iki ondalığa düşürülüp <c>30,00</c> basıyordu.
+    /// </para>
+    /// <para>
+    /// <b>Tanınmayan desende <c>null</c> dönülür</b>, varsayılan bir biçim
+    /// uydurulmaz: çağıran (<see cref="Bicimle"/>) o zaman
+    /// <see cref="Metinle"/>'ye düşer. Uydurulan biçim, desteklenmeyen bir
+    /// deseni kâğıtta makul görünen ama yanlış bir sayıya çeviriyordu; hatanın
+    /// görünür olması, sessizce yanlış basmaktan iyidir.
+    /// </para>
     /// </remarks>
-    public static string SayiDeseni(string desen)
+    public static string? SayiDeseni(string desen)
     {
         var d = desen.Trim();
-        if (d.Length == 0 || d[0] != '%') return "#,##0.00";
+        if (d.Length < 2 || d[0] != '%') return null;
 
-        var harf = char.ToLowerInvariant(d[^1]);
-        var ondalik = 2;
+        // % ile tür harfi arasında yalnızca genişlik ve ondalık olabilir.
+        // "saçma" gibi bir metni desen sayıp son harfine bakmak, tanınmayan
+        // deseni tanınmış gibi göstermek olurdu.
+        var govde = d[1..^1];
+        if (!govde.All(c => char.IsAsciiDigit(c) || c is '.' or '-' or '+')) return null;
 
-        var nokta = d.IndexOf('.');
-        if (nokta >= 0 && nokta + 1 < d.Length && char.IsDigit(d[nokta + 1]))
-            ondalik = d[nokta + 1] - '0';
+        int? verilen = null;
+        var nokta = govde.IndexOf('.');
+        if (nokta >= 0 && nokta + 1 < govde.Length && char.IsAsciiDigit(govde[nokta + 1]))
+            verilen = govde[nokta + 1] - '0';
 
-        var kesir = ondalik > 0 ? "." + new string('0', ondalik) : "";
-
-        return harf switch
+        return char.ToLowerInvariant(d[^1]) switch
         {
-            'n' or 'm' => "#,##0" + kesir,
-            'f' => "0" + kesir,
+            'n' or 'm' => "#,##0" + Kesir('0', verilen ?? 2),
+            'f' => "0" + Kesir('0', verilen ?? 2),
             'd' => "#,##0",
-            _ => "#,##0" + kesir,
+
+            // '#' — basılacak basamak varsa basılır, yoksa hiç: "%g"nin işi bu.
+            'g' => "0" + Kesir('#', verilen ?? 2),
+
+            _ => null,
         };
+
+        static string Kesir(char basamak, int adet)
+            => adet > 0 ? "." + new string(basamak, adet) : "";
     }
 
     /// <summary>

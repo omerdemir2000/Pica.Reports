@@ -225,6 +225,89 @@ public class DuzeltmeSinamalari
         Assert.Contains("OlmayanKutu", bulunamayan[0]);
     }
 
+    /// <summary>
+    /// Elle yazılmış ölçü her kayıtta biraz kaymaz.
+    /// </summary>
+    /// <remarks>
+    /// Düzeltme üç ondalığa yuvarlanırken <c>15,0821</c> → <c>15,082</c>
+    /// oluyordu; sapma tam eşitlik eşiği kadar (0,0005 pt) çıkan değerlerde
+    /// fark "gerçek" sayılıyor ve düzeltme bir daha örtüşmüyordu. Betikle
+    /// üretilmiş oransal ölçekleme düzeltmeleri tam olarak bu aralıkta
+    /// değer taşıyor.
+    /// </remarks>
+    [Theory]
+    [InlineData(15.0821)]
+    [InlineData(54.2955)]
+    [InlineData(156.8535)]
+    public void Elle_yazilmis_olcu_kaydedildikce_kaymaz(double sol)
+    {
+        var ham = Ornek.Kutulu(Ornek.Kutu("K1", sol: 10));
+        var calisma = Ornek.Kutulu(Ornek.Kutu("K1", sol: sol));
+
+        // Tasarımcının kaydettiği fark diskten geçip geri uygulanıyor.
+        var yazi = JsonSerializer.Serialize(DuzenDuzeltmesi.Cikar(ham, calisma), Secenekler);
+        var geri = Ornek.Kutulu(Ornek.Kutu("K1", sol: 10));
+
+        JsonSerializer.Deserialize<DuzenDuzeltmesi>(yazi, Secenekler)!.Uygula(geri);
+
+        // İkinci kayıt yeni bir fark üretmemeli: ürettiyse değer kaymıştır.
+        Assert.Null(NesneDuzeltmesi.Cikar("Veri1", Kutu(calisma, "K1"), Kutu(geri, "K1")));
+    }
+
+    /// <summary>
+    /// Yanlış yazılmış alan adı da sessizce geçilmez.
+    /// </summary>
+    /// <remarks>
+    /// Düzeltme dosyaları elle yazılıyor ve <c>PuntoPt</c> yerine <c>Punto</c>
+    /// yazan biri, değişikliğin neden uygulanmadığını hiçbir yerden
+    /// öğrenemiyordu: okuyucu tanımadığı alanı atlıyor, kutu bulunduğu için
+    /// uyarı da çıkmıyordu.
+    /// </remarks>
+    [Fact]
+    public void Bilinmeyen_alan_sessizce_yutulmaz()
+    {
+        const string json = """
+            {
+              "Nesneler": [
+                { "Bant": "Veri1", "Nesne": "K1", "Punto": 7, "PuntoPt": 9 }
+              ]
+            }
+            """;
+
+        var duzeltme = JsonSerializer.Deserialize<DuzenDuzeltmesi>(json, Secenekler)!;
+        var duzen = Ornek.Kutulu(Ornek.Kutu("K1"));
+
+        var bulunamayan = duzeltme.Uygula(duzen);
+
+        // Doğru yazılmış alan yine de uygulanır: bir yazım hatası yüzünden
+        // düzeltmenin tamamını atmak, elindeki tek çıktıyı kaybetmek olurdu.
+        Assert.Equal(9, Kutu(duzen, "K1").PuntoPt);
+
+        Assert.Single(bulunamayan);
+        Assert.Contains("Punto", bulunamayan[0]);
+        Assert.Contains("K1", bulunamayan[0]);
+    }
+
+    /// <summary>Bant ve sayfa düzeltmelerinde de aynı kural geçerli.</summary>
+    [Fact]
+    public void Bant_ve_sayfa_duzeltmesinde_de_bilinmeyen_alan_bildirilir()
+    {
+        const string json = """
+            {
+              "Sayfalar": [ { "Sayfa": 0, "Genislik": 400 } ],
+              "Bantlar":  [ { "Ad": "Veri1", "Yukseklik": 50 } ]
+            }
+            """;
+
+        var duzeltme = JsonSerializer.Deserialize<DuzenDuzeltmesi>(json, Secenekler)!;
+
+        var bulunamayan = duzeltme.Uygula(Ornek.Kutulu(Ornek.Kutu("K1")));
+
+        Assert.Equal(2, bulunamayan.Count);
+        Assert.Contains(bulunamayan, u => u.Contains("Genislik"));
+        Assert.Contains(bulunamayan, u => u.Contains("Yukseklik"));
+    }
+
     private static DuzenNesnesi Kutu(CetvelDuzeni duzen, string ad)
         => duzen.Sayfalar.SelectMany(s => s.Bantlar).SelectMany(b => b.Nesneler).Single(n => n.Ad == ad);
 }

@@ -160,6 +160,7 @@
   <data name="Tasarimci_Kaydedildi"><value>{0} değişiklik düzeltmeye yazıldı.</value></data>
   <data name="Tasarimci_DuzeltmeKalkti"><value>Düzeltme kaldırıldı; düzen üretilmiş hâline döndü.</value></data>
   <data name="Tasarimci_Kaydedilemedi"><value>Kaydedilemedi: {0}</value></data>
+  <data name="Tasarimci_DuzeltmeTutmadi"><value>Düzeltme uygulanamadı: {0}</value></data>
   <data name="Izgara_Yok"><value>Yok</value></data>
 
   <!-- ============================================================ palet -->

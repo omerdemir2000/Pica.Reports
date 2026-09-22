@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Pica.Reports.Duzen;
 
 /// <summary>
@@ -25,6 +28,29 @@ namespace Pica.Reports.Duzen;
 /// </remarks>
 public sealed class DuzenDuzeltmesi
 {
+    /// <summary>İki ölçünün aynı sayıldığı en büyük fark, punto.</summary>
+    /// <remarks>
+    /// Dönüşüm punto değerlerini <c>piksel × 0,75</c> ile üretiyor ve ondalık
+    /// kuyruğu uzun oluyor (<c>2,8346475</c>). Ham eşitlik arasaydık kayan
+    /// nokta gürültüsü her kayıtta düzeltmeye sahte satır eklerdi. 0,0005 pt,
+    /// bir inçin iki yüz binde biri: kâğıtta karşılığı yok.
+    /// </remarks>
+    public const double Esik = 0.0005;
+
+    /// <summary>Düzeltmeye yazılan ölçülerin ondalık basamak sayısı.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Esik"/>'ten ince olmak zorunda</b> — ve bir zamanlar
+    /// değildi: üç basamağa yuvarlamak <c>15,0821</c>'i <c>15,082</c> yapıyor,
+    /// sapma tam eşik kadar (<c>0,0005</c>) çıkınca fark "gerçek" sayılıyordu.
+    /// Sonuç: elle yazılmış dört ondalıklı bir düzeltme her kaydedilişte biraz
+    /// kayıyor ve düzeltme ile ekrandaki düzen bir daha örtüşmüyordu.
+    /// Dört basamakta yuvarlama hatası en çok <c>0,00005</c>, yani eşiğin
+    /// onda biri.
+    /// </para>
+    /// </remarks>
+    public const int Basamak = 4;
+
     /// <summary>Neden gerektiği. Zorunlu değil ama boş bırakılmamalı.</summary>
     public string? Aciklama { get; set; }
 
@@ -57,8 +83,30 @@ public sealed class DuzenDuzeltmesi
     /// </remarks>
     public List<EklenenNesne> Eklenenler { get; set; } = [];
 
+    /// <summary>Dosyada yazılı olup modelde karşılığı olmayan alanlar.</summary>
+    /// <remarks>
+    /// <para>
+    /// Düzeltme dosyaları <b>elle de yazılıyor</b> ve yanlış yazılmış bir alan
+    /// adı (<c>PuntoPt</c> yerine <c>Punto</c> gibi) okuyucu tarafından sessizce
+    /// yok sayılırdı: değişiklik uygulanmıyor, ortada bir hata da görünmüyordu.
+    /// Tanınmayan alanlar burada toplanıyor ve <see cref="Uygula"/> onları
+    /// bulunamayan düzeltmelerle birlikte bildiriyor.
+    /// </para>
+    /// <para>
+    /// Dosyayı reddetmek yerine toplamanın sebebi: bir alan adı yanlış diye
+    /// düzeltmenin doğru yazılmış öteki yüz satırını da uygulamamak, elindeki
+    /// tek çıktıyı kaybetmek olurdu.
+    /// </para>
+    /// </remarks>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? Bilinmeyenler { get; set; }
+
     /// <summary>Düzeltmeyi düzene uygular.</summary>
-    /// <returns>Karşılığı bulunamayan düzeltmeler — çağıran günlüğe yazar.</returns>
+    /// <returns>
+    /// Uygulanamayan düzeltmeler — çağıran günlüğe yazar. İki türlü olur:
+    /// düzende karşılığı bulunamayan bant/kutu ve modelde karşılığı olmayan
+    /// alan adı (bkz. <see cref="Bilinmeyenler"/>).
+    /// </returns>
     /// <remarks>
     /// Sıra önemli: önce silinenler çıkarılır, sonra eklenenler konur, en son
     /// alan değişiklikleri yazılır. Tersi olsaydı silinmiş bir kutuya yazılan
@@ -67,6 +115,8 @@ public sealed class DuzenDuzeltmesi
     public List<string> Uygula(CetvelDuzeni duzen)
     {
         List<string> bulunamayan = [];
+
+        Bilinmeyen(bulunamayan, "düzeltme", Bilinmeyenler);
 
         // Bantlar kutulardan ÖNCE: silinen bandın kutularına ayrıca dokunmaya
         // gerek kalmaz, eklenen bandın kutuları da kendisiyle birlikte gelir.
@@ -115,6 +165,8 @@ public sealed class DuzenDuzeltmesi
 
         foreach (var d in Sayfalar)
         {
+            Bilinmeyen(bulunamayan, $"{d.Sayfa}. sayfa", d.Bilinmeyenler);
+
             if (d.Sayfa < 0 || d.Sayfa >= duzen.Sayfalar.Count)
             {
                 bulunamayan.Add($"{d.Sayfa}. sayfa (sayfa ayarı)");
@@ -126,6 +178,8 @@ public sealed class DuzenDuzeltmesi
 
         foreach (var d in Bantlar)
         {
+            Bilinmeyen(bulunamayan, d.Ad, d.Bilinmeyenler);
+
             var bant = BantBul(duzen, d.Ad);
 
             if (bant is null) bulunamayan.Add($"{d.Ad} (bant)");
@@ -134,6 +188,8 @@ public sealed class DuzenDuzeltmesi
 
         foreach (var d in Nesneler)
         {
+            Bilinmeyen(bulunamayan, $"{d.Bant}/{d.Nesne}", d.Bilinmeyenler);
+
             var nesne = Bul(duzen, d.Bant, d.Nesne);
 
             if (nesne is null)
@@ -146,6 +202,15 @@ public sealed class DuzenDuzeltmesi
         }
 
         return bulunamayan;
+    }
+
+    /// <summary>Tanınmayan alanları bildirim listesine yazar.</summary>
+    private static void Bilinmeyen(List<string> liste, string nerede,
+                                   Dictionary<string, JsonElement>? alanlar)
+    {
+        if (alanlar is null) return;
+
+        foreach (var ad in alanlar.Keys) liste.Add($"{nerede}: bilinmeyen alan '{ad}'");
     }
 
     private static bool Es(string? a, string? b)
@@ -271,6 +336,10 @@ public sealed class SayfaDuzeltmesi
     public int? SutunSayisi { get; set; }
     public double? SutunAraligiPt { get; set; }
 
+    /// <inheritdoc cref="DuzenDuzeltmesi.Bilinmeyenler"/>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? Bilinmeyenler { get; set; }
+
     public void Uygula(DuzenSayfasi s)
     {
         if (GenislikPt is { } a) s.GenislikPt = a;
@@ -305,8 +374,8 @@ public sealed class SayfaDuzeltmesi
 
         void Olcu(double a, double b, Action<double> yaz)
         {
-            if (Math.Abs(a - b) < 0.0005) return;
-            yaz(Math.Round(b, 3));
+            if (Math.Abs(a - b) < DuzenDuzeltmesi.Esik) return;
+            yaz(Math.Round(b, DuzenDuzeltmesi.Basamak));
             fark = true;
         }
     }
@@ -367,6 +436,10 @@ public sealed class BantDuzeltmesi
     public string? GrupKosulu { get; set; }
     public string? YanBant { get; set; }
 
+    /// <inheritdoc cref="DuzenDuzeltmesi.Bilinmeyenler"/>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? Bilinmeyenler { get; set; }
+
     /// <summary>Verilen alanları banda yazar.</summary>
     public void Uygula(DuzenBandi b)
     {
@@ -384,9 +457,9 @@ public sealed class BantDuzeltmesi
         var d = new BantDuzeltmesi { Ad = yeni.Ad };
         var fark = false;
 
-        if (Math.Abs(ham.YukseklikPt - yeni.YukseklikPt) > 0.0005)
+        if (Math.Abs(ham.YukseklikPt - yeni.YukseklikPt) >= DuzenDuzeltmesi.Esik)
         {
-            d.YukseklikPt = Math.Round(yeni.YukseklikPt, 3);
+            d.YukseklikPt = Math.Round(yeni.YukseklikPt, DuzenDuzeltmesi.Basamak);
             fark = true;
         }
 
@@ -477,6 +550,10 @@ public sealed class NesneDuzeltmesi
     public bool? Uzayabilir { get; set; }
     public bool? Sigdir { get; set; }
 
+    /// <inheritdoc cref="DuzenDuzeltmesi.Bilinmeyenler"/>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? Bilinmeyenler { get; set; }
+
     /// <summary>Verilen alanları kutuya yazar.</summary>
     public void Uygula(DuzenNesnesi n)
     {
@@ -522,10 +599,9 @@ public sealed class NesneDuzeltmesi
     /// İki kutu arasındaki farkı çıkarır; fark yoksa <c>null</c>.
     /// </summary>
     /// <remarks>
-    /// Konum ve boy karşılaştırması yuvarlanır: dönüşüm punto değerlerini
-    /// <c>piksel × 0,75</c> ile üretiyor ve ondalık kuyruğu uzun oluyor
-    /// (<c>2,8346475</c>). Ham eşitlik arasaydık kayan nokta gürültüsü her
-    /// kayıtta düzeltmeye sahte satır eklerdi.
+    /// Konum ve boy karşılaştırması yuvarlanır; ölçüsü ve gerekçesi
+    /// <see cref="DuzenDuzeltmesi.Esik"/> ile
+    /// <see cref="DuzenDuzeltmesi.Basamak"/>'ta.
     /// </remarks>
     public static NesneDuzeltmesi? Cikar(string bant, DuzenNesnesi ham, DuzenNesnesi yeni)
     {
@@ -573,8 +649,8 @@ public sealed class NesneDuzeltmesi
 
         void Olcu(double a, double b, Action<double> yaz)
         {
-            if (Math.Abs(a - b) < 0.0005) return;
-            yaz(Math.Round(b, 3));
+            if (Math.Abs(a - b) < DuzenDuzeltmesi.Esik) return;
+            yaz(Math.Round(b, DuzenDuzeltmesi.Basamak));
             fark = true;
         }
 

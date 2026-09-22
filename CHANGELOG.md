@@ -6,6 +6,42 @@ Bu dosya sürümler arasındaki değişiklikleri anlatır. Biçim
 
 ## [Yayımlanmadı]
 
+## [0.10.2] — 2026-09-22
+
+Dördü de gerçek bir bordro külliyatında kâğıda yanlış basan hatalar; üçü
+sessizdi, yani ekranda her şey doğru görünüyordu.
+
+### Düzeltilen
+
+- **`%g` deseni tanınıyor.** Delphi'nin "genel" biçimi: anlamsız ondalık
+  sıfırlar atılır, binlik ayraç konmaz — tam gün `30`, yarım gün `29,5`.
+  Taşınan külliyatta 60 kutu bu deseni kullanıyor ve hepsi bugüne kadar iki
+  ondalığa düşürülüp `30,00` basıyordu.
+- **Tanınmayan desende varsayılan biçim uydurulmuyor.** `Bicimleme.SayiDeseni`
+  artık `null` dönüyor ve `Bicimle` varsayılan yazıma düşüyor. Eskiden
+  desteklenmeyen her desen sessizce `#,##0.00`'a çevriliyordu: hata kâğıtta
+  makul görünen ama yanlış bir sayı olarak çıkıyor, fark edilmiyordu.
+- **`Sigdir` çalışıyor.** Alan modelde vardı, hiçbir yerde okunmuyordu: metin
+  sığmayınca punto düşmüyor, kutu alt satıra kırıyordu. Dar para kutusuna
+  sığmayan `98.765,43` iki satır basınca tablonun bütün satır hizası bozuluyor.
+  - **Sığdırma kelime kaydırmayı yener**: ikisi birlikte işaretliyse kutu
+    kırmaz, küçültür. Şablonların bir kısmı ikisini birden işaretli getiriyor
+    ve kırma kazandığı için sığdırma hiçbir şey yapmıyordu.
+  - Ölçü kestirmedir (bkz. `Sigdirma`), gerçek yazı tipi ölçümü değil:
+    kütüphane tarayıcıda da PDF motorunda da çalışmak zorunda. Önemli olan
+    tasarımcı, önizleme ve çizicinin **aynı** sayıyı bulması.
+- **Düzeltmedeki bilinmeyen alan sessizce yutulmuyor.** `PuntoPt` yerine
+  `Punto` yazan bir düzeltme yok sayılıyor, ortada bir hata da görünmüyordu.
+  Tanınmayan alanlar artık `Uygula`'nın döndürdüğü listeye giriyor ve
+  tasarımcının uyarı panelinde görünüyor. Dosya reddedilmiyor: bir yazım
+  hatası yüzünden doğru yazılmış öteki yüz satırı da atmak, elindeki tek
+  çıktıyı kaybetmek olurdu.
+- **Elle yazılmış ölçü her kayıtta kaymıyor.** Düzeltme üç ondalığa
+  yuvarlanırken `15,0821` → `15,082` oluyor, sapma tam eşitlik eşiği kadar
+  (0,0005 pt) çıkan değerlerde fark "gerçek" sayılıyordu; betikle üretilmiş
+  oransal ölçekleme düzeltmeleri tam bu aralıkta değer taşıyor. Yuvarlama dört
+  basamağa indi (`DuzenDuzeltmesi.Basamak`), hata artık eşiğin onda biri.
+
 ## [0.10.1] — 2026-08-30
 
 > 0.10.0 yayımlanmadı; alt rapor desteği bu sürümle birlikte çıkıyor.

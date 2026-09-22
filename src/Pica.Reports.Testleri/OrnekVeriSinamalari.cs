@@ -138,10 +138,44 @@ public class BicimlemeSinamalari
     [InlineData("%2.0n", "#,##0")]
     [InlineData("%1.3f", "0.000")]
     [InlineData("%d", "#,##0")]
-    [InlineData("", "#,##0.00")]           // desensiz: varsayılan
-    [InlineData("saçma", "#,##0.00")]      // tanınmayan: varsayılan
+    // "Genel": anlamsız ondalık sıfırlar atılır, binlik ayraç konmaz.
+    // Taşınan düzenlerde 60 kutu bu deseni kullanıyor.
+    [InlineData("%g", "0.##")]
+    [InlineData("%.3g", "0.###")]
     public void Delphi_sayi_deseni_cevrilir(string delphi, string beklenen)
         => Assert.Equal(beklenen, Bicimleme.SayiDeseni(delphi));
+
+    /// <summary>
+    /// Tanınmayan desende varsayılan biçim UYDURULMAZ.
+    /// </summary>
+    /// <remarks>
+    /// Eskiden tanınmayan her desen iki ondalığa düşüyordu: <c>%g</c> yazan
+    /// gün sayısı kutusu kâğıda <c>30</c> yerine <c>30,00</c> basıyor ve hata
+    /// görünmüyordu. Artık <c>null</c> dönülüyor, çağıran varsayılan yazıma
+    /// düşüyor.
+    /// </remarks>
+    [Theory]
+    [InlineData("")]
+    [InlineData("saçma")]
+    [InlineData("%")]
+    [InlineData("%2.2z")]
+    public void Taninmayan_sayi_deseni_null_doner(string delphi)
+        => Assert.Null(Bicimleme.SayiDeseni(delphi));
+
+    /// <summary>Gün sayısı kutusunun kâğıda basılan hâli.</summary>
+    [Theory]
+    [InlineData(30, "30")]
+    [InlineData(29.5, "29,5")]
+    [InlineData(98765.43, "98765,43")]
+    public void Genel_desen_anlamsiz_sifirlari_atar(double deger, string beklenen)
+    {
+        var n = Ornek.Kutu("Memo43");
+        n.Bicim = BicimTuru.Sayi;
+        n.BicimDeseni = "%g";
+        n.OndalikAyraci = ",";
+
+        Assert.Equal(beklenen, Bicimleme.Bicimle((decimal)deger, n));
+    }
 
     [Theory]
     [InlineData("dd.mm.yyyy", "dd.MM.yyyy")]

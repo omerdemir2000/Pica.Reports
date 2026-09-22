@@ -57,14 +57,21 @@ internal static class Bicem
     }
 
     /// <summary>Yazı kutusunun yazı biçemi.</summary>
-    public static string Yazi(DuzenNesnesi n)
+    /// <param name="n">Kutu.</param>
+    /// <param name="metin">
+    /// Kutunun basılacak metni — yalnızca <see cref="DuzenNesnesi.Sigdir"/>
+    /// açıkken, puntoyu ne kadar küçültmek gerektiğini hesaplamak için
+    /// kullanılır (bkz. <see cref="Sigdirma"/>). Verilmezse punto düşürülmez
+    /// ama kırılma yine kapatılır.
+    /// </param>
+    public static string Yazi(DuzenNesnesi n, string? metin = null)
     {
         var b = new StringBuilder()
             // Yazı tipi adı düzenden geldiği gibi verilir; sunucuda ya da
             // tarayıcıda yoksa yedekler devreye girer.
             .Append("font-family:'").Append(n.YaziTipi.Replace("'", "")).Append("',Arial,sans-serif")
-            .Append(";font-size:").Append(Olcu.Px(n.PuntoPt))
-            .Append(";padding:0 ").Append(Olcu.Px(1.5))
+            .Append(";font-size:").Append(Olcu.Px(Sigdirma.Punto(n, metin)))
+            .Append(";padding:0 ").Append(Olcu.Px(Sigdirma.YanDolguPt))
             .Append(";text-align:").Append(n.Yatay switch
             {
                 YatayHiza.Orta => "center",
@@ -72,7 +79,9 @@ internal static class Bicem
                 YatayHiza.Yasli => "justify",
                 _ => "left",
             })
-            .Append(";white-space:").Append(n.KelimeKaydir ? "pre-wrap" : "pre");
+            // Sığdırma kelime kaydırmayı yener: ikisi birlikte işaretliyse kutu
+            // metni kırmaz, puntoyu küçültür (bkz. Sigdirma).
+            .Append(";white-space:").Append(n.KelimeKaydir && !n.Sigdir ? "pre-wrap" : "pre");
 
         if (n.Kalin) b.Append(";font-weight:700");
         if (n.Egik) b.Append(";font-style:italic");

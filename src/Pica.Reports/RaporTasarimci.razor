@@ -1090,7 +1090,15 @@
         if (duzeltme is not null)
         {
             aciklama = duzeltme.Aciklama;
-            duzeltme.Uygula(secili);
+
+            // Uygulanamayan düzeltmeler uyarı listesine düşer: düzeltme
+            // dosyaları elle de yazılıyor ve yanlış yazılmış bir kutu ya da
+            // alan adı sessizce yok sayılsaydı, kullanıcı "değişiklik
+            // uygulanmadı ama neden anlamıyorum" ile baş başa kalırdı. Liste
+            // çalışma kopyasında duruyor, ham düzene yazılmaz.
+            secili.Uyarilar.AddRange(duzeltme.Uygula(secili)
+                .Select(u => Metin.T("Tasarimci_DuzeltmeTutmadi", u)));
+
             FarkiHesapla();
         }
 

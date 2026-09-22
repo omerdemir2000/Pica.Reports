@@ -74,7 +74,7 @@
                              style="@Bicem.Kutu(kutu.Nesne, kutu.SolPt, kutu.UstPt)">
                             @if (kutu.Nesne.Tur is NesneTuru.Yazi)
                             {
-                                <div class="rt-kutu-yazi" style="@Bicem.Yazi(kutu.Nesne)">@kutu.Metin</div>
+                                <div class="rt-kutu-yazi" style="@Bicem.Yazi(kutu.Nesne, kutu.Metin)">@kutu.Metin</div>
                             }
                             else if (kutu.Nesne.Tur is NesneTuru.Resim && kutu.Nesne.ResimVerisi is { Length: > 0 } veri)
                             {

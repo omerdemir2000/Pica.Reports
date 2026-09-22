@@ -163,6 +163,7 @@
   <data name="Tasarimci_Kaydedildi"><value>{0} changes written to the patch.</value></data>
   <data name="Tasarimci_DuzeltmeKalkti"><value>Patch removed; the layout is back to its generated state.</value></data>
   <data name="Tasarimci_Kaydedilemedi"><value>Could not save: {0}</value></data>
+  <data name="Tasarimci_DuzeltmeTutmadi"><value>Patch not applied: {0}</value></data>
   <data name="Izgara_Yok"><value>None</value></data>
 
   <!-- ============================================================ palet -->
